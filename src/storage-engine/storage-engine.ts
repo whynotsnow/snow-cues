@@ -49,57 +49,41 @@ export {
 } from "./sanitize";
 
 export {
-  createPasswordEntry,
-  deletePasswordEntry,
-  listPasswordEntries,
-  listPasswordEntriesBySpace,
-  updatePasswordEntry
-} from "./passwordEntries";
-
-export {
-  createPasswordGroup,
-  deletePasswordGroup,
-  listPasswordGroupsBySpace,
-  updatePasswordGroup
-} from "./passwordGroups";
-
-export {
-  getSpace,
-  listSpaces,
-  saveSpace,
-  updateSpace
-} from "./spaces";
-
-export {
-  listSpaceProfile,
-  listSystemProfile,
-  saveSpaceProfile,
-  saveSystemProfile
-} from "./spaceProfiles";
-
-export {
-  createSpaceRelation,
-  listRelationsForSpace,
-  listSourceRelations,
-  listSuccessorsOfSpace
-} from "./spaceRelations";
-
-export {
-  createMigrationBatch,
-  createMigrationEntry,
-  getMigrationBatch,
-  listMigrationBatchesForTarget,
-  listMigrationEntriesByBatch,
-  refreshMigrationBatchStats,
-  updateMigrationBatch,
-  updateMigrationEntry
-} from "./migrations";
-
-export {
   clearPasswordEntries,
   clearPasswordEntriesBySpace,
   clearSpaceProfile,
   clearSystemProfile,
+  createMigrationBatch,
+  createMigrationEntry,
+  createPasswordEntry,
+  createPasswordGroup,
+  createSpaceRelation,
+  deletePasswordEntry,
+  deletePasswordGroup,
   deleteSpaceData,
-  resetLocalData
-} from "./maintenance";
+  getMigrationBatch,
+  getSpace,
+  getStorageDataRepository,
+  listMigrationBatchesForTarget,
+  listMigrationEntriesByBatch,
+  listPasswordEntries,
+  listPasswordEntriesBySpace,
+  listPasswordGroupsBySpace,
+  listRelationsForSpace,
+  listSourceRelations,
+  listSpaceProfile,
+  listSpaces,
+  listSuccessorsOfSpace,
+  listSystemProfile,
+  refreshMigrationBatchStats,
+  resetLocalData,
+  resetStorageDataRepository,
+  saveSpace,
+  saveSpaceProfile,
+  saveSystemProfile,
+  updateMigrationBatch,
+  updateMigrationEntry,
+  updatePasswordEntry,
+  updatePasswordGroup,
+  updateSpace
+} from "../storage-data/storage-data-service";
