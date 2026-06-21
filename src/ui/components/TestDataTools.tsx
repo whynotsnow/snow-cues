@@ -21,7 +21,7 @@ export function TestDataTools({ controller }: TestDataToolsProps) {
     <section className="test-tools global-test-tools" aria-label="开发测试数据工具">
       <div>
         <h2>开发测试数据工具</h2>
-        <p>这些操作用于开发和验证流程，会直接清理 IndexedDB 中的本地数据。</p>
+        <p>这些操作用于开发和验证流程，会修改当前打开的存储数据草稿。</p>
       </div>
       <div className="form-stack">
         <TextField

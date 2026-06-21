@@ -7,10 +7,29 @@ import {
   type Session
 } from "../session-manager/session-manager";
 import {
+  getStorageDataRepository,
   listSpaceProfile,
+  resetStorageDataRepository,
   type PasswordEntry,
   type SpaceRecord
 } from "../storage-engine/storage-engine";
+import {
+  EXTERNAL_CHANGE_MESSAGE,
+  buildNextStorageDataFile,
+  createInitialStorageDataFile,
+  createStorageDataFolder,
+  createStorageDataWorkspaceFromFile,
+  diffStorageDataContent,
+  exportStorageDataDraft,
+  hasStorageDataChanges,
+  openStorageDataFolder,
+  parseStorageDataFileText,
+  saveStorageDataWorkspace,
+  serializeStorageDataFile,
+  type StorageDataFile,
+  type StorageDataSaveSummary,
+  type StorageDataWorkspace
+} from "../storage-data";
 import type { SpaceRuntimeVerificationStatus } from "../space/types";
 import { useEntryRuntimeState } from "./hooks/useEntryRuntimeState";
 import { useDetachedPasswordController } from "./hooks/useDetachedPasswordController";
@@ -42,11 +61,23 @@ export function useAppController() {
   const [autoReadyingMigrationBatchId, setAutoReadyingMigrationBatchId] = useState("");
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
+  const [storageDataWorkspace, setStorageDataWorkspace] = useState<StorageDataWorkspace | null>(null);
+  const [storageDataSaveSummary, setStorageDataSaveSummary] = useState<StorageDataSaveSummary | null>(null);
+  const [storageDataDownloadText, setStorageDataDownloadText] = useState("");
+  const [storageDataDraftText, setStorageDataDraftText] = useState("");
+  const [storageDataCompareSummary, setStorageDataCompareSummary] = useState<StorageDataSaveSummary | null>(null);
+  const [storageDataCompareWarning, setStorageDataCompareWarning] = useState("");
   const systemNotifications = useSystemNotifications();
   const { notifySystem } = systemNotifications;
 
   const sessionAlive = Boolean(session && !isSessionExpired(session));
   const outsideSpace = uiState === "OUT_OF_SPACE" || uiState === "LEFT_SPACE";
+  const storageDataOpened = Boolean(storageDataWorkspace);
+  const storageDataDirty = storageDataWorkspace ? getStorageDataRepository().isDirty() : false;
+  const storageDataMode = storageDataWorkspace?.mode ?? null;
+  const storageDataId = storageDataWorkspace?.file.storageDataId ?? "";
+  const storageDataRevision = storageDataWorkspace?.file.revision ?? 0;
+  const storageDataUpdatedAt = storageDataWorkspace?.file.updatedAt ?? "";
   const verificationPending = Boolean(loginVerificationEntryId);
   const verificationStatus: SpaceRuntimeVerificationStatus = entries.length === 0
     ? "not_required"
@@ -54,6 +85,147 @@ export function useAppController() {
       ? "pending"
       : "verified";
   const currentSpaceStatus = currentSpace?.status ?? "active";
+  const applyStorageDataFile = useCallback(async (file: StorageDataFile, mode: "download" | "direct-folder" = "download") => {
+    resetStorageDataRepository(file.data);
+    const workspace = await createStorageDataWorkspaceFromFile(file);
+    workspace.mode = mode;
+    workspace.repository = getStorageDataRepository();
+    setStorageDataWorkspace(workspace);
+    setStorageDataSaveSummary(null);
+    setStorageDataDownloadText("");
+    setStorageDataDraftText("");
+    setStorageDataCompareSummary(null);
+    setStorageDataCompareWarning("");
+  }, []);
+
+  const handleCreateStorageData = useCallback(async () => {
+    try {
+      if (typeof window !== "undefined" && typeof window.showDirectoryPicker === "function") {
+        const directoryHandle = await window.showDirectoryPicker();
+        const workspace = await createStorageDataFolder(directoryHandle);
+        resetStorageDataRepository(workspace.file.data);
+        workspace.repository = getStorageDataRepository();
+        setStorageDataWorkspace(workspace);
+        setStatus("已新建存储数据文件夹。保存前请确认 Syncthing 已完成同步。");
+        return;
+      }
+      const emptyFile = await createInitialStorageDataFile();
+      const repository = getStorageDataRepository();
+      const snapshot = repository.snapshot();
+      const hasSnapshotContent = Object.values(snapshot).some((collection) => collection.length > 0);
+      const file = repository.isDirty() || hasSnapshotContent
+        ? await buildNextStorageDataFile(emptyFile, snapshot)
+        : emptyFile;
+      await applyStorageDataFile(file, "download");
+      setStorageDataDownloadText(serializeStorageDataFile(file));
+      setStatus("当前浏览器使用下载新版模式。已生成初始 current.json，请放入你的存储数据文件夹。");
+    } catch (storageError) {
+      setError(storageError instanceof Error ? storageError.message : "新建存储数据失败。");
+    }
+  }, [applyStorageDataFile]);
+
+  const handleOpenStorageDataText = useCallback(async (text: string) => {
+    try {
+      const file = await parseStorageDataFileText(text);
+      await applyStorageDataFile(file, "download");
+      setStatus("已打开存储数据文件。保存时会生成新版文件下载。");
+    } catch (storageError) {
+      setError(storageError instanceof Error ? storageError.message : "打开存储数据失败。");
+    }
+  }, [applyStorageDataFile]);
+
+  const handleOpenStorageDataFolder = useCallback(async () => {
+    try {
+      if (typeof window === "undefined" || typeof window.showDirectoryPicker !== "function") {
+        setError("当前浏览器不支持直接打开存储数据文件夹，请选择 current.json 使用下载新版模式。");
+        return;
+      }
+      const directoryHandle = await window.showDirectoryPicker();
+      const workspace = await openStorageDataFolder(directoryHandle);
+      resetStorageDataRepository(workspace.file.data);
+      workspace.repository = getStorageDataRepository();
+      setStorageDataWorkspace(workspace);
+      setStatus("已打开存储数据文件夹。编辑前请确认 Syncthing 已完成同步。");
+    } catch (storageError) {
+      setError(storageError instanceof Error ? storageError.message : "打开存储数据文件夹失败。");
+    }
+  }, []);
+
+  const handlePrepareStorageDataSave = useCallback(() => {
+    if (!storageDataWorkspace) {
+      setError("请先打开或新建存储数据。");
+      return;
+    }
+    const summary = diffStorageDataContent(storageDataWorkspace.file.data, getStorageDataRepository().snapshot());
+    if (!hasStorageDataChanges(summary)) {
+      setError("没有可保存的存储数据改动。");
+      return;
+    }
+    setStorageDataSaveSummary(summary);
+    setStatus("请确认存储数据保存摘要。");
+  }, [storageDataWorkspace]);
+
+  const handleConfirmStorageDataSave = useCallback(async () => {
+    if (!storageDataWorkspace) {
+      setError("请先打开或新建存储数据。");
+      return;
+    }
+    try {
+      storageDataWorkspace.repository = getStorageDataRepository();
+      const result = await saveStorageDataWorkspace(storageDataWorkspace);
+      setStorageDataWorkspace({ ...storageDataWorkspace });
+      setStorageDataSaveSummary(null);
+      if (result.mode === "download") {
+        setStorageDataDownloadText(result.content);
+        setStatus("已生成新版存储数据文件。请确认 Syncthing 状态后手动替换 current.json。");
+      } else {
+        setStatus("已写入新版 revision 并更新 current.json。切换设备前请等待 Syncthing 完成同步。");
+      }
+    } catch (storageError) {
+      const message = storageError instanceof Error ? storageError.message : "保存存储数据失败。";
+      setError(message);
+      if (message === EXTERNAL_CHANGE_MESSAGE) {
+        notifySystem({
+          tone: "warning",
+          title: "存储数据已变化",
+          body: "为避免覆盖其他设备的修改，本次保存已停止。"
+        });
+      }
+    }
+  }, [notifySystem, storageDataWorkspace]);
+
+  const handleCancelStorageDataSave = useCallback(() => {
+    setStorageDataSaveSummary(null);
+  }, []);
+
+  const handleExportStorageDataDraft = useCallback(async () => {
+    if (!storageDataWorkspace) {
+      setError("请先打开或新建存储数据。");
+      return;
+    }
+    try {
+      storageDataWorkspace.repository = getStorageDataRepository();
+      const draft = await exportStorageDataDraft(storageDataWorkspace, "manual-export");
+      setStorageDataDraftText(draft.content);
+      setStatus("已生成存储数据草稿。草稿不能作为 current.json 直接打开。");
+    } catch (storageError) {
+      setError(storageError instanceof Error ? storageError.message : "导出存储数据草稿失败。");
+    }
+  }, [storageDataWorkspace]);
+
+  const handleCompareStorageDataText = useCallback(async (leftText: string, rightText: string) => {
+    try {
+      const left = await parseStorageDataFileText(leftText);
+      const right = await parseStorageDataFileText(rightText);
+      setStorageDataCompareSummary(diffStorageDataContent(left.data, right.data));
+      setStorageDataCompareWarning(
+        left.storageDataId === right.storageDataId ? "" : "这两个文件属于不同的存储数据集，请不要直接互相覆盖。"
+      );
+      setStatus("已完成两个存储数据文件的摘要比较。");
+    } catch (storageError) {
+      setError(storageError instanceof Error ? storageError.message : "比较存储数据文件失败。");
+    }
+  }, []);
   // 离开空间或会话过期时统一清理内存中的敏感运行时状态。
   const clearSensitiveState = useCallback(() => {
     entryRuntime.clearEntryRuntimeState();
@@ -428,6 +600,25 @@ export function useAppController() {
     confirmingProfile,
     status,
     error,
+    storageDataOpened,
+    storageDataDirty,
+    storageDataMode,
+    storageDataId,
+    storageDataRevision,
+    storageDataUpdatedAt,
+    storageDataSaveSummary,
+    storageDataDownloadText,
+    storageDataDraftText,
+    storageDataCompareSummary,
+    storageDataCompareWarning,
+    handleCreateStorageData,
+    handleOpenStorageDataText,
+    handleOpenStorageDataFolder,
+    handlePrepareStorageDataSave,
+    handleConfirmStorageDataSave,
+    handleCancelStorageDataSave,
+    handleExportStorageDataDraft,
+    handleCompareStorageDataText,
     ...systemNotifications,
     outsideSpace,
     sessionAlive,

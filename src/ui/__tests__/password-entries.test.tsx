@@ -192,19 +192,7 @@ describe("密码条目管理", () => {
     expect(screen.getByRole("heading", { name: "开发导入规则样例" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "填入批量导入样例" })).toBeDisabled();
 
-    const request = indexedDB.open("snow-cues", 9);
-    await new Promise<void>((resolve, reject) => {
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
-    });
-
-    const db = request.result;
-    const tx = db.transaction("password_entries", "readonly");
-    const entriesRequest = tx.objectStore("password_entries").getAll();
-    const entries = await new Promise<Record<string, unknown>[]>((resolve, reject) => {
-      entriesRequest.onsuccess = () => resolve(entriesRequest.result as Record<string, unknown>[]);
-      entriesRequest.onerror = () => reject(entriesRequest.error);
-    });
+    const entries = await listPasswordEntriesBySpace("default") as unknown as Record<string, unknown>[];
 
     expect(entries).toHaveLength(1);
     expect(entries[0]).not.toHaveProperty("master_password");

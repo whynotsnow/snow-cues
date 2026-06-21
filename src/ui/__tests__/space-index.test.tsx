@@ -25,6 +25,7 @@ describe("空间外索引与创建入口", () => {
 
     renderApp();
 
+    fireEvent.click(screen.getByRole("button", { name: "新建存储数据文件夹" }));
     await screen.findByRole("heading", { name: "本地空间索引" });
     expect(await screen.findByText("source")).toBeInTheDocument();
     expect(screen.getByText("target")).toBeInTheDocument();
@@ -44,9 +45,11 @@ describe("空间外索引与创建入口", () => {
     renderApp();
 
     const guidancePanel = getGuidancePanel();
-    expect(within(guidancePanel).getByRole("heading", { name: "开始使用本地密码空间" })).toBeInTheDocument();
-    expect(within(guidancePanel).getByText("新建或进入空间")).toBeInTheDocument();
-    fireEvent.click(within(guidancePanel).getByRole("button", { name: "展开新建空间入口" }));
+    expect(within(guidancePanel).getByRole("heading", { name: "打开存储数据" })).toBeInTheDocument();
+    expect(within(guidancePanel).getByText("打开或新建存储数据")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "新建存储数据文件夹" }));
+    await screen.findByRole("heading", { name: "本地空间索引" });
+    fireEvent.click(within(getGuidancePanel()).getByRole("button", { name: "展开新建空间入口" }));
     expect(screen.getByLabelText("创建方式")).toBeInTheDocument();
   });
 
@@ -62,10 +65,12 @@ describe("空间外索引与创建入口", () => {
 
     renderApp();
 
+    fireEvent.click(screen.getByRole("button", { name: "新建存储数据文件夹" }));
     await screen.findByRole("heading", { name: "开发测试数据工具" });
     fireEvent.change(screen.getByLabelText("测试目标存储空间 ID"), {
       target: { value: "victim" }
     });
+    await waitFor(() => expect(screen.getByLabelText("测试目标存储空间 ID")).toHaveValue("victim"));
     fireEvent.click(screen.getByRole("button", { name: "测试：删除指定空间" }));
     await waitFor(() => expect(screen.getByText("测试操作已删除存储空间 victim。")).toBeInTheDocument());
     await expect(getSpace("victim")).resolves.toBeNull();
@@ -78,6 +83,8 @@ describe("空间外索引与创建入口", () => {
   it("空间外点击新建空间后才展示创建方式", async () => {
     renderApp();
 
+    fireEvent.click(screen.getByRole("button", { name: "新建存储数据文件夹" }));
+    await screen.findByRole("heading", { name: "本地空间索引" });
     expect(screen.getByRole("button", { name: "新建空间" })).toBeInTheDocument();
     expect(screen.queryByLabelText("创建方式")).not.toBeInTheDocument();
 

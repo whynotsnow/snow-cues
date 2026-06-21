@@ -14,17 +14,26 @@ export function Topbar({ controller, navigateToPage }: TopbarProps) {
     currentSpaceStatus,
     currentSpaceIsTemporary,
     outsideSpace,
+    storageDataOpened,
+    storageDataDirty,
+    storageDataMode,
+    storageDataRevision,
     leaveSpace
   } = controller;
 
   return (
     <section className="sidebar" aria-label="应用状态">
       <div className="sidebar-brand">
-        <p className="eyebrow">Snow Cues v1.0</p>
+        <p className="eyebrow">Snow Cues v2.0</p>
         <h1>安全本地密码系统</h1>
-        <p className="subtitle">本地优先，派生输入只存在于当前浏览器会话。</p>
+        <p className="subtitle">以用户维护的存储数据文件夹作为唯一业务数据源。</p>
       </div>
       <div className="sidebar-status">
+        <div className="space-meta">
+          <span>存储数据：{storageDataOpened ? `revision ${storageDataRevision}` : "未打开"}</span>
+          <span>保存模式：{storageDataMode === "direct-folder" ? "直接保存" : storageDataMode === "download" ? "下载新版" : "待选择"}</span>
+          <span>改动：{storageDataDirty ? "未保存" : "已同步到当前草稿"}</span>
+        </div>
         {!outsideSpace ? (
           <div className="space-meta">
             <span>空间：{currentSpaceId}</span>

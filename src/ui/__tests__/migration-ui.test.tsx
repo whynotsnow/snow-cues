@@ -359,6 +359,7 @@ describe("迁移 UI 流程", () => {
 
     renderApp();
 
+    fireEvent.click(screen.getByRole("button", { name: "新建存储数据文件夹" }));
     await screen.findByText("source-clone-draft");
     fireEvent.click(screen.getByRole("button", { name: "新建空间" }));
     fireEvent.change(screen.getByLabelText("创建方式"), {

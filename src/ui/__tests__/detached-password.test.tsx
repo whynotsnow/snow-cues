@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { createMigrationBatch, createMigrationEntry, createSpaceRelation, createPasswordEntry, getSpace, listPasswordEntriesBySpace, listSpaceProfile, saveSpace, saveSpaceProfile } from "../../storage-engine/storage-engine";
 import { createSession } from "../../session-manager/session-manager";
 import { decryptPassword, deriveRuntimeStorageKey, encryptPassword, generatePasswordWithRuleChain } from "../../crypto-engine/crypto-engine";
-import { confirmRuleProfileWithMaster, encryptPasswordForEntrySecret, enterSpace, establishSpaceSession, expectNoPageNotice, expectPageNotice, fillFirstSpaceMasterPassword, getGuidancePanel, getSourceVerificationPanel, mockBrowserNotification, renderApp, resetAppTestEnvironment, seedEncryptedPasswordEntry } from "../../test/appTestHelpers";
+import { confirmRuleProfileWithMaster, encryptPasswordForEntrySecret, ensureStorageDataOpened, enterSpace, establishSpaceSession, expectNoPageNotice, expectPageNotice, fillFirstSpaceMasterPassword, getGuidancePanel, getSourceVerificationPanel, mockBrowserNotification, renderApp, resetAppTestEnvironment, seedEncryptedPasswordEntry } from "../../test/appTestHelpers";
 
 beforeEach(resetAppTestEnvironment);
 
@@ -11,7 +11,7 @@ describe("游离密码流程", () => {
   it("空间外生成游离密码只保存在内存中", async () => {
     renderApp();
 
-    await screen.findByRole("heading", { name: "本地空间索引" });
+    await screen.findByRole("heading", { name: "存储数据" });
     expect(screen.queryByRole("heading", { name: "游离密码" })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "游离密码" }));
     await screen.findByRole("heading", { name: "游离密码" });
@@ -48,7 +48,7 @@ describe("游离密码流程", () => {
 
     renderApp();
 
-    await screen.findByRole("heading", { name: "本地空间索引" });
+    await ensureStorageDataOpened();
     fireEvent.click(screen.getByRole("button", { name: "游离密码" }));
     await screen.findByRole("heading", { name: "游离密码" });
     fireEvent.change(screen.getByLabelText("派生密钥"), {
@@ -62,7 +62,7 @@ describe("游离密码流程", () => {
     expect(within(getGuidancePanel()).getByRole("heading", { name: "迁移游离密码草稿" })).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "空间工作台" }));
-    await screen.findByRole("heading", { name: "本地空间索引" });
+    await ensureStorageDataOpened();
     await enterSpace("vault");
     await establishSpaceSession();
     fireEvent.click(screen.getByRole("button", { name: "密码管理" }));
@@ -115,7 +115,7 @@ describe("游离密码流程", () => {
 
     renderApp();
 
-    await screen.findByRole("heading", { name: "本地空间索引" });
+    await ensureStorageDataOpened();
     fireEvent.click(screen.getByRole("button", { name: "游离密码" }));
     await screen.findByRole("heading", { name: "游离密码" });
     fireEvent.change(screen.getByLabelText("派生密钥"), {

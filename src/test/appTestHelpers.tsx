@@ -17,7 +17,16 @@ export function renderApp() {
   return render(<App />);
 }
 
+export async function ensureStorageDataOpened() {
+  const button = screen.queryByRole("button", { name: "新建存储数据文件夹" });
+  if (button) {
+    fireEvent.click(button);
+    await screen.findByText(/存储数据 ID/);
+  }
+}
+
 export async function enterSpace(spaceId = "default") {
+  await ensureStorageDataOpened();
   const existingSpace = await getSpace(spaceId);
   let spaceCard: HTMLElement | undefined;
   if (existingSpace) {
@@ -67,6 +76,8 @@ export async function confirmRuleProfileWithMaster(masterPassword = "master") {
   }
   fireEvent.click(screen.getByRole("button", { name: "确认初始化" }));
   await waitFor(() => expect(screen.getByText("规则链已初始化并保存。本空间后续进入会继续使用这组规则。")).toBeInTheDocument());
+  fireEvent.click(screen.getByRole("button", { name: "密码管理" }));
+  await screen.findByRole("heading", { name: "密码管理" });
 }
 
 export function fillFirstSpaceMasterPassword(masterPassword = "master") {

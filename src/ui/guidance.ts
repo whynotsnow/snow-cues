@@ -48,7 +48,11 @@ type GuidanceInput = Pick<
   | "spaceIndexItems"
   | "spaceRelations"
   | "verificationPending"
->;
+> & {
+  storageDataOpened?: boolean;
+  storageDataDirty?: boolean;
+  storageDataMode?: "direct-folder" | "download" | null;
+};
 
 const guidancePriority = {
   spaceRestriction: 100,
@@ -118,6 +122,44 @@ function buildOutsideSpaceGuidance(input: GuidanceInput): GuidanceCard[] {
           { label: "按需迁入空间", status: "pending" }
         ],
         secondaryAction: { type: "open-create-space", label: "回到空间工作台" }
+      }
+    ];
+  }
+
+  if (!input.storageDataOpened) {
+    return [
+      {
+        id: "storage-data-open",
+        priority: guidancePriority.spaceRestriction,
+        title: "打开存储数据",
+        body: "Snow Cues 2.0 需要先打开或新建存储数据文件夹。浏览器 IndexedDB 中的旧记录不会作为业务真源。",
+        status: "active",
+        steps: [
+          { label: "确认 Syncthing 已同步", status: "current" },
+          { label: "打开或新建存储数据", status: "pending" },
+          { label: "进入空间工作台", status: "pending" }
+        ],
+        primaryAction: { type: "open-create-space", label: "查看存储数据入口" }
+      }
+    ];
+  }
+
+  if (input.storageDataDirty) {
+    return [
+      {
+        id: "storage-data-save",
+        priority: guidancePriority.spaceVerification,
+        title: "保存存储数据",
+        body: input.storageDataMode === "download"
+          ? "当前使用下载新版模式。保存会生成新版 current.json，请手动放回同步文件夹并确认 Syncthing 状态。"
+          : "当前有未保存改动。保存前会展示摘要 diff，确认后先写 revision 再更新 current.json。",
+        status: "active",
+        steps: [
+          { label: "查看保存摘要", status: "current" },
+          { label: "确认保存", status: "pending" },
+          { label: "等待 Syncthing 同步", status: "pending" }
+        ],
+        primaryAction: { type: "open-create-space", label: "查看保存入口" }
       }
     ];
   }

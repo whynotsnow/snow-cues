@@ -111,7 +111,7 @@ export function useWorkspaceActions({
     setError("");
     setStatus("");
     try {
-      if (!window.confirm("测试操作会清空全部 IndexedDB 本地数据，确定继续吗？")) {
+      if (!window.confirm("测试操作会清空当前打开的存储数据草稿，确定继续吗？")) {
         return;
       }
       await resetLocalData();
