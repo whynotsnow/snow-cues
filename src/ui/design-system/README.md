@@ -2,7 +2,7 @@
 
 ## 当前 UI 现状
 
-Snow Cues v1.0 当前是纯前端、本地优先应用，UI 由 React 组件和 `src/styles.css` 手写样式组成，没有第三方 UI 组件库。应用外壳是三栏工作台：左侧导航与空间状态，中间 hash 路由页面，右侧全局用户操作指引。
+Snow Cues v2.0 当前是纯前端、本地优先应用，UI 由 React 组件和 `src/styles.css` 手写样式组成，没有第三方 UI 组件库。应用外壳是三栏工作台：左侧导航与 storageData / 空间状态，中间 hash 路由页面，右侧全局用户操作指引。
 
 现有 UI 组件主要分布在 `src/ui/components/`、`src/ui/pages/` 和 `src/ui/notifications/`。当前主要表单、卡片、按钮组和只读信息展示已开始通过 `src/ui/design-system/` 组合；少量业务专用结构仍保留原 class，以便后续在不改业务流程的前提下继续收敛。
 
@@ -32,7 +32,7 @@ Snow Cues v1.0 当前是纯前端、本地优先应用，UI 由 React 组件和 
 ## 组件分层规则
 
 - `src/ui/design-system/` 只放内部基础组件，不发布 npm 包，不引入第三方 UI 库。
-- 基础组件不得引入业务 controller、WebCrypto、IndexedDB、规则注册表、空间 policy 或存储模块。
+- 基础组件不得引入业务 controller、WebCrypto、storageData / IndexedDB 兼容层、规则注册表、空间 policy 或存储模块。
 - 基础组件只处理展示、语义、可访问性和轻量交互状态，例如 disabled、loading、label、hint。
 - 业务组件负责组合基础组件并传入 handler，不把密码生成、解密、迁移、空间校验逻辑下沉到基础层。
 - 新增 UI 模式前先判断是否可用现有基础组件组合；确实重复出现的展示模式再进入 design-system。
