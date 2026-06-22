@@ -17,10 +17,11 @@ type AppViewProps = {
 };
 
 export function AppView({ controller }: AppViewProps) {
-  const { activePage, outsideSpace, setActivePage } = controller;
+  const { activePage, currentSpaceId, outsideSpace, setActivePage } = controller;
   const guidance = getUserGuidance(controller);
   const showDevTools = import.meta.env.DEV;
   const initialHashApplied = useRef(false);
+  const scrollResetKey = `${outsideSpace ? "outside" : currentSpaceId}:${activePage}`;
 
   const syncPageFromHash = useCallback(() => {
     const routePage = getPageFromHash();
@@ -58,6 +59,15 @@ export function AppView({ controller }: AppViewProps) {
       window.history.replaceState(null, "", expectedHash);
     }
   }, [activePage, outsideSpace, setActivePage]);
+
+  useEffect(() => {
+    if (typeof navigator !== "undefined" && navigator.userAgent.includes("jsdom")) {
+      return;
+    }
+    window.requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0 });
+    });
+  }, [scrollResetKey]);
 
   function navigateToPage(page: AppPage) {
     if (outsideSpace && page !== "space" && page !== "detached") {
