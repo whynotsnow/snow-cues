@@ -22,7 +22,7 @@ import type {
 export function sanitizePasswordEntry(entry: PasswordEntry): PasswordEntry {
   return {
     id: entry.id,
-    spaceId: entry.spaceId || DEFAULT_SPACE_ID,
+    spaceId: normalizeStoredSpaceId(entry.spaceId),
     encrypted_password: entry.encrypted_password,
     encrypted_memory_hint: entry.encrypted_memory_hint,
     groupId: entry.groupId?.trim() || undefined,

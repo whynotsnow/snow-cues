@@ -161,8 +161,8 @@ export function createStorageDataRepository(initialContent: StorageDataContent =
 
     async getSpace(spaceId: string): Promise<SpaceRecord | null> {
       const normalized = normalizeStoredSpaceId(spaceId);
-      const space = draft.spaces.find((item) => item.spaceId === normalized);
-      return space ? sanitizeSpaceRecord(space) : null;
+      const space = listSpacesFromContent(draft).find((item) => item.spaceId === normalized);
+      return space ?? null;
     },
     async saveSpace(input: SpaceRecordInput): Promise<SpaceRecord> {
       const now = Date.now();
@@ -185,7 +185,7 @@ export function createStorageDataRepository(initialContent: StorageDataContent =
       return space;
     },
     async listSpaces(): Promise<SpaceRecord[]> {
-      return draft.spaces.map(sanitizeSpaceRecord).sort((a, b) => b.updatedAt - a.updatedAt);
+      return listSpacesFromContent(draft);
     },
     async updateSpace(spaceId: string, patch: SpaceRecordPatch): Promise<SpaceRecord> {
       const normalized = normalizeStoredSpaceId(spaceId);
@@ -417,3 +417,75 @@ export function cloneContent(content: StorageDataContent): StorageDataContent {
   return structuredClone(sanitizeStorageDataContent(content));
 }
 
+function listSpacesFromContent(content: StorageDataContent): SpaceRecord[] {
+  const explicitSpaces = new Map<string, SpaceRecord>();
+  for (const space of content.spaces.map(sanitizeSpaceRecord)) {
+    explicitSpaces.set(space.spaceId, space);
+  }
+
+  const observedSpaces = new Map<string, { createdAt: number; updatedAt: number }>();
+  const observeSpace = (spaceId: string, createdAt?: number, updatedAt?: number) => {
+    const normalized = normalizeStoredSpaceId(spaceId);
+    const observedCreatedAt = safeTimestamp(createdAt) ?? safeTimestamp(updatedAt) ?? 0;
+    const observedUpdatedAt = safeTimestamp(updatedAt) ?? observedCreatedAt;
+    const existing = observedSpaces.get(normalized);
+    observedSpaces.set(normalized, {
+      createdAt: existing ? Math.min(existing.createdAt, observedCreatedAt) : observedCreatedAt,
+      updatedAt: existing ? Math.max(existing.updatedAt, observedUpdatedAt) : observedUpdatedAt
+    });
+  };
+
+  for (const profile of content.spaceProfiles.map(sanitizeSpaceProfile)) {
+    observeSpace(profile.spaceId, profile.createdAt, profile.updatedAt);
+  }
+  for (const entry of content.passwordEntries.map(sanitizePasswordEntry)) {
+    observeSpace(entry.spaceId, entry.createdAt, entry.updatedAt);
+  }
+  for (const group of content.passwordGroups.map(sanitizePasswordGroup)) {
+    observeSpace(group.spaceId, group.createdAt, group.updatedAt);
+  }
+  for (const relation of content.spaceRelations.map(sanitizeSpaceRelation)) {
+    observeSpace(relation.fromSpaceId, relation.createdAt, relation.createdAt);
+    observeSpace(relation.toSpaceId, relation.createdAt, relation.createdAt);
+  }
+  for (const batch of content.migrationBatches.map(sanitizeMigrationBatch)) {
+    const updatedAt = Math.max(
+      batch.updatedAt,
+      safeTimestamp(batch.completedAt) ?? 0,
+      safeTimestamp(batch.sourceFinalizedAt) ?? 0
+    );
+    observeSpace(batch.sourceSpaceId, batch.createdAt, updatedAt);
+    observeSpace(batch.targetSpaceId, batch.createdAt, updatedAt);
+  }
+  for (const entry of content.migrationEntries.map(sanitizeMigrationEntry)) {
+    observeSpace(entry.sourceSpaceId, entry.createdAt, entry.updatedAt);
+    observeSpace(entry.targetSpaceId, entry.createdAt, entry.updatedAt);
+  }
+
+  const explicitRecords = Array.from(explicitSpaces.values()).map((space) => {
+    const observed = observedSpaces.get(space.spaceId);
+    return observed
+      ? {
+          ...space,
+          createdAt: Math.min(space.createdAt, observed.createdAt),
+          updatedAt: Math.max(space.updatedAt, observed.updatedAt)
+        }
+      : space;
+  });
+  const inferredRecords = Array.from(observedSpaces.entries())
+    .filter(([spaceId]) => !explicitSpaces.has(spaceId))
+    .map(([spaceId, timestamps]) =>
+      sanitizeSpaceRecord({
+        spaceId,
+        status: "active",
+        createdAt: timestamps.createdAt,
+        updatedAt: timestamps.updatedAt
+      })
+    );
+
+  return [...explicitRecords, ...inferredRecords].sort((a, b) => b.updatedAt - a.updatedAt);
+}
+
+function safeTimestamp(value: unknown): number | undefined {
+  return typeof value === "number" && Number.isFinite(value) ? value : undefined;
+}

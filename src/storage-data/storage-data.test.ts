@@ -103,6 +103,77 @@ describe("storage-data core", () => {
     expect(JSON.stringify(summary)).not.toContain("ciphertext");
     expect(JSON.stringify(summary)).not.toContain("Private Platform");
   });
+
+  it("derives the local space index from imported business data without explicit space records", async () => {
+    const repository = createStorageDataRepository({
+      spaces: [],
+      spaceProfiles: [{
+        spaceId: "Vault",
+        ruleChain: ["v1-hmac"],
+        importedRuleManifests: [],
+        createdAt: 10,
+        updatedAt: 20
+      }],
+      passwordEntries: [{
+        id: "entry",
+        spaceId: "Vault",
+        encrypted_password: "ciphertext",
+        createdAt: 30,
+        updatedAt: 40
+      }],
+      passwordGroups: [],
+      spaceRelations: [],
+      migrationBatches: [],
+      migrationEntries: []
+    });
+
+    await expect(repository.listSpaces()).resolves.toMatchObject([
+      {
+        spaceId: "vault",
+        status: "active",
+        createdAt: 10,
+        updatedAt: 40
+      }
+    ]);
+    await expect(repository.getSpace(" vault ")).resolves.toMatchObject({
+      spaceId: "vault",
+      status: "active"
+    });
+    await expect(repository.listPasswordEntriesBySpace("vault")).resolves.toHaveLength(1);
+    expect(repository.isDirty()).toBe(false);
+  });
+
+  it("uses the latest space-scoped business timestamp in the local space index", async () => {
+    const repository = createStorageDataRepository({
+      spaces: [{
+        spaceId: "vault",
+        status: "active",
+        createdAt: 1,
+        updatedAt: 2
+      }],
+      spaceProfiles: [],
+      passwordEntries: [{
+        id: "entry",
+        spaceId: "vault",
+        encrypted_password: "ciphertext",
+        createdAt: 3,
+        updatedAt: 50
+      }],
+      passwordGroups: [],
+      spaceRelations: [],
+      migrationBatches: [],
+      migrationEntries: []
+    });
+
+    await expect(repository.listSpaces()).resolves.toMatchObject([
+      {
+        spaceId: "vault",
+        status: "active",
+        createdAt: 1,
+        updatedAt: 50
+      }
+    ]);
+  });
 });
 
 describe("storage-data folder access", () => {
