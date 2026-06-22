@@ -47,18 +47,18 @@ export function Topbar({ controller, navigateToPage }: TopbarProps) {
         {outsideSpace ? (
           <>
             <button
-              className={activePage === "detached" ? "" : "tab-active"}
+              className={activePage === "tools" ? "" : "tab-active"}
               onClick={() => navigateToPage("space")}
               type="button"
             >
               空间工作台
             </button>
             <button
-              className={activePage === "detached" ? "tab-active" : ""}
-              onClick={() => navigateToPage("detached")}
+              className={activePage === "tools" ? "tab-active" : ""}
+              onClick={() => navigateToPage("tools")}
               type="button"
             >
-              游离密码
+              系统工具
             </button>
           </>
         ) : (

@@ -5,9 +5,12 @@ import {
   createMigrationEntry,
   createSpaceRelation,
   createPasswordEntry,
+  buildNextStorageDataFile,
+  createInitialStorageDataFile,
   getSpace,
   listPasswordEntriesBySpace,
   listSpaceProfile,
+  serializeStorageDataFile,
   saveSpace,
   saveSpaceProfile
 } from "../../storage-data";
@@ -45,11 +48,17 @@ describe("游离密码流程", () => {
     expect(
       screen.queryByRole("heading", { name: "游离密码" })
     ).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "游离密码" }));
+    fireEvent.click(screen.getByRole("button", { name: "系统工具" }));
+    expect(
+      screen.queryByRole("heading", { name: "存储数据" })
+    ).not.toBeInTheDocument();
     await screen.findByRole("heading", { name: "游离密码" });
     expect(
+      screen.getByRole("heading", { name: "比较两个存储数据文件" })
+    ).toBeInTheDocument();
+    expect(
       within(getGuidancePanel()).getByRole("heading", {
-        name: "生成临时游离密码"
+        name: "使用系统工具"
       })
     ).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText("派生密钥"), {
@@ -96,7 +105,7 @@ describe("游离密码流程", () => {
     renderApp();
 
     await ensureStorageDataOpened();
-    fireEvent.click(screen.getByRole("button", { name: "游离密码" }));
+    fireEvent.click(screen.getByRole("button", { name: "系统工具" }));
     await screen.findByRole("heading", { name: "游离密码" });
     fireEvent.change(screen.getByLabelText("派生密钥"), {
       target: { value: "temporary-key" }
@@ -191,7 +200,7 @@ describe("游离密码流程", () => {
     renderApp();
 
     await ensureStorageDataOpened();
-    fireEvent.click(screen.getByRole("button", { name: "游离密码" }));
+    fireEvent.click(screen.getByRole("button", { name: "系统工具" }));
     await screen.findByRole("heading", { name: "游离密码" });
     fireEvent.change(screen.getByLabelText("派生密钥"), {
       target: { value: "temporary-key" }
@@ -220,5 +229,49 @@ describe("游离密码流程", () => {
       screen.getByText("当前空间已有密码，请先完成空间校验后再保存游离密码。")
     ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "收起保存表单" })).toBeDisabled();
+  });
+
+  it("系统工具页支持空间外比较存储数据且不显示存储数据卡片", async () => {
+    const emptyFile = await createInitialStorageDataFile("storage_data_tools");
+    const changedFile = await buildNextStorageDataFile(emptyFile, {
+      ...emptyFile.data,
+      spaces: [
+        {
+          spaceId: "tools-space",
+          status: "active",
+          createdAt: 1,
+          updatedAt: 1
+        }
+      ]
+    });
+    const leftText = serializeStorageDataFile(emptyFile);
+    const rightText = serializeStorageDataFile(changedFile);
+
+    renderApp();
+
+    fireEvent.click(screen.getByRole("button", { name: "系统工具" }));
+    await screen.findByRole("heading", { name: "比较两个存储数据文件" });
+    expect(
+      screen.queryByRole("heading", { name: "存储数据" })
+    ).not.toBeInTheDocument();
+
+    const fileInputs = screen.getAllByLabelText(/文件 [AB]/);
+    const leftFile = new File([leftText], "left.json", {
+      type: "application/json"
+    });
+    Object.defineProperty(leftFile, "text", { value: async () => leftText });
+    const rightFile = new File([rightText], "right.json", {
+      type: "application/json"
+    });
+    Object.defineProperty(rightFile, "text", { value: async () => rightText });
+    fireEvent.change(fileInputs[0], { target: { files: [leftFile] } });
+    fireEvent.change(fileInputs[1], { target: { files: [rightFile] } });
+    const compareButton = screen.getByRole("button", { name: "比较摘要" });
+    await waitFor(() => expect(compareButton).toBeEnabled());
+    fireEvent.click(compareButton);
+
+    await waitFor(() =>
+      expect(screen.getByText("新增空间：1")).toBeInTheDocument()
+    );
   });
 });

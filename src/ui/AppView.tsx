@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
 import { MessageRow } from "./components/MessageRow";
-import { DetachedPasswordPage } from "./pages/DetachedPasswordPage";
 import { SpaceIndexPanel } from "./components/SpaceIndexPanel";
 import { StorageDataWorkspaceCard } from "./components/StorageDataWorkspaceCard";
 import { SystemNoticeHost } from "./components/SystemNoticeHost";
@@ -8,6 +7,7 @@ import { TestDataTools } from "./components/TestDataTools";
 import { Topbar } from "./components/Topbar";
 import { WorkspaceView } from "./components/WorkspaceView";
 import { GuidancePanel } from "./components/GuidancePanel";
+import { SystemToolsPage } from "./pages/SystemToolsPage";
 import type { AppPage } from "./appTypes";
 import { getUserGuidance, type GuidanceAction } from "./guidance";
 import type { AppController } from "./useAppController";
@@ -49,11 +49,11 @@ export function AppView({ controller }: AppViewProps) {
   }, [syncPageFromHash]);
 
   useEffect(() => {
-    if (outsideSpace && activePage !== "space" && activePage !== "detached") {
+    if (outsideSpace && activePage !== "space" && activePage !== "tools") {
       setActivePage("space");
       return;
     }
-    if (!outsideSpace && activePage === "detached") {
+    if (!outsideSpace && activePage === "tools") {
       setActivePage("space");
       return;
     }
@@ -76,7 +76,7 @@ export function AppView({ controller }: AppViewProps) {
   }, [scrollResetKey]);
 
   function navigateToPage(page: AppPage) {
-    if (outsideSpace && page !== "space" && page !== "detached") {
+    if (outsideSpace && page !== "space" && page !== "tools") {
       return;
     }
     setActivePage(page);
@@ -107,9 +107,11 @@ export function AppView({ controller }: AppViewProps) {
         <Topbar controller={controller} navigateToPage={navigateToPage} />
         <section className="main-column" aria-label="主要内容">
           <MessageRow controller={controller} />
-          <StorageDataWorkspaceCard controller={controller} />
-          {outsideSpace && activePage === "detached" ? (
-            <DetachedPasswordPage controller={controller} />
+          {activePage === "tools" ? null : (
+            <StorageDataWorkspaceCard controller={controller} />
+          )}
+          {outsideSpace && activePage === "tools" ? (
+            <SystemToolsPage controller={controller} />
           ) : outsideSpace ? (
             <SpaceIndexPanel controller={controller} />
           ) : (
@@ -133,14 +135,14 @@ const pageRoutes: Record<AppPage, string> = {
   rules: "#/rules",
   groups: "#/groups",
   passwords: "#/passwords",
-  detached: "#/detached"
+  tools: "#/tools"
 };
 
 function getAllowedPageForScope(page: AppPage, outsideSpace: boolean): AppPage {
   if (outsideSpace) {
-    return page === "detached" ? "detached" : "space";
+    return page === "tools" ? "tools" : "space";
   }
-  return page === "detached" ? "space" : page;
+  return page === "tools" ? "space" : page;
 }
 
 function getHashForPage(page: AppPage) {

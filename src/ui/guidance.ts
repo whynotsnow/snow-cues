@@ -49,6 +49,7 @@ type GuidanceInput = Pick<
   | "spaceRelations"
   | "verificationPending"
 > & {
+  storageDataConflictDetected?: boolean;
   storageDataOpened?: boolean;
   storageDataDirty?: boolean;
   storageDataMode?: "direct-folder" | "download" | null;
@@ -75,6 +76,7 @@ export function getUserGuidance(input: GuidanceInput): UserGuidance {
   const cards = input.outsideSpace
     ? buildOutsideSpaceGuidance(input)
     : [
+        buildStorageDataConflictGuidance(input),
         buildSpaceRestrictionGuidance(input),
         buildDeprecatedSpaceDecryptGuidance(input),
         buildSpaceVerificationGuidance(input),
@@ -86,6 +88,27 @@ export function getUserGuidance(input: GuidanceInput): UserGuidance {
 
   return {
     cards: cards.sort((a, b) => b.priority - a.priority)
+  };
+}
+
+function buildStorageDataConflictGuidance(
+  input: GuidanceInput
+): GuidanceCard | null {
+  if (!input.storageDataConflictDetected) {
+    return null;
+  }
+  return {
+    id: "storage-data-conflict",
+    priority: guidancePriority.spaceRestriction,
+    title: "存储数据需要比较",
+    body: "保存时检测到存储数据已被其他设备更新。为避免会话与文件内容错位，请先离开当前空间，再到系统工具比较文件差异。",
+    status: "blocked",
+    steps: [
+      { label: "停止覆盖保存", status: "done" },
+      { label: "离开当前空间", status: "current" },
+      { label: "使用比较工具判断差异", status: "pending" }
+    ],
+    blockedReason: "空间内已锁定当前加载文件，比较与切换文件前需要先离开空间。"
   };
 }
 
@@ -108,18 +131,40 @@ function buildOutsideSpaceGuidance(input: GuidanceInput): GuidanceCard[] {
     ];
   }
 
-  if (input.activePage === "detached") {
+  if (input.storageDataConflictDetected) {
     return [
       {
-        id: "detached-preview",
-        priority: guidancePriority.regularWork,
-        title: "生成临时游离密码",
-        body: "在这里可以先做空间外临时预览。派生密钥和预览结果不会保存；需要长期使用时，再迁入目标空间保存为正式密码。",
+        id: "storage-data-conflict",
+        priority: guidancePriority.spaceRestriction,
+        title: "比较冲突文件",
+        body: "系统检测到存储数据文件已被其他设备更新。先用系统工具比较 current.json、草稿或冲突文件，再决定保留哪一版内容。",
         status: "active",
         steps: [
-          { label: "输入派生密钥", status: "current" },
-          { label: "生成临时预览", status: "pending" },
-          { label: "按需迁入空间", status: "pending" }
+          { label: "停止覆盖保存", status: "done" },
+          { label: "比较两个存储数据文件", status: "current" },
+          { label: "手动处理同步结果", status: "pending" }
+        ],
+        primaryAction: {
+          type: "navigate",
+          label: "打开系统工具",
+          targetPage: "tools"
+        }
+      }
+    ];
+  }
+
+  if (input.activePage === "tools") {
+    return [
+      {
+        id: "system-tools",
+        priority: guidancePriority.regularWork,
+        title: "使用系统工具",
+        body: "这里提供空间外临时密码预览和存储数据文件摘要比较。两个工具都不会修改 storageData，也不会保存临时输入。",
+        status: "active",
+        steps: [
+          { label: "选择需要的工具", status: "current" },
+          { label: "只在当前页面处理临时输入", status: "pending" },
+          { label: "按结果手动继续", status: "pending" }
         ],
         secondaryAction: { type: "open-create-space", label: "回到空间工作台" }
       }

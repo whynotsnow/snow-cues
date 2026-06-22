@@ -6,7 +6,7 @@ import type {
 import type { SpacePersistedStatus } from "../storage-data";
 
 export type UiState = "OUT_OF_SPACE" | "IN_SPACE" | "ACTIVE" | "LEFT_SPACE";
-export type AppPage = "passwords" | "rules" | "groups" | "space" | "detached";
+export type AppPage = "passwords" | "rules" | "groups" | "space" | "tools";
 
 export type ImportedRuleState = {
   manifest: ImportedRuleManifest;
