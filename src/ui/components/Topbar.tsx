@@ -1,0 +1,75 @@
+import type { AppController } from "../useAppController";
+import { spaceStatusLabels } from "../useAppController";
+import type { AppPage } from "../appTypes";
+
+type TopbarProps = {
+  controller: AppController;
+  navigateToPage: (page: AppPage) => void;
+};
+
+export function Topbar({ controller, navigateToPage }: TopbarProps) {
+  const {
+    activePage,
+    currentSpaceId,
+    currentSpaceStatus,
+    currentSpaceIsTemporary,
+    outsideSpace,
+    leaveSpace
+  } = controller;
+
+  return (
+    <section className="sidebar" aria-label="应用状态">
+      <div className="sidebar-brand">
+        <p className="eyebrow">Snow Cues v1.0</p>
+        <h1>安全本地密码系统</h1>
+        <p className="subtitle">本地优先，派生输入只存在于当前浏览器会话。</p>
+      </div>
+      <div className="sidebar-status">
+        {!outsideSpace ? (
+          <div className="space-meta">
+            <span>空间：{currentSpaceId}</span>
+            <span>状态：{currentSpaceIsTemporary ? "临时空间" : spaceStatusLabels[currentSpaceStatus]}</span>
+          </div>
+        ) : (
+          <div className="space-meta">
+            <span>范围：本地空间工作台</span>
+          </div>
+        )}
+      </div>
+      <nav className="side-menu" aria-label="主导航">
+        {outsideSpace ? (
+          <>
+            <button className={activePage === "detached" ? "" : "tab-active"} onClick={() => navigateToPage("space")} type="button">
+              空间工作台
+            </button>
+            <button className={activePage === "detached" ? "tab-active" : ""} onClick={() => navigateToPage("detached")} type="button">
+              游离密码
+            </button>
+          </>
+        ) : (
+          <>
+            <button className={activePage === "space" ? "tab-active" : ""} onClick={() => navigateToPage("space")} type="button">
+              空间主页
+            </button>
+            <button className={activePage === "rules" ? "tab-active" : ""} onClick={() => navigateToPage("rules")} type="button">
+              规则管理
+            </button>
+            <button className={activePage === "groups" ? "tab-active" : ""} onClick={() => navigateToPage("groups")} type="button">
+              输出适配
+            </button>
+            <button className={activePage === "passwords" ? "tab-active" : ""} onClick={() => navigateToPage("passwords")} type="button">
+              密码管理
+            </button>
+          </>
+        )}
+      </nav>
+      {!outsideSpace ? (
+        <div className="sidebar-actions">
+          <button onClick={() => leaveSpace()} type="button">
+            离开空间
+          </button>
+        </div>
+      ) : null}
+    </section>
+  );
+}
