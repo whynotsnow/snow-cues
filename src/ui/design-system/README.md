@@ -2,7 +2,7 @@
 
 ## 当前 UI 现状
 
-Snow Cues v2.0 当前是纯前端、本地优先应用，UI 由 React 组件和 `src/styles.css` 手写样式组成，没有第三方 UI 组件库。应用外壳是三栏工作台：左侧导航与 storageData / 空间状态，中间 hash 路由页面，右侧全局用户操作指引。
+Snow Cues v2.1 当前是纯前端、本地优先应用，UI 由 React 组件和 `src/styles.css` 手写样式组成，没有第三方 UI 组件库。应用外壳是三栏工作台：左侧导航与 storageData / 空间状态，中间 hash 路由页面，右侧全局用户操作指引。
 
 现有 UI 组件主要分布在 `src/ui/components/`、`src/ui/pages/` 和 `src/ui/notifications/`。当前主要表单、卡片、按钮组和只读信息展示已开始通过 `src/ui/design-system/` 组合；少量业务专用结构仍保留原 class，以便后续在不改业务流程的前提下继续收敛。
 

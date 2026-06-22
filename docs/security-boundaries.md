@@ -49,7 +49,7 @@
 
 ## storageData 边界
 
-- 2.0 正式文件格式为 `format: "snow-cues-storage-data"`、`schemaVersion: 1`。草稿文件格式为 `format: "snow-cues-storage-data-draft"`、`schemaVersion: 1`。主打开流程必须拒绝 draft 文件。
+- 2.1 正式文件格式为 `format: "snow-cues-storage-data"`、`schemaVersion: 1`。草稿文件格式为 `format: "snow-cues-storage-data-draft"`、`schemaVersion: 1`。主打开流程必须拒绝 draft 文件。
 - `storageDataId` 是数据集 ID，不等于单个 `spaceId`。`spaceId` 仍只是数据集内的本地分区标识，不是派生输入。
 - `contentHash` 使用 canonical JSON + WebCrypto SHA-256，格式为 `sha256:<hex>`，计算时必须排除 `contentHash` 自身。
 - 文件夹结构为 `current.json`、`revisions/`、`drafts/`、`conflicts/`。第一版不创建 `manifest.json`，不保存 `deviceId`、`updatedBy` 或 `updatedByLabel`。
@@ -58,7 +58,7 @@
 - 保存前必须重读 `current.json`，用打开时的 revision/hash 检测外部变化。若检测到变化，必须拒绝覆盖，保留内存草稿，并提供重新打开和导出 draft 的路径。
 - 下载模式只生成新版正式文件内容，由用户手动替换 `current.json` 或放置 revision，并确认外部同步已完成；应用不自动写入同步文件夹。
 - 安全摘要 diff 和比较工具只展示集合数量级摘要，不展示密文字段、明文秘密或隐私元数据全文。只读比较工具不得合并、不得写文件。
-- 旧 IndexedDB 模块不再作为业务真源。残留旧浏览器数据不得出现在 2.0 UI 业务流；清空或忽略 IndexedDB 不应影响通过 `storageData` 打开的业务状态。
+- 旧 IndexedDB 模块不再作为业务真源。残留旧浏览器数据不得出现在 2.1 UI 业务流；清空或忽略 IndexedDB 不应影响通过 `storageData` 打开的业务状态。
 
 ## 字段白名单
 
