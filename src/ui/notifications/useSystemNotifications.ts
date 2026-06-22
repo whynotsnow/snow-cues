@@ -4,7 +4,7 @@ import type { NoticeMessage, SystemNotificationPermission } from "./types";
 type BrowserNotificationConstructor = {
   permission: NotificationPermission;
   requestPermission?: () => Promise<NotificationPermission>;
-  new(title: string, options?: NotificationOptions): Notification;
+  new (title: string, options?: NotificationOptions): Notification;
 };
 
 function getBrowserNotification(): BrowserNotificationConstructor | null {
@@ -18,7 +18,9 @@ function canUseBrowserNotification() {
   return typeof window !== "undefined" && window.isSecureContext !== false;
 }
 
-function normalizeSystemNotice(notice: Omit<NoticeMessage, "scope"> & { scope?: "system" }): NoticeMessage {
+function normalizeSystemNotice(
+  notice: Omit<NoticeMessage, "scope"> & { scope?: "system" }
+): NoticeMessage {
   return {
     ...notice,
     scope: "system",
@@ -27,13 +29,15 @@ function normalizeSystemNotice(notice: Omit<NoticeMessage, "scope"> & { scope?: 
 }
 
 export function useSystemNotifications() {
-  const [permission, setPermission] = useState<SystemNotificationPermission>(() => {
-    const NotificationApi = getBrowserNotification();
-    if (!NotificationApi || !canUseBrowserNotification()) {
-      return "unsupported";
+  const [permission, setPermission] = useState<SystemNotificationPermission>(
+    () => {
+      const NotificationApi = getBrowserNotification();
+      if (!NotificationApi || !canUseBrowserNotification()) {
+        return "unsupported";
+      }
+      return NotificationApi.permission;
     }
-    return NotificationApi.permission;
-  });
+  );
   const [systemNotices, setSystemNotices] = useState<NoticeMessage[]>([]);
 
   useEffect(() => {
@@ -47,27 +51,39 @@ export function useSystemNotifications() {
   }, []);
 
   const dismissSystemNotice = useCallback((noticeId: string) => {
-    setSystemNotices((current) => current.filter((notice) => notice.id !== noticeId));
+    setSystemNotices((current) =>
+      current.filter((notice) => notice.id !== noticeId)
+    );
   }, []);
 
-  const notifySystem = useCallback((input: Omit<NoticeMessage, "scope"> & { scope?: "system" }) => {
-    const notice = normalizeSystemNotice(input);
-    const NotificationApi = getBrowserNotification();
-    const livePermission = NotificationApi && canUseBrowserNotification() ? NotificationApi.permission : permission;
+  const notifySystem = useCallback(
+    (input: Omit<NoticeMessage, "scope"> & { scope?: "system" }) => {
+      const notice = normalizeSystemNotice(input);
+      const NotificationApi = getBrowserNotification();
+      const livePermission =
+        NotificationApi && canUseBrowserNotification()
+          ? NotificationApi.permission
+          : permission;
 
-    if (NotificationApi && livePermission === "granted" && canUseBrowserNotification()) {
-      try {
-        new NotificationApi(notice.title, {
-          body: notice.body
-        });
-        return;
-      } catch {
-        setPermission("unsupported");
+      if (
+        NotificationApi &&
+        livePermission === "granted" &&
+        canUseBrowserNotification()
+      ) {
+        try {
+          new NotificationApi(notice.title, {
+            body: notice.body
+          });
+          return;
+        } catch {
+          setPermission("unsupported");
+        }
       }
-    }
 
-    setSystemNotices((current) => [notice, ...current].slice(0, 3));
-  }, [permission]);
+      setSystemNotices((current) => [notice, ...current].slice(0, 3));
+    },
+    [permission]
+  );
 
   const clearSystemNotices = useCallback(() => {
     setSystemNotices([]);

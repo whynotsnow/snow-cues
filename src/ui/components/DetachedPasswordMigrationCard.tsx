@@ -1,6 +1,13 @@
 import type { FormEvent } from "react";
 import { useEffect } from "react";
-import { ActionGroup, Button, Card, SectionHeader, SelectField, TextField } from "../design-system";
+import {
+  ActionGroup,
+  Button,
+  Card,
+  SectionHeader,
+  SelectField,
+  TextField
+} from "../design-system";
 import { useCreatePasswordForm } from "../hooks/useCreatePasswordForm";
 import type { AppController } from "../useAppController";
 
@@ -8,7 +15,9 @@ type DetachedPasswordMigrationCardProps = {
   controller: AppController;
 };
 
-export function DetachedPasswordMigrationCard({ controller }: DetachedPasswordMigrationCardProps) {
+export function DetachedPasswordMigrationCard({
+  controller
+}: DetachedPasswordMigrationCardProps) {
   const {
     pendingDetachedEntrySecret,
     detachedMigrationFormVisible,
@@ -44,9 +53,9 @@ export function DetachedPasswordMigrationCard({ controller }: DetachedPasswordMi
       ? "请先在规则管理页初始化当前空间规则链。"
       : needsSpaceHomeSession
         ? "请先在空间主页设置空间主密码，再保存游离密码。"
-      : !createEntryAllowed
-        ? "当前空间状态不允许创建正式密码。"
-        : "";
+        : !createEntryAllowed
+          ? "当前空间状态不允许创建正式密码。"
+          : "";
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -65,7 +74,12 @@ export function DetachedPasswordMigrationCard({ controller }: DetachedPasswordMi
       <SectionHeader
         actions={
           <ActionGroup variant="entry">
-            <Button disabled={Boolean(disabledReason)} onClick={() => setDetachedMigrationFormVisible(!detachedMigrationFormVisible)}>
+            <Button
+              disabled={Boolean(disabledReason)}
+              onClick={() =>
+                setDetachedMigrationFormVisible(!detachedMigrationFormVisible)
+              }
+            >
               {detachedMigrationFormVisible ? "收起保存表单" : "保存为正式密码"}
             </Button>
             <Button onClick={handleCancelDetachedPasswordMigration}>
@@ -76,27 +90,40 @@ export function DetachedPasswordMigrationCard({ controller }: DetachedPasswordMi
         description="派生密钥已作为关键密钥草稿带入。保存时会按当前空间已初始化规则链正式生成密码；空间外预览结果不会写入正式条目。"
         title="待迁入派生密钥"
       />
-      <p className="login-note">已带入派生密钥草稿。你可以直接沿用，也可以在保存前修改关键密钥。</p>
+      <p className="login-note">
+        已带入派生密钥草稿。你可以直接沿用，也可以在保存前修改关键密钥。
+      </p>
       {disabledReason ? <p className="login-note">{disabledReason}</p> : null}
       {detachedMigrationFormVisible && !disabledReason ? (
-        <form className="form-stack" onSubmit={(event) => void handleSubmit(event)}>
+        <form
+          className="form-stack"
+          onSubmit={(event) => void handleSubmit(event)}
+        >
           <div className="field-grid">
             {!sessionAlive && !needsSpaceHomeSession ? (
               <TextField
                 autoComplete="current-password"
                 label="空间主密码"
-                onChange={(event) => actions.setMasterPassword(event.target.value)}
+                onChange={(event) =>
+                  actions.setMasterPassword(event.target.value)
+                }
                 placeholder="保存时用于建立当前空间会话"
                 type="password"
                 value={values.masterPassword}
               />
             ) : null}
-            <TextField label="平台" onChange={(event) => actions.setPlatform(event.target.value)} value={values.platform} />
+            <TextField
+              label="平台"
+              onChange={(event) => actions.setPlatform(event.target.value)}
+              value={values.platform}
+            />
             <SelectField
               label="所属密码组，可选"
               onChange={(event) => {
                 const groupId = event.target.value;
-                const group = passwordGroups.find((item) => item.id === groupId);
+                const group = passwordGroups.find(
+                  (item) => item.id === groupId
+                );
                 actions.setGroupId(groupId);
                 if (group && !values.platform.trim()) {
                   actions.setPlatform(group.name);
@@ -132,7 +159,13 @@ export function DetachedPasswordMigrationCard({ controller }: DetachedPasswordMi
               value={values.memoryHint}
             />
           </div>
-          <Button disabled={!createEntryAllowed} loading={creatingPassword} loadingLabel="生成中..." type="submit" variant="primary">
+          <Button
+            disabled={!createEntryAllowed}
+            loading={creatingPassword}
+            loadingLabel="生成中..."
+            type="submit"
+            variant="primary"
+          >
             保存为正式密码
           </Button>
         </form>

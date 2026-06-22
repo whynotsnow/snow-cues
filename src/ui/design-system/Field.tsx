@@ -13,7 +13,12 @@ type FieldShellProps = {
   label: ReactNode;
 };
 
-function FieldShell({ children, className = "", hint, label }: FieldShellProps) {
+function FieldShell({
+  children,
+  className = "",
+  hint,
+  label
+}: FieldShellProps) {
   const id = useId();
   const classNames = ["ds-field", className].filter(Boolean).join(" ");
 
@@ -31,7 +36,13 @@ type TextFieldProps = Omit<InputHTMLAttributes<HTMLInputElement>, "id"> & {
   label: ReactNode;
 };
 
-export function TextField({ className = "", hint, label, type = "text", ...props }: TextFieldProps) {
+export function TextField({
+  className = "",
+  hint,
+  label,
+  type = "text",
+  ...props
+}: TextFieldProps) {
   return (
     <FieldShell className={className} hint={hint} label={label}>
       {(id) => <input {...props} id={id} type={type} />}
@@ -39,7 +50,13 @@ export function TextField({ className = "", hint, label, type = "text", ...props
   );
 }
 
-export function NumberField({ className = "", hint, label, type = "number", ...props }: TextFieldProps) {
+export function NumberField({
+  className = "",
+  hint,
+  label,
+  type = "number",
+  ...props
+}: TextFieldProps) {
   return (
     <FieldShell className={className} hint={hint} label={label}>
       {(id) => <input {...props} id={id} type={type} />}
@@ -47,12 +64,20 @@ export function NumberField({ className = "", hint, label, type = "number", ...p
   );
 }
 
-type TextareaFieldProps = Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "id"> & {
+type TextareaFieldProps = Omit<
+  TextareaHTMLAttributes<HTMLTextAreaElement>,
+  "id"
+> & {
   hint?: ReactNode;
   label: ReactNode;
 };
 
-export function TextareaField({ className = "", hint, label, ...props }: TextareaFieldProps) {
+export function TextareaField({
+  className = "",
+  hint,
+  label,
+  ...props
+}: TextareaFieldProps) {
   return (
     <FieldShell className={className} hint={hint} label={label}>
       {(id) => <textarea {...props} id={id} />}
@@ -66,7 +91,13 @@ type SelectFieldProps = Omit<SelectHTMLAttributes<HTMLSelectElement>, "id"> & {
   label: ReactNode;
 };
 
-export function SelectField({ children, className = "", hint, label, ...props }: SelectFieldProps) {
+export function SelectField({
+  children,
+  className = "",
+  hint,
+  label,
+  ...props
+}: SelectFieldProps) {
   return (
     <FieldShell className={className} hint={hint} label={label}>
       {(id) => (
@@ -78,11 +109,18 @@ export function SelectField({ children, className = "", hint, label, ...props }:
   );
 }
 
-type CheckboxFieldProps = Omit<InputHTMLAttributes<HTMLInputElement>, "id" | "type"> & {
+type CheckboxFieldProps = Omit<
+  InputHTMLAttributes<HTMLInputElement>,
+  "id" | "type"
+> & {
   label: ReactNode;
 };
 
-export function CheckboxField({ className = "", label, ...props }: CheckboxFieldProps) {
+export function CheckboxField({
+  className = "",
+  label,
+  ...props
+}: CheckboxFieldProps) {
   const id = useId();
   const classNames = ["checkbox-row", className].filter(Boolean).join(" ");
 

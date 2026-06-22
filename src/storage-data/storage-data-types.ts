@@ -32,7 +32,10 @@ export type StorageDataFile = {
   data: StorageDataContent;
 };
 
-export type StorageDataDraftReason = "save-failed" | "external-change-detected" | "manual-export";
+export type StorageDataDraftReason =
+  | "save-failed"
+  | "external-change-detected"
+  | "manual-export";
 
 export type StorageDataDraftFile = {
   format: typeof STORAGE_DATA_DRAFT_FORMAT;
@@ -80,4 +83,3 @@ export function createEmptyStorageDataContent(): StorageDataContent {
     migrationEntries: []
   };
 }
-

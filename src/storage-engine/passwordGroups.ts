@@ -1,10 +1,21 @@
 import { PASSWORD_GROUP_STORE_NAME } from "./constants";
-import { openDatabase, requestToPromise, runTransaction, transactionDone } from "./database";
+import {
+  openDatabase,
+  requestToPromise,
+  runTransaction,
+  transactionDone
+} from "./database";
 import { sanitizePasswordGroup } from "./sanitize";
 import { listPasswordEntriesBySpace } from "./passwordEntries";
-import type { PasswordGroup, PasswordGroupInput, PasswordGroupPatch } from "./types";
+import type {
+  PasswordGroup,
+  PasswordGroupInput,
+  PasswordGroupPatch
+} from "./types";
 
-export async function createPasswordGroup(input: PasswordGroupInput): Promise<PasswordGroup> {
+export async function createPasswordGroup(
+  input: PasswordGroupInput
+): Promise<PasswordGroup> {
   const now = Date.now();
   const group = sanitizePasswordGroup({
     id: input.id ?? crypto.randomUUID(),
@@ -23,21 +34,36 @@ export async function createPasswordGroup(input: PasswordGroupInput): Promise<Pa
   return group;
 }
 
-export async function listPasswordGroupsBySpace(spaceId: string): Promise<PasswordGroup[]> {
-  const groups = await runTransaction(PASSWORD_GROUP_STORE_NAME, "readonly", (tx) =>
-    requestToPromise<PasswordGroup[]>(tx.objectStore(PASSWORD_GROUP_STORE_NAME).getAll())
+export async function listPasswordGroupsBySpace(
+  spaceId: string
+): Promise<PasswordGroup[]> {
+  const groups = await runTransaction(
+    PASSWORD_GROUP_STORE_NAME,
+    "readonly",
+    (tx) =>
+      requestToPromise<PasswordGroup[]>(
+        tx.objectStore(PASSWORD_GROUP_STORE_NAME).getAll()
+      )
   );
   return groups
     .map(sanitizePasswordGroup)
     .filter((group) => group.spaceId === spaceId)
-    .sort((a, b) => a.name.localeCompare(b.name, "zh-Hans-CN") || b.updatedAt - a.updatedAt);
+    .sort(
+      (a, b) =>
+        a.name.localeCompare(b.name, "zh-Hans-CN") || b.updatedAt - a.updatedAt
+    );
 }
 
-export async function updatePasswordGroup(id: string, patch: PasswordGroupPatch): Promise<PasswordGroup> {
+export async function updatePasswordGroup(
+  id: string,
+  patch: PasswordGroupPatch
+): Promise<PasswordGroup> {
   const db = await openDatabase();
   const tx = db.transaction(PASSWORD_GROUP_STORE_NAME, "readwrite");
   const store = tx.objectStore(PASSWORD_GROUP_STORE_NAME);
-  const existing = await requestToPromise<PasswordGroup | undefined>(store.get(id));
+  const existing = await requestToPromise<PasswordGroup | undefined>(
+    store.get(id)
+  );
 
   if (!existing) {
     throw new Error("未找到密码组。");
@@ -46,7 +72,10 @@ export async function updatePasswordGroup(id: string, patch: PasswordGroupPatch)
   const updated = sanitizePasswordGroup({
     ...existing,
     name: patch.name === undefined ? existing.name : patch.name,
-    description: patch.description === undefined ? existing.description : patch.description,
+    description:
+      patch.description === undefined
+        ? existing.description
+        : patch.description,
     outputPolicy: patch.outputPolicy ?? existing.outputPolicy,
     updatedAt: Date.now()
   });
@@ -59,7 +88,9 @@ export async function updatePasswordGroup(id: string, patch: PasswordGroupPatch)
 export async function deletePasswordGroup(id: string): Promise<void> {
   const db = await openDatabase();
   const tx = db.transaction(PASSWORD_GROUP_STORE_NAME, "readonly");
-  const existing = await requestToPromise<PasswordGroup | undefined>(tx.objectStore(PASSWORD_GROUP_STORE_NAME).get(id));
+  const existing = await requestToPromise<PasswordGroup | undefined>(
+    tx.objectStore(PASSWORD_GROUP_STORE_NAME).get(id)
+  );
   await transactionDone(tx);
 
   if (!existing) {
@@ -71,6 +102,8 @@ export async function deletePasswordGroup(id: string): Promise<void> {
   }
 
   const deleteTx = db.transaction(PASSWORD_GROUP_STORE_NAME, "readwrite");
-  await requestToPromise(deleteTx.objectStore(PASSWORD_GROUP_STORE_NAME).delete(id));
+  await requestToPromise(
+    deleteTx.objectStore(PASSWORD_GROUP_STORE_NAME).delete(id)
+  );
   await transactionDone(deleteTx);
 }

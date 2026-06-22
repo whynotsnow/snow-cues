@@ -1,6 +1,13 @@
 import { useEffect } from "react";
 import type { PasswordEntry } from "../../storage-engine/storage-engine";
-import { ActionGroup, Button, DescriptionList, SelectField, TextareaField, TextField } from "../design-system";
+import {
+  ActionGroup,
+  Button,
+  DescriptionList,
+  SelectField,
+  TextareaField,
+  TextField
+} from "../design-system";
 import { getEntryCapabilities } from "../entryCapabilities";
 import type { AppController } from "../useAppController";
 import { PasswordOutputAdapter } from "./PasswordOutputAdapter";
@@ -12,7 +19,12 @@ type EntryCardProps = {
   hideVerificationControls?: boolean;
 };
 
-export function EntryCard({ controller, entry, autoOpenVerification = false, hideVerificationControls = false }: EntryCardProps) {
+export function EntryCard({
+  controller,
+  entry,
+  autoOpenVerification = false,
+  hideVerificationControls = false
+}: EntryCardProps) {
   const {
     loginVerificationEntryId,
     decryptingEntryId,
@@ -51,16 +63,29 @@ export function EntryCard({ controller, entry, autoOpenVerification = false, hid
   const capabilities = getEntryCapabilities(policyForEntry(entry), entry);
   const isEditing = editingEntryId === entry.id;
   const isVerificationTarget = loginVerificationEntryId === entry.id;
-  const verificationControlsHidden = hideVerificationControls && isVerificationTarget;
+  const verificationControlsHidden =
+    hideVerificationControls && isVerificationTarget;
   const isSavingEntry = editingEntrySavingEntryId === entry.id;
   const isLoadingEditHint = editingEntryLoadingEntryId === entry.id;
-  const entryGroup = entry.groupId ? passwordGroups.find((group) => group.id === entry.groupId) : undefined;
+  const entryGroup = entry.groupId
+    ? passwordGroups.find((group) => group.id === entry.groupId)
+    : undefined;
 
   useEffect(() => {
-    if (autoOpenVerification && isVerificationTarget && decryptingEntryId !== entry.id) {
+    if (
+      autoOpenVerification &&
+      isVerificationTarget &&
+      decryptingEntryId !== entry.id
+    ) {
       setDecryptingEntryId(entry.id);
     }
-  }, [autoOpenVerification, decryptingEntryId, entry.id, isVerificationTarget, setDecryptingEntryId]);
+  }, [
+    autoOpenVerification,
+    decryptingEntryId,
+    entry.id,
+    isVerificationTarget,
+    setDecryptingEntryId
+  ]);
 
   function updateDraft(patch: Partial<NonNullable<typeof editingEntryDraft>>) {
     setEditingEntryDraft((current) =>
@@ -75,8 +100,14 @@ export function EntryCard({ controller, entry, autoOpenVerification = false, hid
   }
 
   return (
-    <article className={entry.deprecatedAt ? "entry-card entry-deprecated" : "entry-card"}>
-      {entry.deprecatedAt ? <span className="deprecated-badge">已废弃</span> : null}
+    <article
+      className={
+        entry.deprecatedAt ? "entry-card entry-deprecated" : "entry-card"
+      }
+    >
+      {entry.deprecatedAt ? (
+        <span className="deprecated-badge">已废弃</span>
+      ) : null}
 
       {isEditing && editingEntryDraft ? (
         <div className="entry-edit-panel">
@@ -84,13 +115,17 @@ export function EntryCard({ controller, entry, autoOpenVerification = false, hid
             <TextField
               disabled={!capabilities.canEditEntryMetadata || isSavingEntry}
               label="平台"
-              onChange={(event) => updateDraft({ platform: event.target.value })}
+              onChange={(event) =>
+                updateDraft({ platform: event.target.value })
+              }
               value={editingEntryDraft.platform}
             />
             <TextField
               disabled={!capabilities.canEditEntryDescription || isSavingEntry}
               label="普通备注"
-              onChange={(event) => updateDraft({ description: event.target.value })}
+              onChange={(event) =>
+                updateDraft({ description: event.target.value })
+              }
               value={editingEntryDraft.description}
             />
             <SelectField
@@ -112,7 +147,8 @@ export function EntryCard({ controller, entry, autoOpenVerification = false, hid
               <strong>关键密钥记忆提示</strong>
             </div>
             <ActionGroup className="memory-hint-actions" variant="compact">
-              {editingEntryDraft.hasExistingMemoryHint && editingEntryDraft.memoryHintMode === "locked" ? (
+              {editingEntryDraft.hasExistingMemoryHint &&
+              editingEntryDraft.memoryHintMode === "locked" ? (
                 <Button
                   disabled={!capabilities.canEditMemoryHint || isSavingEntry}
                   loading={isLoadingEditHint}
@@ -124,7 +160,11 @@ export function EntryCard({ controller, entry, autoOpenVerification = false, hid
                 </Button>
               ) : null}
               {editingEntryDraft.memoryHintMode === "revealed" ? (
-                <Button disabled={isSavingEntry} onClick={() => handleHideEditingMemoryHint(entry)} size="sm">
+                <Button
+                  disabled={isSavingEntry}
+                  onClick={() => handleHideEditingMemoryHint(entry)}
+                  size="sm"
+                >
                   隐藏提示
                 </Button>
               ) : null}
@@ -136,7 +176,9 @@ export function EntryCard({ controller, entry, autoOpenVerification = false, hid
                   onClick={() => void readEditingMemoryHint(entry, "editing")}
                   size="sm"
                 >
-                  {editingEntryDraft.hasExistingMemoryHint ? "解锁编辑" : "添加提示"}
+                  {editingEntryDraft.hasExistingMemoryHint
+                    ? "解锁编辑"
+                    : "添加提示"}
                 </Button>
               ) : null}
             </ActionGroup>
@@ -144,9 +186,15 @@ export function EntryCard({ controller, entry, autoOpenVerification = false, hid
               <TextareaField
                 aria-label="关键密钥记忆提示"
                 autoComplete="off"
-                disabled={!capabilities.canEditMemoryHint || isSavingEntry || isLoadingEditHint}
+                disabled={
+                  !capabilities.canEditMemoryHint ||
+                  isSavingEntry ||
+                  isLoadingEditHint
+                }
                 label="关键密钥记忆提示"
-                onChange={(event) => updateDraft({ memoryHint: event.target.value })}
+                onChange={(event) =>
+                  updateDraft({ memoryHint: event.target.value })
+                }
                 placeholder="不要填写关键密钥本身，也不要填写完整生成规则"
                 value={editingEntryDraft.memoryHint}
               />
@@ -160,7 +208,9 @@ export function EntryCard({ controller, entry, autoOpenVerification = false, hid
               </div>
             )}
           </div>
-          {isLoadingEditHint ? <p className="field-note">正在读取已保存的记忆提示...</p> : null}
+          {isLoadingEditHint ? (
+            <p className="field-note">正在读取已保存的记忆提示...</p>
+          ) : null}
           <ActionGroup variant="entry">
             <Button
               disabled={isLoadingEditHint}
@@ -170,7 +220,8 @@ export function EntryCard({ controller, entry, autoOpenVerification = false, hid
             >
               保存条目
             </Button>
-            {editingEntryDraft.hasExistingMemoryHint && editingEntryDraft.memoryHintMode === "editing" ? (
+            {editingEntryDraft.hasExistingMemoryHint &&
+            editingEntryDraft.memoryHintMode === "editing" ? (
               <Button
                 disabled={isSavingEntry}
                 loading={memoryHintSavingEntryId === entry.id}
@@ -195,7 +246,9 @@ export function EntryCard({ controller, entry, autoOpenVerification = false, hid
         />
       )}
 
-      {decryptingEntryId === entry.id && !isEditing && !verificationControlsHidden ? (
+      {decryptingEntryId === entry.id &&
+      !isEditing &&
+      !verificationControlsHidden ? (
         <div className="decrypt-fields">
           {isVerificationTarget ? (
             <TextField
@@ -233,9 +286,25 @@ export function EntryCard({ controller, entry, autoOpenVerification = false, hid
           <small>请根据提示重新输入关键密钥后再次解密。</small>
         </div>
       ) : null}
-      <div className={isEditing ? "entry-secret entry-secret-editing" : "entry-secret"}>
-        <span>{isEditing ? "密码内容" : visibleEntryId === entry.id ? "已解密核心密码" : "密码状态"}</span>
-        <code>{isEditing ? "当前不支持编辑密码" : visibleEntryId === entry.id ? visiblePassword : "加密密码"}</code>
+      <div
+        className={
+          isEditing ? "entry-secret entry-secret-editing" : "entry-secret"
+        }
+      >
+        <span>
+          {isEditing
+            ? "密码内容"
+            : visibleEntryId === entry.id
+              ? "已解密核心密码"
+              : "密码状态"}
+        </span>
+        <code>
+          {isEditing
+            ? "当前不支持编辑密码"
+            : visibleEntryId === entry.id
+              ? visiblePassword
+              : "加密密码"}
+        </code>
       </div>
       {!isEditing && visibleEntryId === entry.id ? (
         <PasswordOutputAdapter
@@ -245,7 +314,9 @@ export function EntryCard({ controller, entry, autoOpenVerification = false, hid
           onSaveGroupPolicy={handleSaveOutputPolicyToGroup}
         />
       ) : null}
-      {!capabilities.canEditEntry && capabilities.disabledReason ? <p className="field-note">{capabilities.disabledReason}</p> : null}
+      {!capabilities.canEditEntry && capabilities.disabledReason ? (
+        <p className="field-note">{capabilities.disabledReason}</p>
+      ) : null}
       {!isEditing ? (
         <ActionGroup variant="entry">
           {!verificationControlsHidden ? (
@@ -274,11 +345,18 @@ export function EntryCard({ controller, entry, autoOpenVerification = false, hid
               {visibleEntryId === entry.id
                 ? "隐藏"
                 : decryptingEntryId === entry.id
-                  ? isVerificationTarget ? "完成空间校验" : "确认解密"
-                  : isVerificationTarget ? "校验空间" : "解密"}
+                  ? isVerificationTarget
+                    ? "完成空间校验"
+                    : "确认解密"
+                  : isVerificationTarget
+                    ? "校验空间"
+                    : "解密"}
             </Button>
           ) : null}
-          <Button disabled={!capabilities.canDeprecate} onClick={() => void handleDeprecateEntry(entry)}>
+          <Button
+            disabled={!capabilities.canDeprecate}
+            onClick={() => void handleDeprecateEntry(entry)}
+          >
             废弃
           </Button>
           {entry.encrypted_memory_hint && !verificationControlsHidden ? (
@@ -292,14 +370,14 @@ export function EntryCard({ controller, entry, autoOpenVerification = false, hid
             </Button>
           ) : null}
           <Button
-            disabled={!capabilities.canEditEntry || isSavingEntry || isLoadingEditHint}
+            disabled={
+              !capabilities.canEditEntry || isSavingEntry || isLoadingEditHint
+            }
             onClick={() => void handleStartEntryEdit(entry)}
           >
             编辑条目
           </Button>
-          <Button disabled>
-            删除
-          </Button>
+          <Button disabled>删除</Button>
         </ActionGroup>
       ) : null}
     </article>

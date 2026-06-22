@@ -1,4 +1,7 @@
-import type { StorageDataContent, StorageDataSaveSummary } from "./storage-data-types";
+import type {
+  StorageDataContent,
+  StorageDataSaveSummary
+} from "./storage-data-types";
 
 export function createEmptyStorageDataSaveSummary(): StorageDataSaveSummary {
   return {
@@ -17,9 +20,14 @@ export function createEmptyStorageDataSaveSummary(): StorageDataSaveSummary {
   };
 }
 
-export function diffStorageDataContent(base: StorageDataContent, draft: StorageDataContent): StorageDataSaveSummary {
+export function diffStorageDataContent(
+  base: StorageDataContent,
+  draft: StorageDataContent
+): StorageDataSaveSummary {
   const summary = createEmptyStorageDataSaveSummary();
-  const baseSpaces = new Map(base.spaces.map((space) => [space.spaceId, space]));
+  const baseSpaces = new Map(
+    base.spaces.map((space) => [space.spaceId, space])
+  );
   for (const space of draft.spaces) {
     const existing = baseSpaces.get(space.spaceId);
     if (!existing) {
@@ -29,7 +37,9 @@ export function diffStorageDataContent(base: StorageDataContent, draft: StorageD
     }
   }
 
-  const baseEntries = new Map(base.passwordEntries.map((entry) => [entry.id, entry]));
+  const baseEntries = new Map(
+    base.passwordEntries.map((entry) => [entry.id, entry])
+  );
   for (const entry of draft.passwordEntries) {
     const existing = baseEntries.get(entry.id);
     if (!existing) {
@@ -47,7 +57,9 @@ export function diffStorageDataContent(base: StorageDataContent, draft: StorageD
     }
   }
 
-  const baseGroups = new Map(base.passwordGroups.map((group) => [group.id, group]));
+  const baseGroups = new Map(
+    base.passwordGroups.map((group) => [group.id, group])
+  );
   const draftGroupIds = new Set(draft.passwordGroups.map((group) => group.id));
   for (const group of draft.passwordGroups) {
     const existing = baseGroups.get(group.id);
@@ -63,13 +75,29 @@ export function diffStorageDataContent(base: StorageDataContent, draft: StorageD
     }
   }
 
-  summary.changedRuleProfiles = countChangedById(base.spaceProfiles, draft.spaceProfiles, "spaceId");
-  summary.changedMigrationBatches = countChangedById(base.migrationBatches, draft.migrationBatches, "id", "status");
-  summary.changedMigrationEntries = countChangedById(base.migrationEntries, draft.migrationEntries, "id", "status");
+  summary.changedRuleProfiles = countChangedById(
+    base.spaceProfiles,
+    draft.spaceProfiles,
+    "spaceId"
+  );
+  summary.changedMigrationBatches = countChangedById(
+    base.migrationBatches,
+    draft.migrationBatches,
+    "id",
+    "status"
+  );
+  summary.changedMigrationEntries = countChangedById(
+    base.migrationEntries,
+    draft.migrationEntries,
+    "id",
+    "status"
+  );
   return summary;
 }
 
-export function hasStorageDataChanges(summary: StorageDataSaveSummary): boolean {
+export function hasStorageDataChanges(
+  summary: StorageDataSaveSummary
+): boolean {
   return Object.values(summary).some((value) => value > 0);
 }
 
@@ -85,7 +113,11 @@ function countChangedById<T extends Record<string, unknown>>(
     const existing = baseMap.get(item[idKey]);
     if (!existing) {
       count += 1;
-    } else if (field ? existing[field] !== item[field] : safeComparable(existing) !== safeComparable(item)) {
+    } else if (
+      field
+        ? existing[field] !== item[field]
+        : safeComparable(existing) !== safeComparable(item)
+    ) {
       count += 1;
     }
   }
@@ -94,10 +126,14 @@ function countChangedById<T extends Record<string, unknown>>(
 
 function safeComparable(value: unknown): string {
   return JSON.stringify(value, (key, nested) => {
-    if (key === "encrypted_password" || key === "encrypted_memory_hint" || key === "sourceEncryptedPassword" || key === "sourceEncryptedMemoryHint") {
+    if (
+      key === "encrypted_password" ||
+      key === "encrypted_memory_hint" ||
+      key === "sourceEncryptedPassword" ||
+      key === "sourceEncryptedMemoryHint"
+    ) {
       return nested ? "[redacted]" : nested;
     }
     return nested;
   });
 }
-

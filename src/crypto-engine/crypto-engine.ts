@@ -1,8 +1,20 @@
-import { bytesToBase64, bytesToUtf8, concatBytes, utf8ToBytes } from "../lib/bytes";
-import { getRule, type ActiveRuleId, type RuleDefinition } from "../rule-registry/rules";
+import {
+  bytesToBase64,
+  bytesToUtf8,
+  concatBytes,
+  utf8ToBytes
+} from "../lib/bytes";
+import {
+  getRule,
+  type ActiveRuleId,
+  type RuleDefinition
+} from "../rule-registry/rules";
 import { encodePasswordMaterial, type EncodingPolicy } from "./encoding";
 
-export const DEFAULT_DETACHED_RULE_CHAIN: ActiveRuleId[] = ["v1-hmac", "v2-pbkdf2"];
+export const DEFAULT_DETACHED_RULE_CHAIN: ActiveRuleId[] = [
+  "v1-hmac",
+  "v2-pbkdf2"
+];
 
 export type GeneratedPassword = {
   encodedPassword: string;
@@ -17,7 +29,13 @@ export async function generatePassword(
   encodingPolicy: EncodingPolicy,
   importedRules: RuleDefinition[] = []
 ): Promise<GeneratedPassword> {
-  return generatePasswordWithRuleChain(masterKey, entrySecret, [ruleId], encodingPolicy, importedRules);
+  return generatePasswordWithRuleChain(
+    masterKey,
+    entrySecret,
+    [ruleId],
+    encodingPolicy,
+    importedRules
+  );
 }
 
 export async function generatePasswordWithRuleChain(
@@ -70,7 +88,10 @@ export async function generateDetachedPassword(
   );
 }
 
-export async function encryptPassword(storageKey: CryptoKey, password: string): Promise<string> {
+export async function encryptPassword(
+  storageKey: CryptoKey,
+  password: string
+): Promise<string> {
   const iv = crypto.getRandomValues(new Uint8Array(12));
   const ciphertext = await crypto.subtle.encrypt(
     {
@@ -84,7 +105,10 @@ export async function encryptPassword(storageKey: CryptoKey, password: string): 
   return bytesToBase64(concatBytes(iv, new Uint8Array(ciphertext)));
 }
 
-export async function deriveRuntimeStorageKey(masterKey: CryptoKey, entrySecret: string): Promise<CryptoKey> {
+export async function deriveRuntimeStorageKey(
+  masterKey: CryptoKey,
+  entrySecret: string
+): Promise<CryptoKey> {
   if (!entrySecret.trim()) {
     throw new Error("请输入用于加密或解密的关键密钥。");
   }
@@ -95,12 +119,22 @@ export async function deriveRuntimeStorageKey(masterKey: CryptoKey, entrySecret:
     utf8ToBytes(`snow-cues:v1.0:storage-key:${entrySecret}`)
   );
 
-  return crypto.subtle.importKey("raw", keyMaterial, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
+  return crypto.subtle.importKey(
+    "raw",
+    keyMaterial,
+    { name: "AES-GCM", length: 256 },
+    false,
+    ["encrypt", "decrypt"]
+  );
 }
 
-export async function decryptPassword(storageKey: CryptoKey, encryptedPassword: string): Promise<string> {
-  const sealedBytes: Uint8Array<ArrayBuffer> = Uint8Array.from(atob(encryptedPassword), (char) =>
-    char.charCodeAt(0)
+export async function decryptPassword(
+  storageKey: CryptoKey,
+  encryptedPassword: string
+): Promise<string> {
+  const sealedBytes: Uint8Array<ArrayBuffer> = Uint8Array.from(
+    atob(encryptedPassword),
+    (char) => char.charCodeAt(0)
   );
   if (sealedBytes.length <= 12) {
     throw new Error("加密密码数据无效。");

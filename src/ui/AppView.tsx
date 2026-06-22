@@ -17,7 +17,8 @@ type AppViewProps = {
 };
 
 export function AppView({ controller }: AppViewProps) {
-  const { activePage, currentSpaceId, outsideSpace, setActivePage } = controller;
+  const { activePage, currentSpaceId, outsideSpace, setActivePage } =
+    controller;
   const guidance = getUserGuidance(controller);
   const showDevTools = import.meta.env.DEV;
   const initialHashApplied = useRef(false);
@@ -32,7 +33,9 @@ export function AppView({ controller }: AppViewProps) {
     if (nextPage !== routePage) {
       window.history.replaceState(null, "", getHashForPage(nextPage));
     }
-    setActivePage((currentPage) => (currentPage === nextPage ? currentPage : nextPage));
+    setActivePage((currentPage) =>
+      currentPage === nextPage ? currentPage : nextPage
+    );
   }, [outsideSpace, setActivePage]);
 
   useEffect(() => {
@@ -61,7 +64,10 @@ export function AppView({ controller }: AppViewProps) {
   }, [activePage, outsideSpace, setActivePage]);
 
   useEffect(() => {
-    if (typeof navigator !== "undefined" && navigator.userAgent.includes("jsdom")) {
+    if (
+      typeof navigator !== "undefined" &&
+      navigator.userAgent.includes("jsdom")
+    ) {
       return;
     }
     window.requestAnimationFrame(() => {
@@ -107,7 +113,10 @@ export function AppView({ controller }: AppViewProps) {
           ) : outsideSpace ? (
             <SpaceIndexPanel controller={controller} />
           ) : (
-            <WorkspaceView controller={controller} navigateToPage={navigateToPage} />
+            <WorkspaceView
+              controller={controller}
+              navigateToPage={navigateToPage}
+            />
           )}
           {showDevTools ? <TestDataTools controller={controller} /> : null}
         </section>
@@ -139,6 +148,8 @@ function getHashForPage(page: AppPage) {
 }
 
 function getPageFromHash(): AppPage | null {
-  const match = Object.entries(pageRoutes).find(([, hash]) => hash === window.location.hash);
+  const match = Object.entries(pageRoutes).find(
+    ([, hash]) => hash === window.location.hash
+  );
   return match ? (match[0] as AppPage) : null;
 }

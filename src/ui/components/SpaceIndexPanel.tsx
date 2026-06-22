@@ -8,7 +8,7 @@ import {
   SectionHeader,
   SelectField,
   TextareaField,
-  TextField,
+  TextField
 } from "../design-system";
 import { formatSpaceRelationLabel } from "../displayLabels";
 import type { AppController } from "../useAppController";
@@ -34,7 +34,7 @@ export function SpaceIndexPanel({ controller }: SpaceIndexPanelProps) {
     handleEnterSpace,
     refreshSpaceIndex,
     loggingIn,
-    storageDataOpened,
+    storageDataOpened
   } = controller;
   const needsSourceSpace =
     outsideCreateMode === "clone_profile" ||
@@ -58,9 +58,7 @@ export function SpaceIndexPanel({ controller }: SpaceIndexPanelProps) {
           actions={
             <Button
               onClick={() =>
-                setOutsideShowCreateSpaceOptions(
-                  !outsideShowCreateSpaceOptions,
-                )
+                setOutsideShowCreateSpaceOptions(!outsideShowCreateSpaceOptions)
               }
             >
               {outsideShowCreateSpaceOptions ? "收起创建方式" : "新建空间"}
@@ -75,7 +73,7 @@ export function SpaceIndexPanel({ controller }: SpaceIndexPanelProps) {
               label="创建方式"
               onChange={(event) =>
                 setOutsideCreateMode(
-                  event.target.value as typeof outsideCreateMode,
+                  event.target.value as typeof outsideCreateMode
                 )
               }
               value={outsideCreateMode}
@@ -118,9 +116,7 @@ export function SpaceIndexPanel({ controller }: SpaceIndexPanelProps) {
             {needsImportText ? (
               <TextareaField
                 label="导入 JSON"
-                onChange={(event) =>
-                  setOutsideImportText(event.target.value)
-                }
+                onChange={(event) => setOutsideImportText(event.target.value)}
                 placeholder='{"format":"snow-cues-space-export","version":1,...}'
                 value={outsideImportText}
               />
@@ -153,11 +149,11 @@ export function SpaceIndexPanel({ controller }: SpaceIndexPanelProps) {
                     { label: "空间 ID", value: space.spaceId },
                     {
                       label: "空间状态",
-                      value: spaceStatusLabels[space.status],
+                      value: spaceStatusLabels[space.status]
                     },
                     {
                       label: "空间数据更新时间",
-                      value: formatLocalTime(space.updatedAt),
+                      value: formatLocalTime(space.updatedAt)
                     },
                     {
                       label: "空间关系",
@@ -168,12 +164,12 @@ export function SpaceIndexPanel({ controller }: SpaceIndexPanelProps) {
                                 formatSpaceRelationLabel(
                                   relation.fromSpaceId,
                                   relation.toSpaceId,
-                                  relation.type,
-                                ),
+                                  relation.type
+                                )
                               )
                               .join("；")
-                          : "无",
-                    },
+                          : "无"
+                    }
                   ]}
                 />
                 <ActionGroup variant="entry">
@@ -200,6 +196,6 @@ export function SpaceIndexPanel({ controller }: SpaceIndexPanelProps) {
 
 function formatLocalTime(timestamp: number): string {
   return new Date(timestamp).toLocaleString("zh-CN", {
-    hour12: false,
+    hour12: false
   });
 }

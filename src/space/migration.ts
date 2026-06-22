@@ -5,8 +5,15 @@ import {
   generatePasswordWithRuleChain
 } from "../crypto-engine/crypto-engine";
 import type { EncodingPolicy } from "../crypto-engine/encoding";
-import { decryptMemoryHint, encryptMemoryHint } from "../recovery-aid/recovery-aid";
-import { createImportedRule, type ActiveRuleId, type RuleDefinition } from "../rule-registry/rules";
+import {
+  decryptMemoryHint,
+  encryptMemoryHint
+} from "../recovery-aid/recovery-aid";
+import {
+  createImportedRule,
+  type ActiveRuleId,
+  type RuleDefinition
+} from "../rule-registry/rules";
 import type { Session } from "../session-manager/session-manager";
 import {
   createMigrationBatch,
@@ -30,7 +37,7 @@ import {
   type MigrationBatch,
   type MigrationEntry,
   type MigrationMode,
-  type MigrationProfileSnapshot,
+  type MigrationProfileSnapshot
 } from "../storage-engine/storage-engine";
 import { canCreateSuccessorSpace } from "./policy";
 
@@ -61,7 +68,9 @@ export type MigrateEntryInput = {
   externalPasswordUpdated: boolean;
 };
 
-export async function createMigrationBatchFromSpace(input: CreateMigrationBatchFromSpaceInput): Promise<MigrationBatch | null> {
+export async function createMigrationBatchFromSpace(
+  input: CreateMigrationBatchFromSpaceInput
+): Promise<MigrationBatch | null> {
   await assertTargetSpaceAvailable(input.targetSpaceId);
   const [sourceProfile, sourceEntries, sourceGroups] = await Promise.all([
     listSpaceProfile(input.sourceSpaceId),
@@ -75,12 +84,15 @@ export async function createMigrationBatchFromSpace(input: CreateMigrationBatchF
     status: "active"
   });
 
-  const shouldCreateMigrationBatch = input.includeEntries && sourceEntries.length > 0;
+  const shouldCreateMigrationBatch =
+    input.includeEntries && sourceEntries.length > 0;
   if (input.copyProfile && sourceProfile && !shouldCreateMigrationBatch) {
     await saveSpaceProfile({
       spaceId: targetSpace.spaceId,
       ruleChain: [...sourceProfile.ruleChain],
-      importedRuleManifests: sourceProfile.importedRuleManifests.map((manifest) => ({ ...manifest }))
+      importedRuleManifests: sourceProfile.importedRuleManifests.map(
+        (manifest) => ({ ...manifest })
+      )
     });
   }
 
@@ -138,11 +150,16 @@ async function assertTargetSpaceAvailable(spaceId: string): Promise<void> {
   }
 }
 
-export async function markMigrationBatchReady(batchId: string): Promise<MigrationBatch> {
+export async function markMigrationBatchReady(
+  batchId: string
+): Promise<MigrationBatch> {
   return updateMigrationBatch(batchId, { status: "ready" });
 }
 
-export async function updateMigrationBatchFinalizationPreference(batchId: string, autoFinalizeSource: boolean): Promise<MigrationBatch> {
+export async function updateMigrationBatchFinalizationPreference(
+  batchId: string,
+  autoFinalizeSource: boolean
+): Promise<MigrationBatch> {
   const batch = await getMigrationBatch(batchId);
   if (!batch) {
     throw new Error("未找到迁移批次。");
@@ -156,7 +173,9 @@ export async function updateMigrationBatchFinalizationPreference(batchId: string
   return updateMigrationBatch(batchId, { autoFinalizeSource });
 }
 
-export async function migrateEntry(input: MigrateEntryInput): Promise<{ entryId: string; password: string }> {
+export async function migrateEntry(
+  input: MigrateEntryInput
+): Promise<{ entryId: string; password: string }> {
   const [batch, entries] = await Promise.all([
     getMigrationBatch(input.batchId),
     listMigrationEntriesByBatch(input.batchId)
@@ -175,18 +194,35 @@ export async function migrateEntry(input: MigrateEntryInput): Promise<{ entryId:
     throw new Error("这条迁移任务已经处理完成。");
   }
 
-  const sourcePlaintextPassword = await decryptSourcePassword(input.sourceSession, migrationEntry, input.oldEntrySecret);
+  const sourcePlaintextPassword = await decryptSourcePassword(
+    input.sourceSession,
+    migrationEntry,
+    input.oldEntrySecret
+  );
   const plaintextPassword =
-    input.mode === "preserve_password" ? sourcePlaintextPassword : await regenerateTargetPassword(input);
+    input.mode === "preserve_password"
+      ? sourcePlaintextPassword
+      : await regenerateTargetPassword(input);
 
   if (input.mode === "regenerate_password" && !input.externalPasswordUpdated) {
     throw new Error("重新生成模式需要先确认外部平台密码已经更新。");
   }
 
   const newEntryId = crypto.randomUUID();
-  const targetStorageKey = await deriveRuntimeStorageKey(input.targetSession.cryptoKey, input.newEntrySecret);
-  const encryptedPassword = await encryptPassword(targetStorageKey, plaintextPassword);
-  const encryptedMemoryHint = await migrateMemoryHint(input.sourceSession, input.targetSession, migrationEntry, newEntryId);
+  const targetStorageKey = await deriveRuntimeStorageKey(
+    input.targetSession.cryptoKey,
+    input.newEntrySecret
+  );
+  const encryptedPassword = await encryptPassword(
+    targetStorageKey,
+    plaintextPassword
+  );
+  const encryptedMemoryHint = await migrateMemoryHint(
+    input.sourceSession,
+    input.targetSession,
+    migrationEntry,
+    newEntryId
+  );
   const savedEntry = await createPasswordEntry({
     id: newEntryId,
     spaceId: batch.targetSpaceId,
@@ -226,7 +262,10 @@ export async function verifyMigrationSourceEntry(
   await decryptSourcePassword(sourceSession, migrationEntry, oldEntrySecret);
 }
 
-export async function skipMigrationEntry(batchId: string, entryId: string): Promise<MigrationBatch> {
+export async function skipMigrationEntry(
+  batchId: string,
+  entryId: string
+): Promise<MigrationBatch> {
   await updateMigrationEntry(entryId, { status: "skipped" });
   const updatedBatch = await refreshMigrationBatchStats(batchId);
   if (updatedBatch.status === "completed" && updatedBatch.autoFinalizeSource) {
@@ -235,7 +274,9 @@ export async function skipMigrationEntry(batchId: string, entryId: string): Prom
   return updatedBatch;
 }
 
-export async function finalizeMigrationBatchManually(batchId: string): Promise<MigrationBatch> {
+export async function finalizeMigrationBatchManually(
+  batchId: string
+): Promise<MigrationBatch> {
   const batch = await getMigrationBatch(batchId);
   if (!batch) {
     throw new Error("未找到迁移批次。");
@@ -246,12 +287,21 @@ export async function finalizeMigrationBatchManually(batchId: string): Promise<M
   return finalizeMigrationBatch(batch);
 }
 
-async function decryptSourcePassword(sourceSession: Session, entry: MigrationEntry, oldEntrySecret: string): Promise<string> {
-  const sourceStorageKey = await deriveRuntimeStorageKey(sourceSession.cryptoKey, oldEntrySecret);
+async function decryptSourcePassword(
+  sourceSession: Session,
+  entry: MigrationEntry,
+  oldEntrySecret: string
+): Promise<string> {
+  const sourceStorageKey = await deriveRuntimeStorageKey(
+    sourceSession.cryptoKey,
+    oldEntrySecret
+  );
   return decryptPassword(sourceStorageKey, entry.sourceEncryptedPassword);
 }
 
-async function regenerateTargetPassword(input: MigrateEntryInput): Promise<string> {
+async function regenerateTargetPassword(
+  input: MigrateEntryInput
+): Promise<string> {
   if (input.targetRuleIds.length === 0) {
     throw new Error("请先初始化目标空间规则链。");
   }
@@ -280,16 +330,25 @@ async function migrateMemoryHint(
     migrationEntry.sourceEntryId,
     migrationEntry.sourceEncryptedMemoryHint
   );
-  return encryptMemoryHint(targetSession, migrationEntry.targetSpaceId, newEntryId, hint);
+  return encryptMemoryHint(
+    targetSession,
+    migrationEntry.targetSpaceId,
+    newEntryId,
+    hint
+  );
 }
 
-async function finalizeMigrationBatch(batch: MigrationBatch): Promise<MigrationBatch> {
+async function finalizeMigrationBatch(
+  batch: MigrationBatch
+): Promise<MigrationBatch> {
   if (batch.sourceFinalizedAt) {
     return batch;
   }
   const successors = await listSuccessorsOfSpace(batch.sourceSpaceId);
   const relationExists = successors.some(
-    (relation) => relation.fromSpaceId === batch.targetSpaceId && relation.toSpaceId === batch.sourceSpaceId
+    (relation) =>
+      relation.fromSpaceId === batch.targetSpaceId &&
+      relation.toSpaceId === batch.sourceSpaceId
   );
   if (!relationExists) {
     await createSpaceRelation({
@@ -299,7 +358,13 @@ async function finalizeMigrationBatch(batch: MigrationBatch): Promise<MigrationB
     });
   }
   const sourceSpace = await getSpace(batch.sourceSpaceId);
-  if (sourceSpace && canCreateSuccessorSpace({ spaceStatus: sourceSpace.status, sessionAlive: true })) {
+  if (
+    sourceSpace &&
+    canCreateSuccessorSpace({
+      spaceStatus: sourceSpace.status,
+      sessionAlive: true
+    })
+  ) {
     await updateSpace(batch.sourceSpaceId, {
       status: "deprecated",
       deprecatedAt: Date.now()
@@ -308,7 +373,9 @@ async function finalizeMigrationBatch(batch: MigrationBatch): Promise<MigrationB
   return updateMigrationBatch(batch.id, { sourceFinalizedAt: Date.now() });
 }
 
-function profileSnapshotFromProfile(profile: Awaited<ReturnType<typeof listSpaceProfile>>): MigrationProfileSnapshot {
+function profileSnapshotFromProfile(
+  profile: Awaited<ReturnType<typeof listSpaceProfile>>
+): MigrationProfileSnapshot {
   return {
     ruleChain: profile?.ruleChain ? [...profile.ruleChain] : [],
     importedRuleManifests: profile?.importedRuleManifests
@@ -317,6 +384,10 @@ function profileSnapshotFromProfile(profile: Awaited<ReturnType<typeof listSpace
   };
 }
 
-export function ruleCatalogFromSnapshot(snapshot: MigrationProfileSnapshot): RuleDefinition[] {
-  return snapshot.importedRuleManifests.map((manifest) => createImportedRule(manifest));
+export function ruleCatalogFromSnapshot(
+  snapshot: MigrationProfileSnapshot
+): RuleDefinition[] {
+  return snapshot.importedRuleManifests.map((manifest) =>
+    createImportedRule(manifest)
+  );
 }

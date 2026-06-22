@@ -8,7 +8,11 @@ import {
   type PasswordGroup,
   type SpaceRecord
 } from "../../storage-engine/storage-engine";
-import { DEFAULT_PASSWORD_OUTPUT_POLICY, type PasswordOutputPolicy, type PasswordOutputPresetId } from "../../crypto-engine/output-policy";
+import {
+  DEFAULT_PASSWORD_OUTPUT_POLICY,
+  type PasswordOutputPolicy,
+  type PasswordOutputPresetId
+} from "../../crypto-engine/output-policy";
 import { canEditRuleProfile } from "../../space/policy";
 import type { SpacePolicyInput } from "../../space/types";
 import type { Session } from "../../session-manager/session-manager";
@@ -31,7 +35,9 @@ type UsePasswordGroupControllerInput = {
   setStatus: (message: string) => void;
   setUiState: (state: UiState) => void;
   ensureLiveSession: (masterPassword?: string) => Promise<Session>;
-  withLiveSession: <T>(operation: (liveSession: Session) => Promise<T>) => Promise<T>;
+  withLiveSession: <T>(
+    operation: (liveSession: Session) => Promise<T>
+  ) => Promise<T>;
 };
 
 export function usePasswordGroupController({
@@ -47,9 +53,12 @@ export function usePasswordGroupController({
   withLiveSession
 }: UsePasswordGroupControllerInput) {
   const [passwordGroups, setPasswordGroups] = useState<PasswordGroup[]>([]);
-  const [groupDraft, setGroupDraft] = useState<PasswordGroupDraft>(createEmptyGroupDraft());
+  const [groupDraft, setGroupDraft] = useState<PasswordGroupDraft>(
+    createEmptyGroupDraft()
+  );
   const [editingGroupId, setEditingGroupId] = useState<string | null>(null);
-  const [editingGroupDraft, setEditingGroupDraft] = useState<PasswordGroupDraft | null>(null);
+  const [editingGroupDraft, setEditingGroupDraft] =
+    useState<PasswordGroupDraft | null>(null);
   const [groupSavingId, setGroupSavingId] = useState<string | null>(null);
   const [creatingGroup, setCreatingGroup] = useState(false);
 
@@ -67,7 +76,11 @@ export function usePasswordGroupController({
       setPasswordGroups(await listPasswordGroupsBySpace(currentSpaceId));
     } catch (refreshError) {
       setPasswordGroups([]);
-      setError(refreshError instanceof Error ? refreshError.message : "无法读取密码组输出适配。");
+      setError(
+        refreshError instanceof Error
+          ? refreshError.message
+          : "无法读取密码组输出适配。"
+      );
     }
   }, [currentSpaceId, setError]);
 
@@ -104,7 +117,9 @@ export function usePasswordGroupController({
       await refreshPasswordGroups();
       setStatus("密码组已创建。");
     } catch (createError) {
-      setError(createError instanceof Error ? createError.message : "无法创建密码组。");
+      setError(
+        createError instanceof Error ? createError.message : "无法创建密码组。"
+      );
     } finally {
       setCreatingGroup(false);
     }
@@ -130,7 +145,10 @@ export function usePasswordGroupController({
     setGroupSavingId(null);
   }
 
-  async function handleSavePasswordGroup(groupId: string, draft = editingGroupDraft) {
+  async function handleSavePasswordGroup(
+    groupId: string,
+    draft = editingGroupDraft
+  ) {
     setError("");
     setStatus("");
     try {
@@ -151,7 +169,9 @@ export function usePasswordGroupController({
         setStatus("密码组输出适配已保存。");
       });
     } catch (saveError) {
-      setError(saveError instanceof Error ? saveError.message : "无法保存密码组。");
+      setError(
+        saveError instanceof Error ? saveError.message : "无法保存密码组。"
+      );
     } finally {
       setGroupSavingId(null);
     }
@@ -168,11 +188,16 @@ export function usePasswordGroupController({
         setStatus("密码组已删除。");
       });
     } catch (deleteError) {
-      setError(deleteError instanceof Error ? deleteError.message : "无法删除密码组。");
+      setError(
+        deleteError instanceof Error ? deleteError.message : "无法删除密码组。"
+      );
     }
   }
 
-  async function handleSaveOutputPolicyToGroup(groupId: string, outputPolicy: PasswordOutputPolicy) {
+  async function handleSaveOutputPolicyToGroup(
+    groupId: string,
+    outputPolicy: PasswordOutputPolicy
+  ) {
     const group = passwordGroups.find((item) => item.id === groupId);
     if (!group) {
       setError("未找到密码组。");

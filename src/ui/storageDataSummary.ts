@@ -1,6 +1,8 @@
 import type { StorageDataSaveSummary } from "../storage-data";
 
-export function formatStorageDataSummary(summary: StorageDataSaveSummary): string {
+export function formatStorageDataSummary(
+  summary: StorageDataSaveSummary
+): string {
   const items = [
     ["新增空间", summary.addedSpaces],
     ["修改空间状态", summary.modifiedSpaceStatus],
@@ -15,5 +17,7 @@ export function formatStorageDataSummary(summary: StorageDataSaveSummary): strin
     ["迁移批次状态变化", summary.changedMigrationBatches],
     ["迁移条目状态变化", summary.changedMigrationEntries]
   ].filter(([, count]) => Number(count) > 0);
-  return items.length > 0 ? items.map(([label, count]) => `${label}：${count}`).join("；") : "无业务改动";
+  return items.length > 0
+    ? items.map(([label, count]) => `${label}：${count}`).join("；")
+    : "无业务改动";
 }

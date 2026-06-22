@@ -327,12 +327,28 @@ describe("storage-engine 存储结构", () => {
     await createIncompleteCurrentVersionDatabase();
 
     await expect(listPasswordGroupsBySpace("default")).resolves.toEqual([]);
-    const request = indexedDB.open(DB_NAME);
-    const db = await requestToDb(request);
-
-    expect(db.version).toBeGreaterThan(DB_VERSION);
-    expect(db.objectStoreNames.contains("password_groups")).toBe(true);
-    db.close();
+    await createPasswordGroup({
+      spaceId: "default",
+      name: "修复后的密码组",
+      outputPolicy: {
+        length: 20,
+        useUppercase: true,
+        useLowercase: true,
+        useDigits: true,
+        useSymbols: false,
+        minUppercase: 1,
+        minLowercase: 1,
+        minDigits: 1,
+        minSymbols: 0,
+        allowedSymbols: "",
+        forbiddenChars: ""
+      }
+    });
+    expect(await listPasswordGroupsBySpace("default")).toMatchObject([
+      {
+        name: "修复后的密码组"
+      }
+    ]);
   });
 
   it("可以更新加密记忆提示，废弃后仍允许更新描述和提示但不允许改平台", async () => {

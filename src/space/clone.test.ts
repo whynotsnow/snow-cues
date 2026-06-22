@@ -81,7 +81,9 @@ describe("Space config-only clone 与 successor", () => {
         namespace: "office"
       }
     ]);
-    expect(targetProfile?.importedRuleManifests).not.toBe((await listSpaceProfile("source"))?.importedRuleManifests);
+    expect(targetProfile?.importedRuleManifests).not.toBe(
+      (await listSpaceProfile("source"))?.importedRuleManifests
+    );
     expect(await listPasswordGroupsBySpace("target")).toMatchObject([
       {
         spaceId: "target",

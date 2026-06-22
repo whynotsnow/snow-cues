@@ -101,7 +101,10 @@ export const PASSWORD_OUTPUT_PRESETS: PasswordOutputPreset[] = [
 
 export const DEFAULT_PASSWORD_OUTPUT_POLICY = PASSWORD_OUTPUT_PRESETS[0].policy;
 
-export async function adaptPasswordOutput(corePassword: string, policy: PasswordOutputPolicy): Promise<string> {
+export async function adaptPasswordOutput(
+  corePassword: string,
+  policy: PasswordOutputPolicy
+): Promise<string> {
   if (!corePassword) {
     throw new Error("请先解密核心密码。");
   }
@@ -114,13 +117,22 @@ export async function adaptPasswordOutput(corePassword: string, policy: Password
   }
 
   const requiredGroups: Array<{ characters: string; count: number }> = [
-    { characters: characterGroups.uppercase, count: normalizedPolicy.minUppercase },
-    { characters: characterGroups.lowercase, count: normalizedPolicy.minLowercase },
+    {
+      characters: characterGroups.uppercase,
+      count: normalizedPolicy.minUppercase
+    },
+    {
+      characters: characterGroups.lowercase,
+      count: normalizedPolicy.minLowercase
+    },
     { characters: characterGroups.digits, count: normalizedPolicy.minDigits },
     { characters: characterGroups.symbols, count: normalizedPolicy.minSymbols }
   ].filter((group) => group.count > 0);
 
-  const requiredCount = requiredGroups.reduce((total, group) => total + group.count, 0);
+  const requiredCount = requiredGroups.reduce(
+    (total, group) => total + group.count,
+    0
+  );
   if (requiredCount > normalizedPolicy.length) {
     throw new Error("密码输出适配的最小字符数量不能超过总长度。");
   }
@@ -130,7 +142,11 @@ export async function adaptPasswordOutput(corePassword: string, policy: Password
     }
   }
 
-  const stream = await createByteStream(corePassword, normalizedPolicy, normalizedPolicy.length * 4 + 64);
+  const stream = await createByteStream(
+    corePassword,
+    normalizedPolicy,
+    normalizedPolicy.length * 4 + 64
+  );
   let cursor = 0;
   const nextByte = () => stream[cursor++ % stream.length];
   const output: string[] = [];
@@ -152,7 +168,9 @@ export async function adaptPasswordOutput(corePassword: string, policy: Password
   return output.join("");
 }
 
-export function normalizePasswordOutputPolicy(policy: PasswordOutputPolicy): PasswordOutputPolicy {
+export function normalizePasswordOutputPolicy(
+  policy: PasswordOutputPolicy
+): PasswordOutputPolicy {
   return {
     length: clampInteger(policy.length, 4, 128),
     useUppercase: Boolean(policy.useUppercase),
@@ -174,7 +192,9 @@ function buildCharacterGroups(policy: PasswordOutputPolicy) {
     uppercase: policy.useUppercase ? removeForbidden(UPPERCASE, forbidden) : "",
     lowercase: policy.useLowercase ? removeForbidden(LOWERCASE, forbidden) : "",
     digits: policy.useDigits ? removeForbidden(DIGITS, forbidden) : "",
-    symbols: policy.useSymbols ? removeForbidden(policy.allowedSymbols, forbidden) : ""
+    symbols: policy.useSymbols
+      ? removeForbidden(policy.allowedSymbols, forbidden)
+      : ""
   };
 }
 
@@ -195,7 +215,11 @@ function pickCharacter(characters: string, byte: number): string {
   return characters[byte % characters.length];
 }
 
-async function createByteStream(corePassword: string, policy: PasswordOutputPolicy, byteLength: number): Promise<Uint8Array> {
+async function createByteStream(
+  corePassword: string,
+  policy: PasswordOutputPolicy,
+  byteLength: number
+): Promise<Uint8Array> {
   const chunks: number[] = [];
   let counter = 0;
   while (chunks.length < byteLength) {
@@ -212,6 +236,10 @@ async function createByteStream(corePassword: string, policy: PasswordOutputPoli
   return new Uint8Array(chunks.slice(0, byteLength));
 }
 
-export function serializePasswordOutputPolicy(policy: PasswordOutputPolicy): string {
-  return bytesToBase64(utf8ToBytes(JSON.stringify(normalizePasswordOutputPolicy(policy))));
+export function serializePasswordOutputPolicy(
+  policy: PasswordOutputPolicy
+): string {
+  return bytesToBase64(
+    utf8ToBytes(JSON.stringify(normalizePasswordOutputPolicy(policy)))
+  );
 }

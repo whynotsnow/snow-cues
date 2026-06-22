@@ -1,5 +1,10 @@
 import { SPACE_STORE_NAME } from "./constants";
-import { openDatabase, requestToPromise, runTransaction, transactionDone } from "./database";
+import {
+  openDatabase,
+  requestToPromise,
+  runTransaction,
+  transactionDone
+} from "./database";
 import { normalizeStoredSpaceId, sanitizeSpaceRecord } from "./sanitize";
 import type { SpaceRecord, SpaceRecordInput, SpaceRecordPatch } from "./types";
 
@@ -38,15 +43,22 @@ export async function listSpaces(): Promise<SpaceRecord[]> {
   const spaces = await runTransaction(SPACE_STORE_NAME, "readonly", (tx) =>
     requestToPromise<SpaceRecord[]>(tx.objectStore(SPACE_STORE_NAME).getAll())
   );
-  return spaces.map(sanitizeSpaceRecord).sort((a, b) => b.updatedAt - a.updatedAt);
+  return spaces
+    .map(sanitizeSpaceRecord)
+    .sort((a, b) => b.updatedAt - a.updatedAt);
 }
 
-export async function updateSpace(spaceId: string, patch: SpaceRecordPatch): Promise<SpaceRecord> {
+export async function updateSpace(
+  spaceId: string,
+  patch: SpaceRecordPatch
+): Promise<SpaceRecord> {
   const db = await openDatabase();
   const tx = db.transaction(SPACE_STORE_NAME, "readwrite");
   const store = tx.objectStore(SPACE_STORE_NAME);
   const normalizedSpaceId = normalizeStoredSpaceId(spaceId);
-  const existing = await requestToPromise<SpaceRecord | undefined>(store.get(normalizedSpaceId));
+  const existing = await requestToPromise<SpaceRecord | undefined>(
+    store.get(normalizedSpaceId)
+  );
 
   if (!existing) {
     throw new Error("未找到存储空间。");
@@ -56,8 +68,14 @@ export async function updateSpace(spaceId: string, patch: SpaceRecordPatch): Pro
   const now = Date.now();
   const updated = sanitizeSpaceRecord({
     ...existing,
-    displayName: patch.displayName === undefined ? existing.displayName : patch.displayName,
-    description: patch.description === undefined ? existing.description : patch.description,
+    displayName:
+      patch.displayName === undefined
+        ? existing.displayName
+        : patch.displayName,
+    description:
+      patch.description === undefined
+        ? existing.description
+        : patch.description,
     status: nextStatus,
     deprecatedAt:
       patch.deprecatedAt === undefined

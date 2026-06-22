@@ -17,13 +17,21 @@ import {
   sanitizePasswordEntry,
   sanitizeSpaceRelation
 } from "./sanitize";
-import type { MigrationBatch, MigrationEntry, PasswordEntry, PasswordGroup, SpaceRelation } from "./types";
+import type {
+  MigrationBatch,
+  MigrationEntry,
+  PasswordEntry,
+  PasswordGroup,
+  SpaceRelation
+} from "./types";
 
 export async function clearPasswordEntries(): Promise<void> {
   return clearPasswordEntriesBySpace(DEFAULT_SPACE_ID);
 }
 
-export async function clearPasswordEntriesBySpace(spaceId: string): Promise<void> {
+export async function clearPasswordEntriesBySpace(
+  spaceId: string
+): Promise<void> {
   const db = await openDatabase();
   const tx = db.transaction(STORE_NAME, "readwrite");
   const store = tx.objectStore(STORE_NAME);
@@ -70,17 +78,22 @@ export async function deleteSpaceData(spaceId: string): Promise<void> {
   const batchStore = tx.objectStore(MIGRATION_BATCH_STORE_NAME);
   const migrationEntryStore = tx.objectStore(MIGRATION_ENTRY_STORE_NAME);
   const groupStore = tx.objectStore(PASSWORD_GROUP_STORE_NAME);
-  const [entries, relations, batches, migrationEntries, groups] = await Promise.all([
-    requestToPromise<PasswordEntry[]>(entryStore.getAll()),
-    requestToPromise<SpaceRelation[]>(relationStore.getAll()),
-    requestToPromise<MigrationBatch[]>(batchStore.getAll()),
-    requestToPromise<MigrationEntry[]>(migrationEntryStore.getAll()),
-    requestToPromise<PasswordGroup[]>(groupStore.getAll())
-  ]);
+  const [entries, relations, batches, migrationEntries, groups] =
+    await Promise.all([
+      requestToPromise<PasswordEntry[]>(entryStore.getAll()),
+      requestToPromise<SpaceRelation[]>(relationStore.getAll()),
+      requestToPromise<MigrationBatch[]>(batchStore.getAll()),
+      requestToPromise<MigrationEntry[]>(migrationEntryStore.getAll()),
+      requestToPromise<PasswordGroup[]>(groupStore.getAll())
+    ]);
   const deletedBatchIds = new Set(
     batches
       .map(sanitizeMigrationBatch)
-      .filter((batch) => batch.sourceSpaceId === normalizedSpaceId || batch.targetSpaceId === normalizedSpaceId)
+      .filter(
+        (batch) =>
+          batch.sourceSpaceId === normalizedSpaceId ||
+          batch.targetSpaceId === normalizedSpaceId
+      )
       .map((batch) => batch.id)
   );
   await Promise.all([
@@ -96,9 +109,15 @@ export async function deleteSpaceData(spaceId: string): Promise<void> {
       .map((group) => requestToPromise(groupStore.delete(group.id))),
     ...relations
       .map(sanitizeSpaceRelation)
-      .filter((relation) => relation.fromSpaceId === normalizedSpaceId || relation.toSpaceId === normalizedSpaceId)
+      .filter(
+        (relation) =>
+          relation.fromSpaceId === normalizedSpaceId ||
+          relation.toSpaceId === normalizedSpaceId
+      )
       .map((relation) => requestToPromise(relationStore.delete(relation.id))),
-    ...Array.from(deletedBatchIds).map((batchId) => requestToPromise(batchStore.delete(batchId))),
+    ...Array.from(deletedBatchIds).map((batchId) =>
+      requestToPromise(batchStore.delete(batchId))
+    ),
     ...migrationEntries
       .map(sanitizeMigrationEntry)
       .filter(

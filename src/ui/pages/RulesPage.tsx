@@ -1,6 +1,13 @@
 import { useState } from "react";
 import { availableRules } from "../../rule-registry/rules";
-import { ActionGroup, Button, Card, SectionHeader, TextareaField, TextField } from "../design-system";
+import {
+  ActionGroup,
+  Button,
+  Card,
+  SectionHeader,
+  TextareaField,
+  TextField
+} from "../design-system";
 import type { AppController } from "../useAppController";
 
 type RulesPageProps = {
@@ -68,7 +75,11 @@ export function RulesPage({ controller }: RulesPageProps) {
         <SectionHeader
           actions={
             <Button
-              disabled={ruleProfileConfirmed || !confirmRuleProfileAllowed || needsSpaceHomeSession}
+              disabled={
+                ruleProfileConfirmed ||
+                !confirmRuleProfileAllowed ||
+                needsSpaceHomeSession
+              }
               loading={confirmingProfile}
               loadingLabel="初始化中..."
               onClick={() => void confirmRuleProfile()}
@@ -80,7 +91,9 @@ export function RulesPage({ controller }: RulesPageProps) {
           title="规则链初始化"
         />
         {needsSpaceHomeSession ? (
-          <p className="field-note">请先在空间主页设置空间主密码，再初始化规则链。</p>
+          <p className="field-note">
+            请先在空间主页设置空间主密码，再初始化规则链。
+          </p>
         ) : null}
         {!sessionAlive && !ruleProfileConfirmed && !needsSpaceHomeSession ? (
           <TextField
@@ -104,15 +117,25 @@ export function RulesPage({ controller }: RulesPageProps) {
               />
               <span>
                 <strong>{rule.label}</strong>
-                <small>{rule.id} · {rule.origin}</small>
+                <small>
+                  {rule.id} · {rule.origin}
+                </small>
               </span>
             </label>
           ))}
         </div>
         <div className="effective-rule">
-          <span>{ruleProfileConfirmed ? "已冻结规则链" : "待初始化规则链"}</span>
-          <strong>{effectiveRules.length > 0 ? effectiveRules.map((rule) => rule.label).join(" → ") : "未选择规则"}</strong>
-          <small>规则会按从左到右的顺序执行，上一条规则的输出会进入下一条规则；最终结果再按编码策略生成密码。</small>
+          <span>
+            {ruleProfileConfirmed ? "已冻结规则链" : "待初始化规则链"}
+          </span>
+          <strong>
+            {effectiveRules.length > 0
+              ? effectiveRules.map((rule) => rule.label).join(" → ")
+              : "未选择规则"}
+          </strong>
+          <small>
+            规则会按从左到右的顺序执行，上一条规则的输出会进入下一条规则；最终结果再按编码策略生成密码。
+          </small>
         </div>
       </section>
       <div className="rule-grid">
@@ -127,7 +150,12 @@ export function RulesPage({ controller }: RulesPageProps) {
           </Card>
         ))}
         {importedRules.map((item) => (
-          <Card as="article" className="rule-card" key={item.manifest.id} tone="subtle">
+          <Card
+            as="article"
+            className="rule-card"
+            key={item.manifest.id}
+            tone="subtle"
+          >
             <div className="rule-card-header">
               <strong>{item.definition.label}</strong>
               <span>{item.enabled ? "已生效" : "未生效"}</span>
@@ -136,15 +164,26 @@ export function RulesPage({ controller }: RulesPageProps) {
               defaultValue={item.manifest.name}
               disabled={ruleProfileConfirmed || !draftRuleProfileAllowed}
               label="规则名称"
-              onBlur={(event) => handleImportedRuleNameChange(item.manifest.id, event.target.value)}
+              onBlur={(event) =>
+                handleImportedRuleNameChange(
+                  item.manifest.id,
+                  event.target.value
+                )
+              }
             />
             <p>{item.definition.description}</p>
             <code>{item.manifest.id}</code>
             <ActionGroup variant="entry">
-              <Button disabled={ruleProfileConfirmed || !draftRuleProfileAllowed} onClick={() => handleImportedRuleToggle(item.manifest.id)}>
+              <Button
+                disabled={ruleProfileConfirmed || !draftRuleProfileAllowed}
+                onClick={() => handleImportedRuleToggle(item.manifest.id)}
+              >
                 {item.enabled ? "停用" : "启用"}
               </Button>
-              <Button disabled={ruleProfileConfirmed || !draftRuleProfileAllowed} onClick={() => handleImportedRuleDelete(item.manifest.id)}>
+              <Button
+                disabled={ruleProfileConfirmed || !draftRuleProfileAllowed}
+                onClick={() => handleImportedRuleDelete(item.manifest.id)}
+              >
                 删除规则
               </Button>
             </ActionGroup>
@@ -160,7 +199,12 @@ export function RulesPage({ controller }: RulesPageProps) {
           placeholder="粘贴声明式规则 JSON"
           value={ruleImportText}
         />
-        <Button disabled={ruleProfileConfirmed || !draftRuleProfileAllowed} type="submit">导入规则</Button>
+        <Button
+          disabled={ruleProfileConfirmed || !draftRuleProfileAllowed}
+          type="submit"
+        >
+          导入规则
+        </Button>
       </form>
       {showDevRuleSamples ? (
         <section className="sample-rules" aria-label="开发导入规则样例">
@@ -170,12 +214,19 @@ export function RulesPage({ controller }: RulesPageProps) {
           />
           <div className="sample-rule-grid">
             {DEV_SAMPLE_RULE_MANIFESTS.map((manifest) => (
-              <Card as="article" className="sample-rule-card" key={manifest.id} tone="subtle">
+              <Card
+                as="article"
+                className="sample-rule-card"
+                key={manifest.id}
+                tone="subtle"
+              >
                 <strong>{manifest.name}</strong>
                 <code>{JSON.stringify(manifest)}</code>
                 <Button
                   disabled={ruleProfileConfirmed || !draftRuleProfileAllowed}
-                  onClick={() => setRuleImportText(JSON.stringify(manifest, null, 2))}
+                  onClick={() =>
+                    setRuleImportText(JSON.stringify(manifest, null, 2))
+                  }
                 >
                   填入导入框
                 </Button>
@@ -185,7 +236,11 @@ export function RulesPage({ controller }: RulesPageProps) {
           <ActionGroup variant="tool">
             <Button
               disabled={ruleProfileConfirmed || !draftRuleProfileAllowed}
-              onClick={() => setRuleImportText(JSON.stringify(DEV_SAMPLE_RULE_MANIFESTS, null, 2))}
+              onClick={() =>
+                setRuleImportText(
+                  JSON.stringify(DEV_SAMPLE_RULE_MANIFESTS, null, 2)
+                )
+              }
             >
               填入批量导入样例
             </Button>

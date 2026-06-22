@@ -1,6 +1,9 @@
 import { bytesToBase64, utf8ToBytes } from "../lib/bytes";
 
-export type CryptoRule = (masterKey: CryptoKey, salt: string) => Promise<string>;
+export type CryptoRule = (
+  masterKey: CryptoKey,
+  salt: string
+) => Promise<string>;
 
 export type RuleDefinition = {
   id: string;
@@ -23,15 +26,26 @@ export type ImportedRuleManifest = {
 };
 
 async function hmacSha256(masterKey: CryptoKey, salt: string): Promise<string> {
-  const signature = await crypto.subtle.sign("HMAC", masterKey, utf8ToBytes(salt));
+  const signature = await crypto.subtle.sign(
+    "HMAC",
+    masterKey,
+    utf8ToBytes(salt)
+  );
   return bytesToBase64(new Uint8Array(signature));
 }
 
 async function pbkdf2Rule(masterKey: CryptoKey, salt: string): Promise<string> {
-  const hmacMaterial = await hmacSha256(masterKey, `snow-cues:v1.0:v2-pbkdf2:material:${salt}`);
-  const keyMaterial = await crypto.subtle.importKey("raw", utf8ToBytes(hmacMaterial), "PBKDF2", false, [
-    "deriveBits"
-  ]);
+  const hmacMaterial = await hmacSha256(
+    masterKey,
+    `snow-cues:v1.0:v2-pbkdf2:material:${salt}`
+  );
+  const keyMaterial = await crypto.subtle.importKey(
+    "raw",
+    utf8ToBytes(hmacMaterial),
+    "PBKDF2",
+    false,
+    ["deriveBits"]
+  );
   const bits = await crypto.subtle.deriveBits(
     {
       name: "PBKDF2",
@@ -76,15 +90,22 @@ export const RuleRegistry = Object.freeze({
   })
 } satisfies Record<RuleId, RuleDefinition>);
 
-export function getRule(ruleId: ActiveRuleId, importedRules: RuleDefinition[] = []): RuleDefinition {
-  const rule = RuleRegistry[ruleId as RuleId] ?? importedRules.find((item) => item.id === ruleId);
+export function getRule(
+  ruleId: ActiveRuleId,
+  importedRules: RuleDefinition[] = []
+): RuleDefinition {
+  const rule =
+    RuleRegistry[ruleId as RuleId] ??
+    importedRules.find((item) => item.id === ruleId);
   if (!rule || !rule.available) {
     throw new Error(`规则不可用：${ruleId}`);
   }
   return rule;
 }
 
-export const availableRules = Object.values(RuleRegistry).filter((rule) => rule.available);
+export const availableRules = Object.values(RuleRegistry).filter(
+  (rule) => rule.available
+);
 
 export function parseImportedRuleManifest(input: string): ImportedRuleManifest {
   let parsed: unknown;
@@ -105,7 +126,10 @@ export function parseImportedRuleManifest(input: string): ImportedRuleManifest {
     throw new Error("导入规则只允许 hmac-sha256 或 pbkdf2-sha256。");
   }
 
-  const namespace = typeof parsed.namespace === "string" && parsed.namespace.trim() ? parsed.namespace.trim() : id;
+  const namespace =
+    typeof parsed.namespace === "string" && parsed.namespace.trim()
+      ? parsed.namespace.trim()
+      : id;
   const iterations =
     typeof parsed.iterations === "number" && Number.isInteger(parsed.iterations)
       ? Math.min(Math.max(parsed.iterations, 100_000), 600_000)
@@ -120,7 +144,9 @@ export function parseImportedRuleManifest(input: string): ImportedRuleManifest {
   };
 }
 
-export function createImportedRule(manifest: ImportedRuleManifest): RuleDefinition {
+export function createImportedRule(
+  manifest: ImportedRuleManifest
+): RuleDefinition {
   if (manifest.algorithm === "hmac-sha256") {
     return {
       id: manifest.id,
@@ -128,7 +154,8 @@ export function createImportedRule(manifest: ImportedRuleManifest): RuleDefiniti
       available: true,
       origin: "导入规则",
       description: `声明式 HMAC-SHA256 规则，namespace=${manifest.namespace}。`,
-      execute: (masterKey, salt) => hmacSha256(masterKey, `${manifest.namespace}:${salt}`)
+      execute: (masterKey, salt) =>
+        hmacSha256(masterKey, `${manifest.namespace}:${salt}`)
     };
   }
 
@@ -139,10 +166,17 @@ export function createImportedRule(manifest: ImportedRuleManifest): RuleDefiniti
     origin: "导入规则",
     description: `声明式 PBKDF2-SHA256 规则，iterations=${manifest.iterations}，namespace=${manifest.namespace}。`,
     execute: async (masterKey, salt) => {
-      const hmacMaterial = await hmacSha256(masterKey, `${manifest.namespace}:material:${salt}`);
-      const keyMaterial = await crypto.subtle.importKey("raw", utf8ToBytes(hmacMaterial), "PBKDF2", false, [
-        "deriveBits"
-      ]);
+      const hmacMaterial = await hmacSha256(
+        masterKey,
+        `${manifest.namespace}:material:${salt}`
+      );
+      const keyMaterial = await crypto.subtle.importKey(
+        "raw",
+        utf8ToBytes(hmacMaterial),
+        "PBKDF2",
+        false,
+        ["deriveBits"]
+      );
       const bits = await crypto.subtle.deriveBits(
         {
           name: "PBKDF2",

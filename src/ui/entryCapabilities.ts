@@ -22,7 +22,10 @@ export type EntryCapabilities = {
   hiddenReason: string;
 };
 
-export function getEntryCapabilities(policyInput: SpacePolicyInput, entry: PasswordEntry): EntryCapabilities {
+export function getEntryCapabilities(
+  policyInput: SpacePolicyInput,
+  entry: PasswordEntry
+): EntryCapabilities {
   const canDecrypt = canDeriveInSpace(policyInput);
   const canReadHint = canViewMemoryHint(policyInput);
   const canEditMetadata = canEditEntryMetadata(policyInput);
@@ -45,7 +48,10 @@ export function getEntryCapabilities(policyInput: SpacePolicyInput, entry: Passw
   };
 }
 
-function getDisabledReason(policyInput: SpacePolicyInput, entry: PasswordEntry) {
+function getDisabledReason(
+  policyInput: SpacePolicyInput,
+  entry: PasswordEntry
+) {
   if (!policyInput.sessionAlive) {
     return policyInput.verificationStatus === "pending"
       ? "请先输入空间主密码并完成空间校验。"

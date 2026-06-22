@@ -66,16 +66,28 @@ describe("Space policy 能力矩阵", () => {
 
     expect(canCreateEntry(input)).toBe(false);
     expect(canEditRuleProfile(input)).toBe(false);
-    expect(canViewMemoryHint({ ...input, isVerificationTarget: false })).toBe(false);
-    expect(canViewMemoryHint({ ...input, isVerificationTarget: true })).toBe(true);
+    expect(canViewMemoryHint({ ...input, isVerificationTarget: false })).toBe(
+      false
+    );
+    expect(canViewMemoryHint({ ...input, isVerificationTarget: true })).toBe(
+      true
+    );
   });
 
   it("迁移写入要求 active、会话存活、校验完成且目标规则已初始化", () => {
     expect(canManageMigration(activeReady)).toBe(true);
-    expect(canManageMigration({ ...activeReady, ruleProfileInitialized: false })).toBe(false);
-    expect(canManageMigration({ ...activeReady, verificationStatus: "pending" })).toBe(false);
-    expect(canManageMigration({ ...activeReady, spaceStatus: "deprecated" })).toBe(false);
-    expect(canManageMigration({ ...activeReady, spaceStatus: "archived" })).toBe(false);
+    expect(
+      canManageMigration({ ...activeReady, ruleProfileInitialized: false })
+    ).toBe(false);
+    expect(
+      canManageMigration({ ...activeReady, verificationStatus: "pending" })
+    ).toBe(false);
+    expect(
+      canManageMigration({ ...activeReady, spaceStatus: "deprecated" })
+    ).toBe(false);
+    expect(
+      canManageMigration({ ...activeReady, spaceStatus: "archived" })
+    ).toBe(false);
   });
 
   it("UI 能力聚合会给出编辑、解密和禁用原因", () => {
@@ -89,7 +101,9 @@ describe("Space policy 能力矩阵", () => {
     };
     expect(getEntryCapabilities(pending, entry).canEditEntry).toBe(false);
     expect(getEntryCapabilities(pending, entry).canDecrypt).toBe(true);
-    expect(getEntryCapabilities(pending, entry).disabledReason).toBe("当前空间已有密码，请先完成空间校验后再编辑这条密码。");
+    expect(getEntryCapabilities(pending, entry).disabledReason).toBe(
+      "当前空间已有密码，请先完成空间校验后再编辑这条密码。"
+    );
 
     const archived = {
       ...activeReady,

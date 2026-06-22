@@ -28,10 +28,14 @@ export function useSpaceIndexController(
   setStatus: (message: string) => void
 ) {
   const [spaceIndexItems, setSpaceIndexItems] = useState<SpaceIndexItem[]>([]);
-  const [outsideShowCreateSpaceOptions, setOutsideShowCreateSpaceOptions] = useState(false);
-  const [outsideCreateMode, setOutsideCreateMode] = useState<OutsideCreateMode>("blank");
-  const [outsideCreateTargetSpaceId, setOutsideCreateTargetSpaceId] = useState("");
-  const [outsideCloneSourceSpaceId, setOutsideCloneSourceSpaceId] = useState("");
+  const [outsideShowCreateSpaceOptions, setOutsideShowCreateSpaceOptions] =
+    useState(false);
+  const [outsideCreateMode, setOutsideCreateMode] =
+    useState<OutsideCreateMode>("blank");
+  const [outsideCreateTargetSpaceId, setOutsideCreateTargetSpaceId] =
+    useState("");
+  const [outsideCloneSourceSpaceId, setOutsideCloneSourceSpaceId] =
+    useState("");
   const [outsideImportText, setOutsideImportText] = useState("");
 
   const refreshSpaceIndex = useCallback(async () => {
@@ -45,13 +49,19 @@ export function useSpaceIndexController(
       );
       setSpaceIndexItems(items);
     } catch (refreshError) {
-      setError(refreshError instanceof Error ? refreshError.message : "无法读取本地空间索引。");
+      setError(
+        refreshError instanceof Error
+          ? refreshError.message
+          : "无法读取本地空间索引。"
+      );
       setSpaceIndexItems([]);
     }
   }, [setError]);
 
   useEffect(() => {
-    setOutsideCloneSourceSpaceId((current) => current || spaceIndexItems[0]?.space.spaceId || "");
+    setOutsideCloneSourceSpaceId(
+      (current) => current || spaceIndexItems[0]?.space.spaceId || ""
+    );
   }, [spaceIndexItems]);
 
   useEffect(() => {
@@ -72,9 +82,16 @@ export function useSpaceIndexController(
       if (existingSpace) {
         throw new Error("目标存储空间已存在，请更换空间 ID 或直接进入该空间。");
       }
-      await enterCreatedSpace(targetSpaceId, "已进入临时存储空间。在空间主页设置空间主密码后，可初始化规则链或创建密码。");
+      await enterCreatedSpace(
+        targetSpaceId,
+        "已进入临时存储空间。在空间主页设置空间主密码后，可初始化规则链或创建密码。"
+      );
     } catch (createError) {
-      setError(createError instanceof Error ? createError.message : "无法创建空白空间。");
+      setError(
+        createError instanceof Error
+          ? createError.message
+          : "无法创建空白空间。"
+      );
     }
   }
 
@@ -99,10 +116,14 @@ export function useSpaceIndexController(
       await refreshSpaceIndex();
       await enterCreatedSpace(
         targetSpaceId,
-        batch ? "已创建目标空间和密码迁移队列，并进入目标空间主页。请先在空间主页设置空间主密码后继续。" : "已从已有空间 clone 配置并进入目标空间主页。请先在空间主页设置空间主密码后继续。"
+        batch
+          ? "已创建目标空间和密码迁移队列，并进入目标空间主页。请先在空间主页设置空间主密码后继续。"
+          : "已从已有空间 clone 配置并进入目标空间主页。请先在空间主页设置空间主密码后继续。"
       );
     } catch (cloneError) {
-      setError(cloneError instanceof Error ? cloneError.message : "无法 clone 空间。");
+      setError(
+        cloneError instanceof Error ? cloneError.message : "无法 clone 空间。"
+      );
     }
   }
 
@@ -123,10 +144,16 @@ export function useSpaceIndexController(
       await refreshSpaceIndex();
       await enterCreatedSpace(
         targetSpaceId,
-        batch ? "已从导入文件创建空间，密码条目已进入迁移队列，并进入空间主页。请先在空间主页设置空间主密码后继续。" : "已从导入文件创建空间并进入空间主页。请先在空间主页设置空间主密码后继续。"
+        batch
+          ? "已从导入文件创建空间，密码条目已进入迁移队列，并进入空间主页。请先在空间主页设置空间主密码后继续。"
+          : "已从导入文件创建空间并进入空间主页。请先在空间主页设置空间主密码后继续。"
       );
     } catch (importError) {
-      setError(importError instanceof Error ? importError.message : "无法导入空间数据。");
+      setError(
+        importError instanceof Error
+          ? importError.message
+          : "无法导入空间数据。"
+      );
     }
   }
 
@@ -135,14 +162,20 @@ export function useSpaceIndexController(
       await handleOutsideCreateBlankSpace();
       return;
     }
-    if (outsideCreateMode === "clone_profile" || outsideCreateMode === "clone_with_entries") {
+    if (
+      outsideCreateMode === "clone_profile" ||
+      outsideCreateMode === "clone_with_entries"
+    ) {
       await handleOutsideCloneSpace(outsideCreateMode === "clone_with_entries");
       return;
     }
     await handleOutsideImportSpace(outsideCreateMode === "import_with_entries");
   }
 
-  async function enterCreatedSpace(targetSpaceId: string, successMessage: string) {
+  async function enterCreatedSpace(
+    targetSpaceId: string,
+    successMessage: string
+  ) {
     setOutsideCreateTargetSpaceId("");
     setOutsideCreateMode("blank");
     setOutsideImportText("");

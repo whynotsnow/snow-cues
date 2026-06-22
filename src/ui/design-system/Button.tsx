@@ -26,7 +26,9 @@ export function Button({
     variant === "ghost" ? "ds-button-ghost" : "",
     size === "sm" ? "ds-button-sm" : "",
     className
-  ].filter(Boolean).join(" ");
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <button
@@ -36,7 +38,7 @@ export function Button({
       disabled={disabled || loading}
       type={type}
     >
-      {loading ? loadingLabel ?? children : children}
+      {loading ? (loadingLabel ?? children) : children}
     </button>
   );
 }

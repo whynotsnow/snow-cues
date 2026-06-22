@@ -46,7 +46,8 @@ export function EntryVerificationPanel({
   successNote,
   verified = false
 }: EntryVerificationPanelProps) {
-  const selectedEntry = entries.find((entry) => entry.id === selectedEntryId) ?? entries[0] ?? null;
+  const selectedEntry =
+    entries.find((entry) => entry.id === selectedEntryId) ?? entries[0] ?? null;
 
   if (!selectedEntry && !verified) {
     return null;
@@ -56,16 +57,22 @@ export function EntryVerificationPanel({
     <div className="verification-panel">
       <div className="panel-heading">
         <h2>{title}</h2>
-        <p>{verified ? successDescription ?? description : description}</p>
+        <p>{verified ? (successDescription ?? description) : description}</p>
       </div>
       {verified ? (
-        successNote ? <p className="login-note">{successNote}</p> : null
+        successNote ? (
+          <p className="login-note">{successNote}</p>
+        ) : null
       ) : (
         <>
           {entries.length > 1 && selectedEntry ? (
             <label className="verification-entry-selector">
               {selectLabel}
-              <select disabled={disabled || submitting} onChange={(event) => onSelectEntry(event.target.value)} value={selectedEntry.id}>
+              <select
+                disabled={disabled || submitting}
+                onChange={(event) => onSelectEntry(event.target.value)}
+                value={selectedEntry.id}
+              >
                 {entries.map((entry) => (
                   <option key={entry.id} value={entry.id}>
                     {formatVerificationEntryLabel(entry)}
@@ -86,8 +93,12 @@ export function EntryVerificationPanel({
             />
           ) : null}
           {onSubmit && submitLabel ? (
-            <button disabled={disabled || submitting} onClick={onSubmit} type="button">
-              {submitting ? submittingLabel ?? submitLabel : submitLabel}
+            <button
+              disabled={disabled || submitting}
+              onClick={onSubmit}
+              type="button"
+            >
+              {submitting ? (submittingLabel ?? submitLabel) : submitLabel}
             </button>
           ) : null}
         </>
@@ -96,7 +107,9 @@ export function EntryVerificationPanel({
   );
 }
 
-export function formatVerificationEntryLabel(entry: Pick<VerificationEntryOption, "platform" | "description" | "updatedAt">) {
+export function formatVerificationEntryLabel(
+  entry: Pick<VerificationEntryOption, "platform" | "description" | "updatedAt">
+) {
   const name = entry.platform || entry.description || "未填写平台";
   return `${name} · ${new Date(entry.updatedAt).toLocaleString("zh-CN")}`;
 }

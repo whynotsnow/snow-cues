@@ -13,7 +13,8 @@ export type CreatePasswordInput = {
   maxLength: number;
 };
 
-const DEFAULT_CUSTOM_CHARSET = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%+=?";
+const DEFAULT_CUSTOM_CHARSET =
+  "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%+=?";
 
 export function useCreatePasswordForm() {
   // 新建表单输入仅停留在组件生命周期内，提交成功后由表单主动清空。

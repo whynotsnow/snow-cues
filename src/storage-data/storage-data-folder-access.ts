@@ -1,4 +1,7 @@
-import { diffStorageDataContent, hasStorageDataChanges } from "./storage-data-diff";
+import {
+  diffStorageDataContent,
+  hasStorageDataChanges
+} from "./storage-data-diff";
 import {
   buildNextStorageDataFile,
   buildStorageDataDraftFile,
@@ -7,7 +10,10 @@ import {
   serializeStorageDataDraftFile,
   serializeStorageDataFile
 } from "./storage-data-format";
-import { createStorageDataRepository, type StorageDataRepository } from "./storage-data-repository";
+import {
+  createStorageDataRepository,
+  type StorageDataRepository
+} from "./storage-data-repository";
 import type {
   StorageDataDraftFile,
   StorageDataDraftReason,
@@ -52,7 +58,14 @@ export type StorageDataDraftExport = {
 };
 
 export class StorageDataSaveError extends Error {
-  constructor(message: string, readonly code: "empty-save" | "external-change" | "write-failed" | "unsupported") {
+  constructor(
+    message: string,
+    readonly code:
+      | "empty-save"
+      | "external-change"
+      | "write-failed"
+      | "unsupported"
+  ) {
     super(message);
   }
 }
@@ -64,8 +77,14 @@ declare global {
   }
 
   interface FileSystemDirectoryHandle {
-    getDirectoryHandle(name: string, options?: { create?: boolean }): Promise<FileSystemDirectoryHandle>;
-    getFileHandle(name: string, options?: { create?: boolean }): Promise<FileSystemFileHandle>;
+    getDirectoryHandle(
+      name: string,
+      options?: { create?: boolean }
+    ): Promise<FileSystemDirectoryHandle>;
+    getFileHandle(
+      name: string,
+      options?: { create?: boolean }
+    ): Promise<FileSystemFileHandle>;
   }
 
   interface FileSystemFileHandle {
@@ -80,12 +99,15 @@ declare global {
 }
 
 export function detectStorageDataAccessMode(): FileSystemAccessMode {
-  return typeof window !== "undefined" && typeof window.showDirectoryPicker === "function"
+  return typeof window !== "undefined" &&
+    typeof window.showDirectoryPicker === "function"
     ? "direct-folder"
     : "download-only";
 }
 
-export async function createStorageDataWorkspaceFromFile(file: StorageDataFile): Promise<StorageDataWorkspace> {
+export async function createStorageDataWorkspaceFromFile(
+  file: StorageDataFile
+): Promise<StorageDataWorkspace> {
   return {
     mode: "download",
     file,
@@ -95,13 +117,21 @@ export async function createStorageDataWorkspaceFromFile(file: StorageDataFile):
   };
 }
 
-export async function openStorageDataText(text: string): Promise<StorageDataWorkspace> {
-  return createStorageDataWorkspaceFromFile(await parseStorageDataFileText(text));
+export async function openStorageDataText(
+  text: string
+): Promise<StorageDataWorkspace> {
+  return createStorageDataWorkspaceFromFile(
+    await parseStorageDataFileText(text)
+  );
 }
 
-export async function openStorageDataFolder(directoryHandle: FileSystemDirectoryHandle): Promise<StorageDataWorkspace> {
+export async function openStorageDataFolder(
+  directoryHandle: FileSystemDirectoryHandle
+): Promise<StorageDataWorkspace> {
   const currentHandle = await directoryHandle.getFileHandle("current.json");
-  const file = await parseStorageDataFileText(await (await currentHandle.getFile()).text());
+  const file = await parseStorageDataFileText(
+    await (await currentHandle.getFile()).text()
+  );
   await ensureStorageDataDirectories(directoryHandle);
   return {
     mode: "direct-folder",
@@ -113,33 +143,64 @@ export async function openStorageDataFolder(directoryHandle: FileSystemDirectory
   };
 }
 
-export async function createStorageDataFolder(directoryHandle: FileSystemDirectoryHandle): Promise<StorageDataWorkspace> {
+export async function createStorageDataFolder(
+  directoryHandle: FileSystemDirectoryHandle
+): Promise<StorageDataWorkspace> {
   await ensureStorageDataDirectories(directoryHandle);
   const file = await createInitialStorageDataFile();
-  await writeFile(await directoryHandle.getFileHandle("current.json", { create: true }), serializeStorageDataFile(file));
-  const revisions = await directoryHandle.getDirectoryHandle("revisions", { create: true });
   await writeFile(
-    await revisions.getFileHandle(createRevisionFileName(file.revision), { create: true }),
+    await directoryHandle.getFileHandle("current.json", { create: true }),
+    serializeStorageDataFile(file)
+  );
+  const revisions = await directoryHandle.getDirectoryHandle("revisions", {
+    create: true
+  });
+  await writeFile(
+    await revisions.getFileHandle(createRevisionFileName(file.revision), {
+      create: true
+    }),
     serializeStorageDataFile(file)
   );
   return openStorageDataFolder(directoryHandle);
 }
 
-export async function saveStorageDataWorkspace(workspace: StorageDataWorkspace): Promise<StorageDataSaveResult> {
-  const summary = diffStorageDataContent(workspace.file.data, workspace.repository.snapshot());
+export async function saveStorageDataWorkspace(
+  workspace: StorageDataWorkspace
+): Promise<StorageDataSaveResult> {
+  const summary = diffStorageDataContent(
+    workspace.file.data,
+    workspace.repository.snapshot()
+  );
   if (!hasStorageDataChanges(summary)) {
     throw new StorageDataSaveError("没有可保存的存储数据改动。", "empty-save");
   }
-  const nextFile = await buildNextStorageDataFile(workspace.file, workspace.repository.snapshot());
+  const nextFile = await buildNextStorageDataFile(
+    workspace.file,
+    workspace.repository.snapshot()
+  );
   if (workspace.mode === "direct-folder") {
     if (!workspace.directoryHandle) {
-      throw new StorageDataSaveError("当前浏览器未授权写入存储数据文件夹。", "unsupported");
+      throw new StorageDataSaveError(
+        "当前浏览器未授权写入存储数据文件夹。",
+        "unsupported"
+      );
     }
     await assertNoExternalChange(workspace);
-    const revisions = await workspace.directoryHandle.getDirectoryHandle("revisions", { create: true });
+    const revisions = await workspace.directoryHandle.getDirectoryHandle(
+      "revisions",
+      { create: true }
+    );
     const revisionFileName = createRevisionFileName(nextFile.revision);
-    await writeFile(await revisions.getFileHandle(revisionFileName, { create: true }), serializeStorageDataFile(nextFile));
-    await writeFile(await workspace.directoryHandle.getFileHandle("current.json", { create: true }), serializeStorageDataFile(nextFile));
+    await writeFile(
+      await revisions.getFileHandle(revisionFileName, { create: true }),
+      serializeStorageDataFile(nextFile)
+    );
+    await writeFile(
+      await workspace.directoryHandle.getFileHandle("current.json", {
+        create: true
+      }),
+      serializeStorageDataFile(nextFile)
+    );
     markWorkspaceSaved(workspace, nextFile);
     return { mode: "direct-folder", file: nextFile, revisionFileName, summary };
   }
@@ -158,12 +219,22 @@ export async function exportStorageDataDraft(
   workspace: StorageDataWorkspace,
   reason: StorageDataDraftReason
 ): Promise<StorageDataDraftExport> {
-  const draft = buildStorageDataDraftFile(workspace.file, workspace.repository.snapshot(), reason);
+  const draft = buildStorageDataDraftFile(
+    workspace.file,
+    workspace.repository.snapshot(),
+    reason
+  );
   const fileName = createDraftFileName(draft.createdAt);
   const content = serializeStorageDataDraftFile(draft);
   if (workspace.mode === "direct-folder" && workspace.directoryHandle) {
-    const drafts = await workspace.directoryHandle.getDirectoryHandle("drafts", { create: true });
-    await writeFile(await drafts.getFileHandle(fileName, { create: true }), content);
+    const drafts = await workspace.directoryHandle.getDirectoryHandle(
+      "drafts",
+      { create: true }
+    );
+    await writeFile(
+      await drafts.getFileHandle(fileName, { create: true }),
+      content
+    );
   }
   return { fileName, content, draft };
 }
@@ -172,14 +243,22 @@ async function assertNoExternalChange(workspace: StorageDataWorkspace) {
   if (!workspace.directoryHandle) {
     return;
   }
-  const currentHandle = await workspace.directoryHandle.getFileHandle("current.json");
-  const current = await parseStorageDataFileText(await (await currentHandle.getFile()).text());
-  if (current.revision !== workspace.openedRevision || current.contentHash !== workspace.openedHash) {
+  const currentHandle =
+    await workspace.directoryHandle.getFileHandle("current.json");
+  const current = await parseStorageDataFileText(
+    await (await currentHandle.getFile()).text()
+  );
+  if (
+    current.revision !== workspace.openedRevision ||
+    current.contentHash !== workspace.openedHash
+  ) {
     throw new StorageDataSaveError(EXTERNAL_CHANGE_MESSAGE, "external-change");
   }
 }
 
-async function ensureStorageDataDirectories(directoryHandle: FileSystemDirectoryHandle) {
+async function ensureStorageDataDirectories(
+  directoryHandle: FileSystemDirectoryHandle
+) {
   await directoryHandle.getDirectoryHandle("revisions", { create: true });
   await directoryHandle.getDirectoryHandle("drafts", { create: true });
   await directoryHandle.getDirectoryHandle("conflicts", { create: true });
@@ -191,11 +270,17 @@ async function writeFile(fileHandle: FileSystemFileHandle, content: string) {
     await writable.write(content);
     await writable.close();
   } catch (error) {
-    throw new StorageDataSaveError(error instanceof Error ? error.message : "存储数据文件写入失败。", "write-failed");
+    throw new StorageDataSaveError(
+      error instanceof Error ? error.message : "存储数据文件写入失败。",
+      "write-failed"
+    );
   }
 }
 
-function markWorkspaceSaved(workspace: StorageDataWorkspace, file: StorageDataFile) {
+function markWorkspaceSaved(
+  workspace: StorageDataWorkspace,
+  file: StorageDataFile
+) {
   workspace.file = file;
   workspace.openedRevision = file.revision;
   workspace.openedHash = file.contentHash;
@@ -207,6 +292,8 @@ export function createRevisionFileName(revision: number): string {
 }
 
 export function createDraftFileName(isoString: string): string {
-  return `storage-data-draft-${isoString.replace(/\.\d{3}Z$/, "Z").replace(/[-:]/g, "").replace("T", "T")}.json`;
+  return `storage-data-draft-${isoString
+    .replace(/\.\d{3}Z$/, "Z")
+    .replace(/[-:]/g, "")
+    .replace("T", "T")}.json`;
 }
-

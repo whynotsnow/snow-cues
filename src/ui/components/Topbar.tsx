@@ -22,13 +22,20 @@ export function Topbar({ controller, navigateToPage }: TopbarProps) {
       <div className="sidebar-brand">
         <p className="eyebrow">Snow Cues v2.0</p>
         <h1>安全本地密码系统</h1>
-        <p className="subtitle">以用户维护的存储数据文件夹作为唯一业务数据源。</p>
+        <p className="subtitle">
+          以用户维护的存储数据文件夹作为唯一业务数据源。
+        </p>
       </div>
       <div className="sidebar-status">
         {!outsideSpace ? (
           <div className="space-meta">
             <span>空间：{currentSpaceId}</span>
-            <span>状态：{currentSpaceIsTemporary ? "临时空间" : spaceStatusLabels[currentSpaceStatus]}</span>
+            <span>
+              状态：
+              {currentSpaceIsTemporary
+                ? "临时空间"
+                : spaceStatusLabels[currentSpaceStatus]}
+            </span>
           </div>
         ) : (
           <div className="space-meta">
@@ -39,25 +46,49 @@ export function Topbar({ controller, navigateToPage }: TopbarProps) {
       <nav className="side-menu" aria-label="主导航">
         {outsideSpace ? (
           <>
-            <button className={activePage === "detached" ? "" : "tab-active"} onClick={() => navigateToPage("space")} type="button">
+            <button
+              className={activePage === "detached" ? "" : "tab-active"}
+              onClick={() => navigateToPage("space")}
+              type="button"
+            >
               空间工作台
             </button>
-            <button className={activePage === "detached" ? "tab-active" : ""} onClick={() => navigateToPage("detached")} type="button">
+            <button
+              className={activePage === "detached" ? "tab-active" : ""}
+              onClick={() => navigateToPage("detached")}
+              type="button"
+            >
               游离密码
             </button>
           </>
         ) : (
           <>
-            <button className={activePage === "space" ? "tab-active" : ""} onClick={() => navigateToPage("space")} type="button">
+            <button
+              className={activePage === "space" ? "tab-active" : ""}
+              onClick={() => navigateToPage("space")}
+              type="button"
+            >
               空间主页
             </button>
-            <button className={activePage === "rules" ? "tab-active" : ""} onClick={() => navigateToPage("rules")} type="button">
+            <button
+              className={activePage === "rules" ? "tab-active" : ""}
+              onClick={() => navigateToPage("rules")}
+              type="button"
+            >
               规则管理
             </button>
-            <button className={activePage === "groups" ? "tab-active" : ""} onClick={() => navigateToPage("groups")} type="button">
+            <button
+              className={activePage === "groups" ? "tab-active" : ""}
+              onClick={() => navigateToPage("groups")}
+              type="button"
+            >
               输出适配
             </button>
-            <button className={activePage === "passwords" ? "tab-active" : ""} onClick={() => navigateToPage("passwords")} type="button">
+            <button
+              className={activePage === "passwords" ? "tab-active" : ""}
+              onClick={() => navigateToPage("passwords")}
+              type="button"
+            >
               密码管理
             </button>
           </>

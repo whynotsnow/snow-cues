@@ -46,7 +46,9 @@ export type CreateBlankSpaceInput = {
   targetSpaceId: string;
 };
 
-export async function createBlankSpace(input: CreateBlankSpaceInput): Promise<SpaceRecord> {
+export async function createBlankSpace(
+  input: CreateBlankSpaceInput
+): Promise<SpaceRecord> {
   await assertTargetSpaceAvailable(input.targetSpaceId);
   return saveSpace({
     spaceId: input.targetSpaceId,
@@ -54,13 +56,17 @@ export async function createBlankSpace(input: CreateBlankSpaceInput): Promise<Sp
   });
 }
 
-export async function exportSpacePackage(input: ExportSpaceInput): Promise<SpaceExportPackage> {
+export async function exportSpacePackage(
+  input: ExportSpaceInput
+): Promise<SpaceExportPackage> {
   const [space, profile, relations, groups, entries] = await Promise.all([
     getSpace(input.spaceId),
     listSpaceProfile(input.spaceId),
     listRelationsForSpace(input.spaceId),
     listPasswordGroupsBySpace(input.spaceId),
-    input.includeEntries ? listPasswordEntriesBySpace(input.spaceId) : Promise.resolve(undefined)
+    input.includeEntries
+      ? listPasswordEntriesBySpace(input.spaceId)
+      : Promise.resolve(undefined)
   ]);
 
   return {
@@ -76,7 +82,9 @@ export async function exportSpacePackage(input: ExportSpaceInput): Promise<Space
   };
 }
 
-export async function importSpacePackage(input: ImportSpaceInput): Promise<MigrationBatch | null> {
+export async function importSpacePackage(
+  input: ImportSpaceInput
+): Promise<MigrationBatch | null> {
   const parsed = parseSpaceExportPackage(input.packageText);
   await assertTargetSpaceAvailable(input.targetSpaceId);
   const savedSpace = await saveSpace({
@@ -87,12 +95,16 @@ export async function importSpacePackage(input: ImportSpaceInput): Promise<Migra
   });
 
   const parsedEntries = parsed.entries ?? [];
-  const importEntries = Boolean(input.importEntries && parsedEntries.length > 0);
+  const importEntries = Boolean(
+    input.importEntries && parsedEntries.length > 0
+  );
   if (input.importProfile && parsed.profile && !importEntries) {
     await saveSpaceProfile({
       spaceId: savedSpace.spaceId,
       ruleChain: [...parsed.profile.ruleChain],
-      importedRuleManifests: parsed.profile.importedRuleManifests.map((manifest) => ({ ...manifest }))
+      importedRuleManifests: parsed.profile.importedRuleManifests.map(
+        (manifest) => ({ ...manifest })
+      )
     });
   }
 
@@ -119,7 +131,9 @@ export async function importSpacePackage(input: ImportSpaceInput): Promise<Migra
     sourceProfileSnapshot: {
       ruleChain: parsed.profile?.ruleChain ? [...parsed.profile.ruleChain] : [],
       importedRuleManifests: parsed.profile?.importedRuleManifests
-        ? parsed.profile.importedRuleManifests.map((manifest) => ({ ...manifest }))
+        ? parsed.profile.importedRuleManifests.map((manifest) => ({
+            ...manifest
+          }))
         : []
     },
     totalCount: parsedEntries.length
@@ -172,13 +186,20 @@ function parseSpaceExportPackage(packageText: string): SpaceExportPackage {
     throw new Error("导入数据格式无效。");
   }
   const candidate = parsed as Partial<SpaceExportPackage>;
-  if (candidate.format !== "snow-cues-space-export" || candidate.version !== 1 || !candidate.sourceSpaceId) {
+  if (
+    candidate.format !== "snow-cues-space-export" ||
+    candidate.version !== 1 ||
+    !candidate.sourceSpaceId
+  ) {
     throw new Error("导入数据不是受支持的空间备份格式。");
   }
   return {
     format: "snow-cues-space-export",
     version: 1,
-    exportedAt: typeof candidate.exportedAt === "number" ? candidate.exportedAt : Date.now(),
+    exportedAt:
+      typeof candidate.exportedAt === "number"
+        ? candidate.exportedAt
+        : Date.now(),
     sourceSpaceId: candidate.sourceSpaceId,
     space: candidate.space ?? null,
     profile: candidate.profile ?? null,

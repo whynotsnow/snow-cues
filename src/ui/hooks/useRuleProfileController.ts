@@ -7,7 +7,11 @@ import {
   type ImportedRuleManifest,
   type RuleDefinition
 } from "../../rule-registry/rules";
-import { saveSpace, saveSpaceProfile, type SpaceRecord } from "../../storage-engine/storage-engine";
+import {
+  saveSpace,
+  saveSpaceProfile,
+  type SpaceRecord
+} from "../../storage-engine/storage-engine";
 import { canEditRuleProfile } from "../../space/policy";
 import type { SpacePolicyInput } from "../../space/types";
 import {
@@ -50,23 +54,38 @@ export function useRuleProfileController({
   setStatus,
   ensureLiveSession
 }: UseRuleProfileControllerInput) {
-  const [draftRuleIds, setDraftRuleIds] = useState<ActiveRuleId[]>(DEFAULT_RULE_CHAIN);
+  const [draftRuleIds, setDraftRuleIds] =
+    useState<ActiveRuleId[]>(DEFAULT_RULE_CHAIN);
   const [frozenRuleIds, setFrozenRuleIds] = useState<ActiveRuleId[]>([]);
   const [importedRules, setImportedRules] = useState<ImportedRuleState[]>([]);
   const [ruleImportText, setRuleImportText] = useState("");
   const [confirmingProfile, setConfirmingProfile] = useState(false);
 
   const availableRuleOptions = useMemo(
-    () => [...availableRules, ...importedRules.filter((rule) => rule.enabled).map((rule) => rule.definition)],
+    () => [
+      ...availableRules,
+      ...importedRules
+        .filter((rule) => rule.enabled)
+        .map((rule) => rule.definition)
+    ],
     [importedRules]
   );
-  const ruleCatalog = useMemo(() => [...availableRules, ...importedRules.map((rule) => rule.definition)], [importedRules]);
+  const ruleCatalog = useMemo(
+    () => [...availableRules, ...importedRules.map((rule) => rule.definition)],
+    [importedRules]
+  );
   const frozenRules = useMemo(
-    () => frozenRuleIds.map((id) => ruleCatalog.find((rule) => rule.id === id)).filter((rule): rule is RuleDefinition => Boolean(rule)),
+    () =>
+      frozenRuleIds
+        .map((id) => ruleCatalog.find((rule) => rule.id === id))
+        .filter((rule): rule is RuleDefinition => Boolean(rule)),
     [frozenRuleIds, ruleCatalog]
   );
   const draftRules = useMemo(
-    () => draftRuleIds.map((id) => ruleCatalog.find((rule) => rule.id === id)).filter((rule): rule is RuleDefinition => Boolean(rule)),
+    () =>
+      draftRuleIds
+        .map((id) => ruleCatalog.find((rule) => rule.id === id))
+        .filter((rule): rule is RuleDefinition => Boolean(rule)),
     [draftRuleIds, ruleCatalog]
   );
   const effectiveRules = ruleProfileConfirmed ? frozenRules : draftRules;
@@ -75,11 +94,18 @@ export function useRuleProfileController({
     sessionAlive: true
   });
   const editRuleProfileAllowed = canEditRuleProfile(basePolicyInput);
-  const confirmRuleProfileAllowed = draftRuleProfileAllowed && !ruleProfileConfirmed;
+  const confirmRuleProfileAllowed =
+    draftRuleProfileAllowed && !ruleProfileConfirmed;
 
-  function ensureRulePolicyAllowed(fallbackMessage = "当前空间不能导入或修改规则。") {
+  function ensureRulePolicyAllowed(
+    fallbackMessage = "当前空间不能导入或修改规则。"
+  ) {
     if (!draftRuleProfileAllowed) {
-      throw new Error(verificationPending ? "当前空间已有密码，请先完成空间校验后再进行写入或修改操作。" : fallbackMessage);
+      throw new Error(
+        verificationPending
+          ? "当前空间已有密码，请先完成空间校验后再进行写入或修改操作。"
+          : fallbackMessage
+      );
     }
   }
 
@@ -90,30 +116,38 @@ export function useRuleProfileController({
     setRuleProfileConfirmed(false);
   }, [setRuleProfileConfirmed]);
 
-  const applyPersistedProfile = useCallback((profileRuleIds: ActiveRuleId[], manifests: ImportedRuleManifest[]) => {
-    // 恢复空间 profile 时只重建声明式导入规则，规则链随后作为冻结配置使用。
-    const restoredRules = manifests.map((manifest) => ({
-      manifest,
-      definition: createImportedRule(manifest),
-      enabled: true
-    }));
-    setImportedRules(restoredRules);
-    setDraftRuleIds(profileRuleIds);
-    setFrozenRuleIds(profileRuleIds);
-    setRuleProfileConfirmed(true);
-  }, [setRuleProfileConfirmed]);
+  const applyPersistedProfile = useCallback(
+    (profileRuleIds: ActiveRuleId[], manifests: ImportedRuleManifest[]) => {
+      // 恢复空间 profile 时只重建声明式导入规则，规则链随后作为冻结配置使用。
+      const restoredRules = manifests.map((manifest) => ({
+        manifest,
+        definition: createImportedRule(manifest),
+        enabled: true
+      }));
+      setImportedRules(restoredRules);
+      setDraftRuleIds(profileRuleIds);
+      setFrozenRuleIds(profileRuleIds);
+      setRuleProfileConfirmed(true);
+    },
+    [setRuleProfileConfirmed]
+  );
 
-  const applyDraftProfile = useCallback((profileRuleIds: ActiveRuleId[], manifests: ImportedRuleManifest[]) => {
-    const restoredRules = manifests.map((manifest) => ({
-      manifest,
-      definition: createImportedRule(manifest),
-      enabled: true
-    }));
-    setImportedRules(restoredRules);
-    setDraftRuleIds(profileRuleIds.length > 0 ? profileRuleIds : DEFAULT_RULE_CHAIN);
-    setFrozenRuleIds([]);
-    setRuleProfileConfirmed(false);
-  }, [setRuleProfileConfirmed]);
+  const applyDraftProfile = useCallback(
+    (profileRuleIds: ActiveRuleId[], manifests: ImportedRuleManifest[]) => {
+      const restoredRules = manifests.map((manifest) => ({
+        manifest,
+        definition: createImportedRule(manifest),
+        enabled: true
+      }));
+      setImportedRules(restoredRules);
+      setDraftRuleIds(
+        profileRuleIds.length > 0 ? profileRuleIds : DEFAULT_RULE_CHAIN
+      );
+      setFrozenRuleIds([]);
+      setRuleProfileConfirmed(false);
+    },
+    [setRuleProfileConfirmed]
+  );
 
   useEffect(() => {
     // 可用规则变化时修剪草稿链；已冻结规则缺失则只提示，不自动替换。
@@ -125,10 +159,18 @@ export function useRuleProfileController({
     if (!ruleProfileConfirmed) {
       return;
     }
-    if (!frozenRuleIds.every((id) => ruleCatalog.some((rule) => rule.id === id))) {
+    if (
+      !frozenRuleIds.every((id) => ruleCatalog.some((rule) => rule.id === id))
+    ) {
       setError("当前规则链缺少规则定义，请重新进入空间并按原规则初始化。");
     }
-  }, [availableRuleOptions, frozenRuleIds, ruleCatalog, ruleProfileConfirmed, setError]);
+  }, [
+    availableRuleOptions,
+    frozenRuleIds,
+    ruleCatalog,
+    ruleProfileConfirmed,
+    setError
+  ]);
 
   function parseRuleImportText(): ImportedRuleManifest[] {
     let parsed: unknown;
@@ -139,7 +181,9 @@ export function useRuleProfileController({
     }
 
     const manifestInputs = Array.isArray(parsed) ? parsed : [parsed];
-    return manifestInputs.map((manifestInput) => parseImportedRuleManifest(JSON.stringify(manifestInput)));
+    return manifestInputs.map((manifestInput) =>
+      parseImportedRuleManifest(JSON.stringify(manifestInput))
+    );
   }
 
   function handleImportRule(event: FormEvent<HTMLFormElement>) {
@@ -154,7 +198,10 @@ export function useRuleProfileController({
       }
       const manifests = parseRuleImportText();
       // 导入阶段先做 ID 去重，避免同名规则进入本次初始化候选集。
-      const existingIds = new Set([...availableRules.map((rule) => rule.id), ...importedRules.map((rule) => rule.manifest.id)]);
+      const existingIds = new Set([
+        ...availableRules.map((rule) => rule.id),
+        ...importedRules.map((rule) => rule.manifest.id)
+      ]);
       const importingIds = new Set<string>();
       for (const manifest of manifests) {
         if (existingIds.has(manifest.id) || importingIds.has(manifest.id)) {
@@ -168,14 +215,13 @@ export function useRuleProfileController({
         definition: createImportedRule(manifest),
         enabled: true
       }));
-      setImportedRules((current) => [
-        ...current,
-        ...nextRules
-      ]);
+      setImportedRules((current) => [...current, ...nextRules]);
       setRuleImportText("");
       setStatus(`已导入 ${nextRules.length} 条规则，初始化前可加入规则链。`);
     } catch (importError) {
-      setError(importError instanceof Error ? importError.message : "无法导入规则。");
+      setError(
+        importError instanceof Error ? importError.message : "无法导入规则。"
+      );
     }
   }
 
@@ -183,15 +229,23 @@ export function useRuleProfileController({
     try {
       ensureRulePolicyAllowed("当前空间不能修改规则。");
     } catch (verifyError) {
-      setError(verifyError instanceof Error ? verifyError.message : "请先完成空间校验。");
+      setError(
+        verifyError instanceof Error
+          ? verifyError.message
+          : "请先完成空间校验。"
+      );
       return;
     }
     if (ruleProfileConfirmed) {
-      setError("规则链已初始化。为保持已有密码可追溯，本次会话内不再变更规则启用状态。");
+      setError(
+        "规则链已初始化。为保持已有密码可追溯，本次会话内不再变更规则启用状态。"
+      );
       return;
     }
     setImportedRules((current) =>
-      current.map((item) => (item.manifest.id === id ? { ...item, enabled: !item.enabled } : item))
+      current.map((item) =>
+        item.manifest.id === id ? { ...item, enabled: !item.enabled } : item
+      )
     );
     setDraftRuleIds((current) => current.filter((ruleId) => ruleId !== id));
   }
@@ -200,7 +254,11 @@ export function useRuleProfileController({
     try {
       ensureRulePolicyAllowed("当前空间不能修改规则。");
     } catch (verifyError) {
-      setError(verifyError instanceof Error ? verifyError.message : "请先完成空间校验。");
+      setError(
+        verifyError instanceof Error
+          ? verifyError.message
+          : "请先完成空间校验。"
+      );
       return;
     }
     if (ruleProfileConfirmed) {
@@ -231,17 +289,29 @@ export function useRuleProfileController({
     try {
       ensureRulePolicyAllowed("当前空间不能删除规则。");
     } catch (verifyError) {
-      setError(verifyError instanceof Error ? verifyError.message : "请先完成空间校验。");
+      setError(
+        verifyError instanceof Error
+          ? verifyError.message
+          : "请先完成空间校验。"
+      );
       return;
     }
     if (ruleProfileConfirmed) {
-      setError("规则链已初始化。为保持已有密码可追溯，本次会话内不再删除规则。");
+      setError(
+        "规则链已初始化。为保持已有密码可追溯，本次会话内不再删除规则。"
+      );
       return;
     }
-    if (!window.confirm("确认删除这条导入规则？未初始化前删除不会影响已保存密码。")) {
+    if (
+      !window.confirm(
+        "确认删除这条导入规则？未初始化前删除不会影响已保存密码。"
+      )
+    ) {
       return;
     }
-    setImportedRules((current) => current.filter((item) => item.manifest.id !== id));
+    setImportedRules((current) =>
+      current.filter((item) => item.manifest.id !== id)
+    );
     setDraftRuleIds((current) => current.filter((ruleId) => ruleId !== id));
   }
 
@@ -249,7 +319,11 @@ export function useRuleProfileController({
     try {
       ensureRulePolicyAllowed("当前空间不能修改规则链。");
     } catch (verifyError) {
-      setError(verifyError instanceof Error ? verifyError.message : "请先完成空间校验。");
+      setError(
+        verifyError instanceof Error
+          ? verifyError.message
+          : "请先完成空间校验。"
+      );
       return;
     }
     if (ruleProfileConfirmed) {
@@ -273,12 +347,18 @@ export function useRuleProfileController({
       if (!sessionAlive) {
         await ensureLiveSession(masterPassword);
       }
-      const normalizedRuleIds = draftRuleIds.filter((id, index) => draftRuleIds.indexOf(id) === index);
+      const normalizedRuleIds = draftRuleIds.filter(
+        (id, index) => draftRuleIds.indexOf(id) === index
+      );
       if (normalizedRuleIds.length === 0) {
         setError("请至少选择一个规则后再初始化。");
         return;
       }
-      if (!window.confirm("确认初始化规则链？初始化后本空间会冻结这组规则链，本次会话内不能再导入、停用、重命名或删除参与规则。")) {
+      if (
+        !window.confirm(
+          "确认初始化规则链？初始化后本空间会冻结这组规则链，本次会话内不能再导入、停用、重命名或删除参与规则。"
+        )
+      ) {
         return false;
       }
       const selectedImportedManifests = importedRules
@@ -303,7 +383,11 @@ export function useRuleProfileController({
       setStatus("规则链已初始化并保存。本空间后续进入会继续使用这组规则。");
       return true;
     } catch (profileError) {
-      setError(profileError instanceof Error ? profileError.message : "无法保存存储空间规则链配置。");
+      setError(
+        profileError instanceof Error
+          ? profileError.message
+          : "无法保存存储空间规则链配置。"
+      );
       return false;
     } finally {
       setConfirmingProfile(false);

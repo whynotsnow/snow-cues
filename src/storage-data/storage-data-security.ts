@@ -29,16 +29,32 @@ const FORBIDDEN_KEYS = new Set([
   "context"
 ]);
 
-export function sanitizeStorageDataContent(input: Partial<StorageDataContent>): StorageDataContent {
+export function sanitizeStorageDataContent(
+  input: Partial<StorageDataContent>
+): StorageDataContent {
   const cleaned = stripForbiddenKeys(input) as Partial<StorageDataContent>;
   return {
-    spaces: Array.isArray(cleaned.spaces) ? cleaned.spaces.map(sanitizeSpaceRecord) : [],
-    spaceProfiles: Array.isArray(cleaned.spaceProfiles) ? cleaned.spaceProfiles.map(sanitizeSpaceProfile) : [],
-    passwordEntries: Array.isArray(cleaned.passwordEntries) ? cleaned.passwordEntries.map(sanitizePasswordEntry) : [],
-    passwordGroups: Array.isArray(cleaned.passwordGroups) ? cleaned.passwordGroups.map(sanitizePasswordGroup) : [],
-    spaceRelations: Array.isArray(cleaned.spaceRelations) ? cleaned.spaceRelations.map(sanitizeSpaceRelation) : [],
-    migrationBatches: Array.isArray(cleaned.migrationBatches) ? cleaned.migrationBatches.map(sanitizeMigrationBatch) : [],
-    migrationEntries: Array.isArray(cleaned.migrationEntries) ? cleaned.migrationEntries.map(sanitizeMigrationEntry) : []
+    spaces: Array.isArray(cleaned.spaces)
+      ? cleaned.spaces.map(sanitizeSpaceRecord)
+      : [],
+    spaceProfiles: Array.isArray(cleaned.spaceProfiles)
+      ? cleaned.spaceProfiles.map(sanitizeSpaceProfile)
+      : [],
+    passwordEntries: Array.isArray(cleaned.passwordEntries)
+      ? cleaned.passwordEntries.map(sanitizePasswordEntry)
+      : [],
+    passwordGroups: Array.isArray(cleaned.passwordGroups)
+      ? cleaned.passwordGroups.map(sanitizePasswordGroup)
+      : [],
+    spaceRelations: Array.isArray(cleaned.spaceRelations)
+      ? cleaned.spaceRelations.map(sanitizeSpaceRelation)
+      : [],
+    migrationBatches: Array.isArray(cleaned.migrationBatches)
+      ? cleaned.migrationBatches.map(sanitizeMigrationBatch)
+      : [],
+    migrationEntries: Array.isArray(cleaned.migrationEntries)
+      ? cleaned.migrationEntries.map(sanitizeMigrationEntry)
+      : []
   };
 }
 
@@ -58,4 +74,3 @@ export function stripForbiddenKeys(value: unknown): unknown {
   }
   return output;
 }
-

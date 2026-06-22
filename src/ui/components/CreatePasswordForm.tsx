@@ -34,13 +34,21 @@ export function CreatePasswordForm({ controller }: CreatePasswordFormProps) {
   }
 
   return (
-    <form className="generator-panel" onSubmit={(event) => void handleSubmit(event)}>
+    <form
+      className="generator-panel"
+      onSubmit={(event) => void handleSubmit(event)}
+    >
       <div className="panel-heading">
         <h2>新建密码</h2>
-        <p>当前密码会使用已初始化的规则链。请确认你能在未来用同一组规则和同一个关键密钥重建结果。</p>
+        <p>
+          当前密码会使用已初始化的规则链。请确认你能在未来用同一组规则和同一个关键密钥重建结果。
+        </p>
       </div>
       <ol className="flow-preview">
-        <li>读取已冻结的规则链：{effectiveRules.map((rule) => rule.label).join(" → ")}</li>
+        <li>
+          读取已冻结的规则链：
+          {effectiveRules.map((rule) => rule.label).join(" → ")}
+        </li>
         <li>输入关键密钥，按规则链顺序生成密码材料</li>
         <li>将最终材料编码为密码输出</li>
         <li>用空间会话和关键密钥派生临时 AES-GCM key</li>
@@ -49,10 +57,16 @@ export function CreatePasswordForm({ controller }: CreatePasswordFormProps) {
       <div className="effective-rule">
         <span>当前生效规则链</span>
         <strong>{effectiveRules.map((rule) => rule.label).join(" → ")}</strong>
-        <small>{effectiveRules.map((rule) => rule.description).join(" ")}</small>
+        <small>
+          {effectiveRules.map((rule) => rule.description).join(" ")}
+        </small>
       </div>
       <div className="field-grid">
-        {needsSpaceHomeSession ? <p className="field-note">请先在空间主页设置空间主密码，再创建密码。</p> : null}
+        {needsSpaceHomeSession ? (
+          <p className="field-note">
+            请先在空间主页设置空间主密码，再创建密码。
+          </p>
+        ) : null}
         {!sessionAlive && !needsSpaceHomeSession ? (
           <TextField
             autoComplete="current-password"
@@ -63,7 +77,11 @@ export function CreatePasswordForm({ controller }: CreatePasswordFormProps) {
             value={values.masterPassword}
           />
         ) : null}
-        <TextField label="平台" onChange={(event) => actions.setPlatform(event.target.value)} value={values.platform} />
+        <TextField
+          label="平台"
+          onChange={(event) => actions.setPlatform(event.target.value)}
+          value={values.platform}
+        />
         <SelectField
           label="所属密码组，可选"
           onChange={(event) => {
@@ -103,7 +121,13 @@ export function CreatePasswordForm({ controller }: CreatePasswordFormProps) {
           placeholder="加密保存；不要填写关键密钥本身"
           value={values.memoryHint}
         />
-        <SelectField label="输出编码" onChange={(event) => actions.setEncodingMode(event.target.value as EncodingMode)} value={values.encodingMode}>
+        <SelectField
+          label="输出编码"
+          onChange={(event) =>
+            actions.setEncodingMode(event.target.value as EncodingMode)
+          }
+          value={values.encodingMode}
+        >
           <option value="base62">Base62</option>
           <option value="base64">Base64</option>
           <option value="custom">自定义字符集</option>

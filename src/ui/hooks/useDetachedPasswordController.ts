@@ -13,25 +13,35 @@ type UseDetachedPasswordControllerInput = {
   setError: (message: string) => void;
 };
 
-const DEFAULT_CUSTOM_CHARSET = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%+=?";
+const DEFAULT_CUSTOM_CHARSET =
+  "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%+=?";
 
 export function useDetachedPasswordController({
   setStatus,
   setError
 }: UseDetachedPasswordControllerInput) {
   const [detachedDerivationKey, setDetachedDerivationKey] = useState("");
-  const [detachedEncodingMode, setDetachedEncodingMode] = useState<EncodingMode>("base62");
-  const [detachedCustomCharset, setDetachedCustomCharset] = useState(DEFAULT_CUSTOM_CHARSET);
+  const [detachedEncodingMode, setDetachedEncodingMode] =
+    useState<EncodingMode>("base62");
+  const [detachedCustomCharset, setDetachedCustomCharset] = useState(
+    DEFAULT_CUSTOM_CHARSET
+  );
   const [detachedMaxLength, setDetachedMaxLength] = useState(24);
-  const [detachedOutputPresetId, setDetachedOutputPresetId] = useState<PasswordOutputPresetId | "custom">("strong");
-  const [detachedOutputPolicy, setDetachedOutputPolicy] = useState<PasswordOutputPolicy>(DEFAULT_PASSWORD_OUTPUT_POLICY);
-  const [detachedApplyOutputPolicy, setDetachedApplyOutputPolicy] = useState(true);
+  const [detachedOutputPresetId, setDetachedOutputPresetId] = useState<
+    PasswordOutputPresetId | "custom"
+  >("strong");
+  const [detachedOutputPolicy, setDetachedOutputPolicy] =
+    useState<PasswordOutputPolicy>(DEFAULT_PASSWORD_OUTPUT_POLICY);
+  const [detachedApplyOutputPolicy, setDetachedApplyOutputPolicy] =
+    useState(true);
   const [detachedPasswordPreview, setDetachedPasswordPreview] = useState("");
   const [detachedPasswordVisible, setDetachedPasswordVisible] = useState(false);
   const [detachedGenerating, setDetachedGenerating] = useState(false);
   const [detachedCopyStatus, setDetachedCopyStatus] = useState("");
-  const [pendingDetachedEntrySecret, setPendingDetachedEntrySecret] = useState("");
-  const [detachedMigrationFormVisible, setDetachedMigrationFormVisible] = useState(false);
+  const [pendingDetachedEntrySecret, setPendingDetachedEntrySecret] =
+    useState("");
+  const [detachedMigrationFormVisible, setDetachedMigrationFormVisible] =
+    useState(false);
 
   async function handleGenerateDetachedPassword() {
     setError("");
@@ -45,7 +55,10 @@ export function useDetachedPasswordController({
         maxLength: detachedMaxLength
       });
       const previewPassword = detachedApplyOutputPolicy
-        ? await adaptPasswordOutput(generated.encodedPassword, detachedOutputPolicy)
+        ? await adaptPasswordOutput(
+            generated.encodedPassword,
+            detachedOutputPolicy
+          )
         : generated.encodedPassword;
       setDetachedPasswordPreview(previewPassword);
       setDetachedPasswordVisible(true);
@@ -57,7 +70,11 @@ export function useDetachedPasswordController({
     } catch (generateError) {
       setDetachedPasswordPreview("");
       setDetachedPasswordVisible(false);
-      setError(generateError instanceof Error ? generateError.message : "无法生成游离密码。");
+      setError(
+        generateError instanceof Error
+          ? generateError.message
+          : "无法生成游离密码。"
+      );
     } finally {
       setDetachedGenerating(false);
     }
@@ -92,7 +109,9 @@ export function useDetachedPasswordController({
     }
     setPendingDetachedEntrySecret(detachedDerivationKey);
     setDetachedMigrationFormVisible(false);
-    setStatus("已准备迁移派生密钥。请进入目标空间后，在密码管理页按当前空间规则生成并保存正式密码。");
+    setStatus(
+      "已准备迁移派生密钥。请进入目标空间后，在密码管理页按当前空间规则生成并保存正式密码。"
+    );
   }
 
   function handleCancelDetachedPasswordMigration() {

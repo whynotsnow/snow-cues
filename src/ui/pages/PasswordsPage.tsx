@@ -36,9 +36,16 @@ export function PasswordsPage({ controller }: PasswordsPageProps) {
         <div className="section-header">
           <div>
             <h2>密码管理</h2>
-            <p>查看、解密和维护当前空间中的密码条目。新建密码需要正常空间、可用会话和已初始化规则链；受限空间只保留允许的查看能力。</p>
+            <p>
+              查看、解密和维护当前空间中的密码条目。新建密码需要正常空间、可用会话和已初始化规则链；受限空间只保留允许的查看能力。
+            </p>
           </div>
-          <button className="primary-button" disabled={createDisabled} onClick={handleCreateEntryClick} type="button">
+          <button
+            className="primary-button"
+            disabled={createDisabled}
+            onClick={handleCreateEntryClick}
+            type="button"
+          >
             {createLabel}
           </button>
         </div>
@@ -46,7 +53,10 @@ export function PasswordsPage({ controller }: PasswordsPageProps) {
 
       <DetachedPasswordMigrationCard controller={controller} />
       {showCreateForm ? <CreatePasswordForm controller={controller} /> : null}
-      <EntriesSection controller={controller} hideVerificationControls={verificationPending} />
+      <EntriesSection
+        controller={controller}
+        hideVerificationControls={verificationPending}
+      />
     </>
   );
 }

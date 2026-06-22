@@ -7,7 +7,11 @@ type PasswordOutputPolicyFieldsProps = {
   onChange: (policy: PasswordOutputPolicy) => void;
 };
 
-export function PasswordOutputPolicyFields({ disabled = false, policy, onChange }: PasswordOutputPolicyFieldsProps) {
+export function PasswordOutputPolicyFields({
+  disabled = false,
+  policy,
+  onChange
+}: PasswordOutputPolicyFieldsProps) {
   function patch(next: Partial<PasswordOutputPolicy>) {
     onChange({
       ...policy,
@@ -29,14 +33,18 @@ export function PasswordOutputPolicyFields({ disabled = false, policy, onChange 
         disabled={disabled || !policy.useUppercase}
         label="最少大写"
         min={0}
-        onChange={(event) => patch({ minUppercase: Number(event.target.value) })}
+        onChange={(event) =>
+          patch({ minUppercase: Number(event.target.value) })
+        }
         value={policy.minUppercase}
       />
       <NumberField
         disabled={disabled || !policy.useLowercase}
         label="最少小写"
         min={0}
-        onChange={(event) => patch({ minLowercase: Number(event.target.value) })}
+        onChange={(event) =>
+          patch({ minLowercase: Number(event.target.value) })
+        }
         value={policy.minLowercase}
       />
       <NumberField
@@ -58,25 +66,45 @@ export function PasswordOutputPolicyFields({ disabled = false, policy, onChange 
           checked={policy.useUppercase}
           disabled={disabled}
           label="大写"
-          onChange={(event) => patch({ useUppercase: event.target.checked, minUppercase: event.target.checked ? policy.minUppercase : 0 })}
+          onChange={(event) =>
+            patch({
+              useUppercase: event.target.checked,
+              minUppercase: event.target.checked ? policy.minUppercase : 0
+            })
+          }
         />
         <CheckboxField
           checked={policy.useLowercase}
           disabled={disabled}
           label="小写"
-          onChange={(event) => patch({ useLowercase: event.target.checked, minLowercase: event.target.checked ? policy.minLowercase : 0 })}
+          onChange={(event) =>
+            patch({
+              useLowercase: event.target.checked,
+              minLowercase: event.target.checked ? policy.minLowercase : 0
+            })
+          }
         />
         <CheckboxField
           checked={policy.useDigits}
           disabled={disabled}
           label="数字"
-          onChange={(event) => patch({ useDigits: event.target.checked, minDigits: event.target.checked ? policy.minDigits : 0 })}
+          onChange={(event) =>
+            patch({
+              useDigits: event.target.checked,
+              minDigits: event.target.checked ? policy.minDigits : 0
+            })
+          }
         />
         <CheckboxField
           checked={policy.useSymbols}
           disabled={disabled}
           label="符号"
-          onChange={(event) => patch({ useSymbols: event.target.checked, minSymbols: event.target.checked ? policy.minSymbols : 0 })}
+          onChange={(event) =>
+            patch({
+              useSymbols: event.target.checked,
+              minSymbols: event.target.checked ? policy.minSymbols : 0
+            })
+          }
         />
       </div>
       <TextField

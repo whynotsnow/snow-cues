@@ -6,4 +6,3 @@ export * from "./storage-data-repository";
 export * from "./storage-data-security";
 export * from "./storage-data-service";
 export * from "./storage-data-types";
-

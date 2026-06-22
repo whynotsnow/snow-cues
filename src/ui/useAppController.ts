@@ -1,20 +1,20 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   parseImportedRuleManifest,
-  type ActiveRuleId,
+  type ActiveRuleId
 } from "../rule-registry/rules";
 import {
   createSession,
   isSessionExpired,
   touchSession,
-  type Session,
+  type Session
 } from "../session-manager/session-manager";
 import {
   getStorageDataRepository,
   listSpaceProfile,
   resetStorageDataRepository,
   type PasswordEntry,
-  type SpaceRecord,
+  type SpaceRecord
 } from "../storage-engine/storage-engine";
 import {
   EXTERNAL_CHANGE_MESSAGE,
@@ -31,7 +31,7 @@ import {
   serializeStorageDataFile,
   type StorageDataFile,
   type StorageDataSaveSummary,
-  type StorageDataWorkspace,
+  type StorageDataWorkspace
 } from "../storage-data";
 import type { SpaceRuntimeVerificationStatus } from "../space/types";
 import { useEntryRuntimeState } from "./hooks/useEntryRuntimeState";
@@ -109,7 +109,7 @@ export function useAppController() {
   const applyStorageDataFile = useCallback(
     async (
       file: StorageDataFile,
-      mode: "download" | "direct-folder" = "download",
+      mode: "download" | "direct-folder" = "download"
     ) => {
       resetStorageDataRepository(file.data);
       const workspace = await createStorageDataWorkspaceFromFile(file);
@@ -122,7 +122,7 @@ export function useAppController() {
       setStorageDataCompareSummary(null);
       setStorageDataCompareWarning("");
     },
-    [],
+    []
   );
 
   const handleCreateStorageData = useCallback(async () => {
@@ -146,7 +146,7 @@ export function useAppController() {
       const repository = getStorageDataRepository();
       const snapshot = repository.snapshot();
       const hasSnapshotContent = Object.values(snapshot).some(
-        (collection) => collection.length > 0,
+        (collection) => collection.length > 0
       );
       const file =
         repository.isDirty() || hasSnapshotContent
@@ -155,13 +155,13 @@ export function useAppController() {
       await applyStorageDataFile(file, "download");
       setStorageDataDownloadText(serializeStorageDataFile(file));
       setStatus(
-        "当前浏览器使用下载新版模式。已生成初始 current.json，请放入你的存储数据文件夹。",
+        "当前浏览器使用下载新版模式。已生成初始 current.json，请放入你的存储数据文件夹。"
       );
     } catch (storageError) {
       setError(
         storageError instanceof Error
           ? storageError.message
-          : "新建存储数据失败。",
+          : "新建存储数据失败。"
       );
     }
   }, [applyStorageDataFile, assertCanChangeLoadedStorageData]);
@@ -179,11 +179,11 @@ export function useAppController() {
         setError(
           storageError instanceof Error
             ? storageError.message
-            : "打开存储数据失败。",
+            : "打开存储数据失败。"
         );
       }
     },
-    [applyStorageDataFile, assertCanChangeLoadedStorageData],
+    [applyStorageDataFile, assertCanChangeLoadedStorageData]
   );
 
   const handleOpenStorageDataFolder = useCallback(async () => {
@@ -196,7 +196,7 @@ export function useAppController() {
         typeof window.showDirectoryPicker !== "function"
       ) {
         setError(
-          "当前浏览器不支持直接打开存储数据文件夹，请选择 current.json 使用下载新版模式。",
+          "当前浏览器不支持直接打开存储数据文件夹，请选择 current.json 使用下载新版模式。"
         );
         return;
       }
@@ -210,7 +210,7 @@ export function useAppController() {
       setError(
         storageError instanceof Error
           ? storageError.message
-          : "打开存储数据文件夹失败。",
+          : "打开存储数据文件夹失败。"
       );
     }
   }, [assertCanChangeLoadedStorageData]);
@@ -222,7 +222,7 @@ export function useAppController() {
     }
     const summary = diffStorageDataContent(
       storageDataWorkspace.file.data,
-      getStorageDataRepository().snapshot(),
+      getStorageDataRepository().snapshot()
     );
     if (!hasStorageDataChanges(summary)) {
       setError("没有可保存的存储数据改动。");
@@ -245,11 +245,11 @@ export function useAppController() {
       if (result.mode === "download") {
         setStorageDataDownloadText(result.content);
         setStatus(
-          "已生成新版存储数据文件。请确认 Syncthing 状态后手动替换 current.json。",
+          "已生成新版存储数据文件。请确认 Syncthing 状态后手动替换 current.json。"
         );
       } else {
         setStatus(
-          "已写入新版 revision 并更新 current.json。切换设备前请等待 Syncthing 完成同步。",
+          "已写入新版 revision 并更新 current.json。切换设备前请等待 Syncthing 完成同步。"
         );
       }
     } catch (storageError) {
@@ -262,7 +262,7 @@ export function useAppController() {
         notifySystem({
           tone: "warning",
           title: "存储数据已变化",
-          body: "为避免覆盖其他设备的修改，本次保存已停止。",
+          body: "为避免覆盖其他设备的修改，本次保存已停止。"
         });
       }
     }
@@ -281,7 +281,7 @@ export function useAppController() {
       storageDataWorkspace.repository = getStorageDataRepository();
       const draft = await exportStorageDataDraft(
         storageDataWorkspace,
-        "manual-export",
+        "manual-export"
       );
       setStorageDataDraftText(draft.content);
       setStatus("已生成存储数据草稿。草稿不能作为 current.json 直接打开。");
@@ -289,7 +289,7 @@ export function useAppController() {
       setError(
         storageError instanceof Error
           ? storageError.message
-          : "导出存储数据草稿失败。",
+          : "导出存储数据草稿失败。"
       );
     }
   }, [storageDataWorkspace]);
@@ -300,23 +300,23 @@ export function useAppController() {
         const left = await parseStorageDataFileText(leftText);
         const right = await parseStorageDataFileText(rightText);
         setStorageDataCompareSummary(
-          diffStorageDataContent(left.data, right.data),
+          diffStorageDataContent(left.data, right.data)
         );
         setStorageDataCompareWarning(
           left.storageDataId === right.storageDataId
             ? ""
-            : "这两个文件属于不同的存储数据集，请不要直接互相覆盖。",
+            : "这两个文件属于不同的存储数据集，请不要直接互相覆盖。"
         );
         setStatus("已完成两个存储数据文件的摘要比较。");
       } catch (storageError) {
         setError(
           storageError instanceof Error
             ? storageError.message
-            : "比较存储数据文件失败。",
+            : "比较存储数据文件失败。"
         );
       }
     },
-    [],
+    []
   );
   // 离开空间或会话过期时统一清理内存中的敏感运行时状态。
   const clearSensitiveState = useCallback(() => {
@@ -334,7 +334,7 @@ export function useAppController() {
       setStatus("");
       setError("");
     },
-    [entryRuntime],
+    [entryRuntime]
   );
   const ensureLiveSession = useCallback(
     async (masterPassword?: string): Promise<Session> => {
@@ -358,7 +358,7 @@ export function useAppController() {
         notifySystem({
           tone: "warning",
           title: "空间会话已过期",
-          body: "当前空间会话已结束，请重新进入后继续操作。",
+          body: "当前空间会话已结束，请重新进入后继续操作。"
         });
         throw new Error("空间会话已过期，请重新进入。");
       }
@@ -366,7 +366,7 @@ export function useAppController() {
       setSession(nextSession);
       return nextSession;
     },
-    [clearSensitiveState, notifySystem, session],
+    [clearSensitiveState, notifySystem, session]
   );
   // 应用级策略输入集中在这里生成，子 hook 只消费结果，避免各自重复推导门禁状态。
   const basePolicyInput = useMemo(
@@ -374,14 +374,9 @@ export function useAppController() {
       spaceStatus: currentSpaceStatus,
       sessionAlive,
       ruleProfileInitialized: ruleProfileConfirmed,
-      verificationStatus,
+      verificationStatus
     }),
-    [
-      currentSpaceStatus,
-      ruleProfileConfirmed,
-      sessionAlive,
-      verificationStatus,
-    ],
+    [currentSpaceStatus, ruleProfileConfirmed, sessionAlive, verificationStatus]
   );
   const ruleProfile = useRuleProfileController({
     basePolicyInput,
@@ -397,7 +392,7 @@ export function useAppController() {
     setRuleProfileConfirmed,
     setShowCreateForm,
     setStatus,
-    ensureLiveSession,
+    ensureLiveSession
   });
   const {
     draftRuleIds,
@@ -422,7 +417,7 @@ export function useAppController() {
     handleImportedRuleNameChange,
     handleImportedRuleDelete,
     handleDraftRuleToggle,
-    handleConfirmRuleProfile,
+    handleConfirmRuleProfile
   } = ruleProfile;
 
   const loadSpaceProfile = useCallback(
@@ -436,7 +431,7 @@ export function useAppController() {
       try {
         // profile 中的导入规则只恢复声明式 manifest，不恢复任何运行时代码。
         const manifests = profile.importedRuleManifests.map((manifest) =>
-          parseImportedRuleManifest(JSON.stringify(manifest)),
+          parseImportedRuleManifest(JSON.stringify(manifest))
         );
         applyPersistedProfile(profile.ruleChain, manifests);
         setStatus("已载入存储空间规则链配置。");
@@ -444,16 +439,16 @@ export function useAppController() {
         setError(
           profileError instanceof Error
             ? profileError.message
-            : "存储空间规则链配置无效。",
+            : "存储空间规则链配置无效。"
         );
         notifySystem({
           tone: "error",
           title: "空间配置读取失败",
-          body: "存储空间规则链配置无效，请检查本地数据状态。",
+          body: "存储空间规则链配置无效，请检查本地数据状态。"
         });
       }
     },
-    [applyPersistedProfile, notifySystem, resetRuleProfile],
+    [applyPersistedProfile, notifySystem, resetRuleProfile]
   );
 
   const spaceAccess = useSpaceAccessController({
@@ -474,7 +469,7 @@ export function useAppController() {
     setSession,
     setShowCreateForm,
     setStatus,
-    setUiState,
+    setUiState
   });
   const {
     leaveSpace,
@@ -482,13 +477,13 @@ export function useAppController() {
     inspectSpace,
     withLiveSession,
     handleStartSpaceSession,
-    handleEnterSpace,
+    handleEnterSpace
   } = spaceAccess;
   const spaceIndex = useSpaceIndexController(
     outsideSpace,
     handleEnterSpace,
     setError,
-    setStatus,
+    setStatus
   );
 
   useEffect(() => {
@@ -500,7 +495,7 @@ export function useAppController() {
 
   const detachedPasswordController = useDetachedPasswordController({
     setError,
-    setStatus,
+    setStatus
   });
 
   const pendingDetachedEntrySecret =
@@ -524,7 +519,7 @@ export function useAppController() {
     detachedMigrationFormVisible,
     outsideSpace,
     pendingDetachedEntrySecret,
-    setDetachedMigrationFormVisible,
+    setDetachedMigrationFormVisible
   ]);
 
   const groupController = usePasswordGroupController({
@@ -537,7 +532,7 @@ export function useAppController() {
     setStatus,
     setUiState,
     ensureLiveSession,
-    withLiveSession,
+    withLiveSession
   });
   const { passwordGroups, setPasswordGroups, refreshPasswordGroups } =
     groupController;
@@ -571,7 +566,7 @@ export function useAppController() {
     setStatus,
     setUiState,
     ensureLiveSession,
-    withLiveSession,
+    withLiveSession
   });
   const {
     policyForEntry,
@@ -586,7 +581,7 @@ export function useAppController() {
     handleSaveEntryEdit,
     handleClearMemoryHint,
     handleEntryPatch,
-    handleDeprecateEntry,
+    handleDeprecateEntry
   } = entryActions;
 
   const workspaceActions = useWorkspaceActions({
@@ -604,7 +599,7 @@ export function useAppController() {
     setShowCreateForm,
     setStatus,
     setVisibleEntryId: entryRuntime.setVisibleEntryId,
-    setVisiblePassword: entryRuntime.setVisiblePassword,
+    setVisiblePassword: entryRuntime.setVisiblePassword
   });
   const {
     createEntryAllowed,
@@ -615,7 +610,7 @@ export function useAppController() {
     handleClearPasswords,
     handleClearProfile,
     handleResetLocalData,
-    handleDeleteTestSpace,
+    handleDeleteTestSpace
   } = workspaceActions;
 
   const spaceManagement = useSpaceManagementController({
@@ -631,7 +626,7 @@ export function useAppController() {
     refreshSpaceIndex: spaceIndex.refreshSpaceIndex,
     notifySystem,
     setError,
-    setStatus,
+    setStatus
   });
 
   useEffect(() => {
@@ -647,7 +642,7 @@ export function useAppController() {
       (batch) =>
         batch.status === "draft" &&
         (batch.sourceProfileSnapshot.ruleChain.length > 0 ||
-          batch.sourceProfileSnapshot.importedRuleManifests.length > 0),
+          batch.sourceProfileSnapshot.importedRuleManifests.length > 0)
     );
     if (!draftBatch) {
       return;
@@ -656,27 +651,27 @@ export function useAppController() {
     try {
       const manifests =
         draftBatch.sourceProfileSnapshot.importedRuleManifests.map((manifest) =>
-          parseImportedRuleManifest(JSON.stringify(manifest)),
+          parseImportedRuleManifest(JSON.stringify(manifest))
         );
       applyDraftProfile(
         draftBatch.sourceProfileSnapshot.ruleChain as ActiveRuleId[],
-        manifests,
+        manifests
       );
       setAppliedMigrationDraftBatchId(draftBatch.id);
       setStatus(
-        "已载入来源空间规则链草稿，请在规则管理页确认初始化后再迁移密码条目。",
+        "已载入来源空间规则链草稿，请在规则管理页确认初始化后再迁移密码条目。"
       );
     } catch (profileError) {
       setAppliedMigrationDraftBatchId(draftBatch.id);
       setError(
         profileError instanceof Error
           ? profileError.message
-          : "来源空间规则链快照无效。",
+          : "来源空间规则链快照无效。"
       );
       notifySystem({
         tone: "error",
         title: "迁移规则草稿读取失败",
-        body: "来源空间规则链快照无效，请检查本地迁移数据。",
+        body: "来源空间规则链快照无效，请检查本地迁移数据。"
       });
     }
   }, [
@@ -686,7 +681,7 @@ export function useAppController() {
     outsideSpace,
     ruleProfileConfirmed,
     setError,
-    spaceManagement.migrationBatches,
+    spaceManagement.migrationBatches
   ]);
 
   useEffect(() => {
@@ -698,7 +693,7 @@ export function useAppController() {
       return;
     }
     const draftBatch = spaceManagement.migrationBatches.find(
-      (batch) => batch.status === "draft",
+      (batch) => batch.status === "draft"
     );
     if (!draftBatch || autoReadyingMigrationBatchId === draftBatch.id) {
       return;
@@ -717,7 +712,7 @@ export function useAppController() {
         setError(
           readyError instanceof Error
             ? readyError.message
-            : "迁移批次无法自动进入就绪状态。",
+            : "迁移批次无法自动进入就绪状态。"
         );
       });
   }, [
@@ -726,7 +721,7 @@ export function useAppController() {
     outsideSpace,
     ruleProfileConfirmed,
     setError,
-    spaceManagement,
+    spaceManagement
   ]);
 
   return {
@@ -821,7 +816,7 @@ export function useAppController() {
     handleDeleteTestSpace,
     ...groupController,
     ...detachedPasswordController,
-    ...spaceManagement,
+    ...spaceManagement
   };
 }
 

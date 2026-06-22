@@ -1,4 +1,8 @@
-import type { ActiveRuleId, ImportedRuleManifest, RuleDefinition } from "../rule-registry/rules";
+import type {
+  ActiveRuleId,
+  ImportedRuleManifest,
+  RuleDefinition
+} from "../rule-registry/rules";
 import type { SpacePersistedStatus } from "../storage-engine/storage-engine";
 
 export type UiState = "OUT_OF_SPACE" | "IN_SPACE" | "ACTIVE" | "LEFT_SPACE";

@@ -1,10 +1,21 @@
-import type { PasswordEntry, SpacePersistedStatus, SpaceProfile, SpaceRecord } from "../storage-engine/storage-engine";
+import type {
+  PasswordEntry,
+  SpacePersistedStatus,
+  SpaceProfile,
+  SpaceRecord
+} from "../storage-engine/storage-engine";
 
-export type { SpacePersistedStatus, SpaceRecord } from "../storage-engine/storage-engine";
+export type {
+  SpacePersistedStatus,
+  SpaceRecord
+} from "../storage-engine/storage-engine";
 
 export type SpaceDiagnosticStatus = "healthy" | "corrupted";
 
-export type SpaceRuntimeVerificationStatus = "not_required" | "pending" | "verified";
+export type SpaceRuntimeVerificationStatus =
+  | "not_required"
+  | "pending"
+  | "verified";
 
 export type SpaceRuntimeContext = {
   sessionAlive: boolean;

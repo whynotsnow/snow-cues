@@ -15,7 +15,13 @@ const actionGroupClasses: Record<ActionGroupVariant, string> = {
   compact: "entry-actions compact-actions"
 };
 
-export function ActionGroup({ children, className = "", variant = "default" }: ActionGroupProps) {
-  const classNames = [actionGroupClasses[variant], className].filter(Boolean).join(" ");
+export function ActionGroup({
+  children,
+  className = "",
+  variant = "default"
+}: ActionGroupProps) {
+  const classNames = [actionGroupClasses[variant], className]
+    .filter(Boolean)
+    .join(" ");
   return <div className={classNames}>{children}</div>;
 }

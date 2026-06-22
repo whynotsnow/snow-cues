@@ -1,5 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { createSession, isSessionExpired, touchSession, wipeSession, type Session } from "../../session-manager/session-manager";
+import {
+  createSession,
+  isSessionExpired,
+  touchSession,
+  wipeSession,
+  type Session
+} from "../../session-manager/session-manager";
 import {
   listMigrationBatchesForTarget,
   listMigrationEntriesByBatch,
@@ -19,7 +25,10 @@ import {
   updateMigrationBatchFinalizationPreference,
   verifyMigrationSourceEntry
 } from "../../space/migration";
-import { exportSpacePackage, stringifySpaceExportPackage } from "../../space/transfer";
+import {
+  exportSpacePackage,
+  stringifySpaceExportPackage
+} from "../../space/transfer";
 import type { SpacePolicyInput } from "../../space/types";
 import type { Session as TargetSession } from "../../session-manager/session-manager";
 import type { ActiveRuleId, RuleDefinition } from "../../rule-registry/rules";
@@ -32,11 +41,15 @@ type UseSpaceManagementControllerInput = {
   ruleCatalog: RuleDefinition[];
   ruleProfileConfirmed: boolean;
   ensureLiveSession: (masterPassword?: string) => Promise<TargetSession>;
-  withLiveSession: <T>(operation: (liveSession: TargetSession) => Promise<T>) => Promise<T>;
+  withLiveSession: <T>(
+    operation: (liveSession: TargetSession) => Promise<T>
+  ) => Promise<T>;
   enterSpace: (input: { spaceId: string }) => Promise<boolean>;
   refreshEntries: () => Promise<void>;
   refreshSpaceIndex: () => Promise<void>;
-  notifySystem: (input: Omit<NoticeMessage, "scope"> & { scope?: "system" }) => void;
+  notifySystem: (
+    input: Omit<NoticeMessage, "scope"> & { scope?: "system" }
+  ) => void;
   setError: (message: string) => void;
   setStatus: (message: string) => void;
 };
@@ -63,39 +76,66 @@ export function useSpaceManagementController({
   setError,
   setStatus
 }: UseSpaceManagementControllerInput) {
-  const [migrationBatches, setMigrationBatches] = useState<MigrationBatch[]>([]);
-  const [migrationEntries, setMigrationEntries] = useState<MigrationEntry[]>([]);
+  const [migrationBatches, setMigrationBatches] = useState<MigrationBatch[]>(
+    []
+  );
+  const [migrationEntries, setMigrationEntries] = useState<MigrationEntry[]>(
+    []
+  );
   const [spaceRelations, setSpaceRelations] = useState<SpaceRelation[]>([]);
   const [selectedMigrationBatchId, setSelectedMigrationBatchId] = useState("");
   const [exportText, setExportText] = useState("");
-  const [spaceOperationMode, setSpaceOperationMode] = useState<SpaceOperationMode>("");
+  const [spaceOperationMode, setSpaceOperationMode] =
+    useState<SpaceOperationMode>("");
   const [createTargetSpaceId, setCreateTargetSpaceId] = useState("");
   const [sourceMasterPassword, setSourceMasterPassword] = useState("");
-  const [migrationTargetMasterPassword, setMigrationTargetMasterPassword] = useState("");
+  const [migrationTargetMasterPassword, setMigrationTargetMasterPassword] =
+    useState("");
   const [sourceSession, setSourceSession] = useState<Session | null>(null);
   const [sourceSessionVerified, setSourceSessionVerified] = useState(false);
   const [sourceSessionVerifying, setSourceSessionVerifying] = useState(false);
-  const [sourceVerificationFeedback, setSourceVerificationFeedback] = useState("");
-  const [sourceVerificationFeedbackTone, setSourceVerificationFeedbackTone] = useState<"info" | "success" | "error">("info");
-  const [sourceVerificationEntryId, setSourceVerificationEntryId] = useState("");
-  const [oldEntrySecrets, setOldEntrySecrets] = useState<Record<string, string>>({});
-  const [newEntrySecrets, setNewEntrySecrets] = useState<Record<string, string>>({});
-  const [reuseOldEntrySecret, setReuseOldEntrySecret] = useState<Record<string, boolean>>({});
-  const [migrationModes, setMigrationModes] = useState<Record<string, MigrationMode>>({});
-  const [externalPasswordUpdated, setExternalPasswordUpdated] = useState<Record<string, boolean>>({});
+  const [sourceVerificationFeedback, setSourceVerificationFeedback] =
+    useState("");
+  const [sourceVerificationFeedbackTone, setSourceVerificationFeedbackTone] =
+    useState<"info" | "success" | "error">("info");
+  const [sourceVerificationEntryId, setSourceVerificationEntryId] =
+    useState("");
+  const [oldEntrySecrets, setOldEntrySecrets] = useState<
+    Record<string, string>
+  >({});
+  const [newEntrySecrets, setNewEntrySecrets] = useState<
+    Record<string, string>
+  >({});
+  const [reuseOldEntrySecret, setReuseOldEntrySecret] = useState<
+    Record<string, boolean>
+  >({});
+  const [migrationModes, setMigrationModes] = useState<
+    Record<string, MigrationMode>
+  >({});
+  const [externalPasswordUpdated, setExternalPasswordUpdated] = useState<
+    Record<string, boolean>
+  >({});
   const [lastMigratedPassword, setLastMigratedPassword] = useState("");
-  const [migrationEntryFeedbacks, setMigrationEntryFeedbacks] = useState<Record<string, {
-    tone: "success" | "error";
-    title: string;
-    body: string;
-  }>>({});
+  const [migrationEntryFeedbacks, setMigrationEntryFeedbacks] = useState<
+    Record<
+      string,
+      {
+        tone: "success" | "error";
+        title: string;
+        body: string;
+      }
+    >
+  >({});
   const migrationAllowed = canManageMigration({
     ...basePolicyInput,
     sessionAlive: true
   });
 
   const selectedMigrationBatch = useMemo(
-    () => migrationBatches.find((batch) => batch.id === selectedMigrationBatchId) ?? migrationBatches[0] ?? null,
+    () =>
+      migrationBatches.find((batch) => batch.id === selectedMigrationBatchId) ??
+      migrationBatches[0] ??
+      null,
     [migrationBatches, selectedMigrationBatchId]
   );
 
@@ -113,21 +153,33 @@ export function useSpaceManagementController({
       ]);
       setMigrationBatches(batches);
       setSpaceRelations(relations);
-      const nextBatch = batches.find((batch) => batch.status !== "completed") ?? batches[0] ?? null;
+      const nextBatch =
+        batches.find((batch) => batch.status !== "completed") ??
+        batches[0] ??
+        null;
       setSelectedMigrationBatchId(nextBatch?.id ?? "");
-      const nextEntries = nextBatch ? await listMigrationEntriesByBatch(nextBatch.id) : [];
+      const nextEntries = nextBatch
+        ? await listMigrationEntriesByBatch(nextBatch.id)
+        : [];
       setMigrationEntries(nextEntries);
       setSourceVerificationEntryId((current) =>
-        current && nextEntries.some((entry) => entry.id === current && entry.status === "pending")
+        current &&
+        nextEntries.some(
+          (entry) => entry.id === current && entry.status === "pending"
+        )
           ? current
-          : nextEntries.find((entry) => entry.status === "pending")?.id ?? ""
+          : (nextEntries.find((entry) => entry.status === "pending")?.id ?? "")
       );
     } catch (refreshError) {
       setMigrationBatches([]);
       setMigrationEntries([]);
       setSourceVerificationEntryId("");
       setSpaceRelations([]);
-      setError(refreshError instanceof Error ? refreshError.message : "无法读取空间迁移和关系数据。");
+      setError(
+        refreshError instanceof Error
+          ? refreshError.message
+          : "无法读取空间迁移和关系数据。"
+      );
     }
   }, [currentSpaceId, setError]);
 
@@ -145,15 +197,22 @@ export function useSpaceManagementController({
       .then((entries) => {
         setMigrationEntries(entries);
         setSourceVerificationEntryId((current) =>
-          current && entries.some((entry) => entry.id === current && entry.status === "pending")
+          current &&
+          entries.some(
+            (entry) => entry.id === current && entry.status === "pending"
+          )
             ? current
-            : entries.find((entry) => entry.status === "pending")?.id ?? ""
+            : (entries.find((entry) => entry.status === "pending")?.id ?? "")
         );
       })
       .catch((refreshError) => {
         setMigrationEntries([]);
         setSourceVerificationEntryId("");
-        setError(refreshError instanceof Error ? refreshError.message : "无法读取迁移条目。");
+        setError(
+          refreshError instanceof Error
+            ? refreshError.message
+            : "无法读取迁移条目。"
+        );
       });
   }, [selectedMigrationBatchId, setError]);
 
@@ -181,7 +240,9 @@ export function useSpaceManagementController({
     setSourceMasterPassword("");
   }
 
-  async function withMigrationTargetSession<T>(operation: (liveSession: TargetSession) => Promise<T>): Promise<T> {
+  async function withMigrationTargetSession<T>(
+    operation: (liveSession: TargetSession) => Promise<T>
+  ): Promise<T> {
     if (basePolicyInput.sessionAlive) {
       return withLiveSession(operation);
     }
@@ -198,12 +259,23 @@ export function useSpaceManagementController({
     setStatus("");
     try {
       await withLiveSession(async () => {
-        const pkg = await exportSpacePackage({ spaceId: currentSpaceId, includeEntries });
+        const pkg = await exportSpacePackage({
+          spaceId: currentSpaceId,
+          includeEntries
+        });
         setExportText(stringifySpaceExportPackage(pkg));
-        setStatus(includeEntries ? "已生成完整备份 JSON。导入后密码条目会进入迁移队列。" : "已生成空间配置 JSON。");
+        setStatus(
+          includeEntries
+            ? "已生成完整备份 JSON。导入后密码条目会进入迁移队列。"
+            : "已生成空间配置 JSON。"
+        );
       });
     } catch (exportError) {
-      setError(exportError instanceof Error ? exportError.message : "无法导出空间数据。");
+      setError(
+        exportError instanceof Error
+          ? exportError.message
+          : "无法导出空间数据。"
+      );
     }
   }
 
@@ -228,10 +300,18 @@ export function useSpaceManagementController({
       setSpaceOperationMode("");
       const entered = await enterSpace({ spaceId: targetSpaceId });
       if (entered) {
-        setStatus(batch ? "已从当前空间创建目标空间和迁移队列，并进入目标空间主页。请先在空间主页设置空间主密码后继续。" : "已 clone 当前空间配置到新空间，并进入目标空间主页。请先在空间主页设置空间主密码后继续。");
+        setStatus(
+          batch
+            ? "已从当前空间创建目标空间和迁移队列，并进入目标空间主页。请先在空间主页设置空间主密码后继续。"
+            : "已 clone 当前空间配置到新空间，并进入目标空间主页。请先在空间主页设置空间主密码后继续。"
+        );
       }
     } catch (cloneError) {
-      setError(cloneError instanceof Error ? cloneError.message : "无法 clone 当前空间。");
+      setError(
+        cloneError instanceof Error
+          ? cloneError.message
+          : "无法 clone 当前空间。"
+      );
     }
   }
 
@@ -256,31 +336,59 @@ export function useSpaceManagementController({
   }
 
   const handleMarkReadyMigrationBatches = useCallback(async () => {
-    const draftBatches = migrationBatches.filter((batch) => batch.status === "draft");
-    if (draftBatches.length === 0 || !ruleProfileConfirmed || !migrationAllowed) {
+    const draftBatches = migrationBatches.filter(
+      (batch) => batch.status === "draft"
+    );
+    if (
+      draftBatches.length === 0 ||
+      !ruleProfileConfirmed ||
+      !migrationAllowed
+    ) {
       return false;
     }
 
     await withMigrationTargetSession(async () => {
-      await Promise.all(draftBatches.map((batch) => markMigrationBatchReady(batch.id)));
+      await Promise.all(
+        draftBatches.map((batch) => markMigrationBatchReady(batch.id))
+      );
       await refreshMigrations();
       setStatus("目标规则链已初始化，迁移批次已自动就绪。");
     });
     return true;
-  }, [migrationAllowed, migrationBatches, refreshMigrations, ruleProfileConfirmed, setStatus, withMigrationTargetSession]);
+  }, [
+    migrationAllowed,
+    migrationBatches,
+    refreshMigrations,
+    ruleProfileConfirmed,
+    setStatus,
+    withMigrationTargetSession
+  ]);
 
-  async function handleMigrationAutoFinalizeChange(autoFinalizeSource: boolean) {
+  async function handleMigrationAutoFinalizeChange(
+    autoFinalizeSource: boolean
+  ) {
     setError("");
     setStatus("");
     try {
       if (!selectedMigrationBatch) {
         throw new Error("当前没有迁移批次。");
       }
-      await updateMigrationBatchFinalizationPreference(selectedMigrationBatch.id, autoFinalizeSource);
+      await updateMigrationBatchFinalizationPreference(
+        selectedMigrationBatch.id,
+        autoFinalizeSource
+      );
       await refreshMigrations();
-      setStatus(autoFinalizeSource ? "迁移完成后会自动流转来源空间状态。" : "已改为手动流转来源空间状态。");
+      setStatus(
+        autoFinalizeSource
+          ? "迁移完成后会自动流转来源空间状态。"
+          : "已改为手动流转来源空间状态。"
+      );
     } catch (preferenceError) {
-      setError(preferenceError instanceof Error ? preferenceError.message : "无法更新迁移流转设置。");
+      setError(
+        preferenceError instanceof Error
+          ? preferenceError.message
+          : "无法更新迁移流转设置。"
+      );
     }
   }
 
@@ -295,7 +403,11 @@ export function useSpaceManagementController({
       await refreshMigrations();
       setStatus("来源空间状态已手动流转为历史空间，并已记录接替关系。");
     } catch (finalizeError) {
-      setError(finalizeError instanceof Error ? finalizeError.message : "无法流转来源空间状态。");
+      setError(
+        finalizeError instanceof Error
+          ? finalizeError.message
+          : "无法流转来源空间状态。"
+      );
     }
   }
 
@@ -309,8 +421,11 @@ export function useSpaceManagementController({
       if (!selectedMigrationBatch) {
         throw new Error("当前没有迁移批次。");
       }
-      const pendingEntry = migrationEntries.find((entry) => entry.id === sourceVerificationEntryId && entry.status === "pending")
-        ?? migrationEntries.find((entry) => entry.status === "pending");
+      const pendingEntry =
+        migrationEntries.find(
+          (entry) =>
+            entry.id === sourceVerificationEntryId && entry.status === "pending"
+        ) ?? migrationEntries.find((entry) => entry.status === "pending");
       if (!pendingEntry) {
         throw new Error("当前没有待校验的迁移条目。");
       }
@@ -341,7 +456,10 @@ export function useSpaceManagementController({
         body: "来源空间已完成校验，可以继续迁移条目。"
       });
     } catch (verifyError) {
-      const message = verifyError instanceof Error ? verifyError.message : "请检查旧空间主密码和所选旧密码条目的旧关键密钥。";
+      const message =
+        verifyError instanceof Error
+          ? verifyError.message
+          : "请检查旧空间主密码和所选旧密码条目的旧关键密钥。";
       setSourceVerificationFeedback(message);
       setSourceVerificationFeedbackTone("error");
       setError(message);
@@ -380,7 +498,9 @@ export function useSpaceManagementController({
         const liveSourceSession = touchSession(sourceSession);
         setSourceSession(liveSourceSession);
         const oldEntrySecret = oldEntrySecrets[entry.id] ?? "";
-        const newEntrySecret = reuseOldEntrySecret[entry.id] ? oldEntrySecret : newEntrySecrets[entry.id] ?? "";
+        const newEntrySecret = reuseOldEntrySecret[entry.id]
+          ? oldEntrySecret
+          : (newEntrySecrets[entry.id] ?? "");
         const mode = migrationModes[entry.id] ?? "preserve_password";
         const result = await migrateEntry({
           batchId: selectedMigrationBatch.id,
@@ -392,14 +512,19 @@ export function useSpaceManagementController({
           newEntrySecret,
           targetRuleIds: effectiveRuleIds,
           targetRuleCatalog: ruleCatalog,
-          externalPasswordUpdated: mode === "preserve_password" || Boolean(externalPasswordUpdated[entry.id])
+          externalPasswordUpdated:
+            mode === "preserve_password" ||
+            Boolean(externalPasswordUpdated[entry.id])
         });
         await refreshEntries();
         await refreshMigrations();
         setOldEntrySecrets((current) => ({ ...current, [entry.id]: "" }));
         setNewEntrySecrets((current) => ({ ...current, [entry.id]: "" }));
         setLastMigratedPassword(result.password);
-        const message = mode === "regenerate_password" ? "已按目标规则生成新密码并完成迁移。" : "已保持平台密码不变并完成迁移。";
+        const message =
+          mode === "regenerate_password"
+            ? "已按目标规则生成新密码并完成迁移。"
+            : "已保持平台密码不变并完成迁移。";
         setMigrationEntryFeedbacks((current) => ({
           ...current,
           [entry.id]: {
@@ -411,7 +536,8 @@ export function useSpaceManagementController({
         setStatus(message);
       });
     } catch (migrateError) {
-      const message = migrateError instanceof Error ? migrateError.message : "无法迁移条目。";
+      const message =
+        migrateError instanceof Error ? migrateError.message : "无法迁移条目。";
       setMigrationEntryFeedbacks((current) => ({
         ...current,
         [entry.id]: {
@@ -453,7 +579,8 @@ export function useSpaceManagementController({
         setStatus("已跳过这条迁移任务。");
       });
     } catch (skipError) {
-      const message = skipError instanceof Error ? skipError.message : "无法跳过迁移条目。";
+      const message =
+        skipError instanceof Error ? skipError.message : "无法跳过迁移条目。";
       setMigrationEntryFeedbacks((current) => ({
         ...current,
         [entry.id]: {

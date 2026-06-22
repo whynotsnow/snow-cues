@@ -1,4 +1,10 @@
-import { base64ToBytes, bytesToBase64, bytesToUtf8, concatBytes, utf8ToBytes } from "../lib/bytes";
+import {
+  base64ToBytes,
+  bytesToBase64,
+  bytesToUtf8,
+  concatBytes,
+  utf8ToBytes
+} from "../lib/bytes";
 import type { Session } from "../session-manager/session-manager";
 
 const MEMORY_HINT_PURPOSE = "snow-cues:memory-hint:v1";
@@ -54,15 +60,22 @@ export async function decryptMemoryHint(
   return bytesToUtf8(new Uint8Array(plaintext));
 }
 
-async function deriveMemoryHintKey(session: Session, spaceId: string, entryId: string): Promise<CryptoKey> {
+async function deriveMemoryHintKey(
+  session: Session,
+  spaceId: string,
+  entryId: string
+): Promise<CryptoKey> {
   const keyMaterial = await crypto.subtle.sign(
     "HMAC",
     session.cryptoKey,
     utf8ToBytes(`${MEMORY_HINT_PURPOSE}:${spaceId}:${entryId}`)
   );
 
-  return crypto.subtle.importKey("raw", keyMaterial, { name: "AES-GCM", length: 256 }, false, [
-    "encrypt",
-    "decrypt"
-  ]);
+  return crypto.subtle.importKey(
+    "raw",
+    keyMaterial,
+    { name: "AES-GCM", length: 256 },
+    false,
+    ["encrypt", "decrypt"]
+  );
 }

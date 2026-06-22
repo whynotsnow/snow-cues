@@ -2,7 +2,8 @@ import { base64ToBytes, bytesToBase64, utf8ToBytes } from "../lib/bytes";
 
 export type EncodingMode = "base64" | "base62" | "custom";
 
-const BASE62_ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+const BASE62_ALPHABET =
+  "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 export type EncodingPolicy = {
   mode: EncodingMode;
@@ -10,16 +11,24 @@ export type EncodingPolicy = {
   maxLength?: number;
 };
 
-export function encodePasswordMaterial(material: string, policy: EncodingPolicy): string {
+export function encodePasswordMaterial(
+  material: string,
+  policy: EncodingPolicy
+): string {
   const bytes = decodeRuleMaterial(material);
   const rawOutput =
     policy.mode === "base64"
       ? bytesToBase64(bytes)
       : policy.mode === "base62"
         ? mapBytesToCharset(bytes, BASE62_ALPHABET)
-        : mapBytesToCharset(bytes, normalizeCustomCharset(policy.customCharset));
+        : mapBytesToCharset(
+            bytes,
+            normalizeCustomCharset(policy.customCharset)
+          );
 
-  return policy.maxLength && policy.maxLength > 0 ? rawOutput.slice(0, policy.maxLength) : rawOutput;
+  return policy.maxLength && policy.maxLength > 0
+    ? rawOutput.slice(0, policy.maxLength)
+    : rawOutput;
 }
 
 function decodeRuleMaterial(material: string): Uint8Array<ArrayBuffer> {

@@ -26,10 +26,24 @@ export function MessageRow({ controller }: MessageRowProps) {
   return (
     <div className="message-row" aria-label="操作反馈" aria-live="polite">
       {error ? (
-        <Notice notice={{ scope: "action", tone: "error", title: "操作失败", body: error }} />
+        <Notice
+          notice={{
+            scope: "action",
+            tone: "error",
+            title: "操作失败",
+            body: error
+          }}
+        />
       ) : null}
       {!error && visibleStatus ? (
-        <Notice notice={{ scope: "action", tone: "success", title: "操作完成", body: visibleStatus }} />
+        <Notice
+          notice={{
+            scope: "action",
+            tone: "success",
+            title: "操作完成",
+            body: visibleStatus
+          }}
+        />
       ) : null}
     </div>
   );

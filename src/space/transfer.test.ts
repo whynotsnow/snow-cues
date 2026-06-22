@@ -7,7 +7,11 @@ import {
   resetLocalData,
   saveSpace
 } from "../storage-engine/storage-engine";
-import { exportSpacePackage, importSpacePackage, stringifySpaceExportPackage } from "./transfer";
+import {
+  exportSpacePackage,
+  importSpacePackage,
+  stringifySpaceExportPackage
+} from "./transfer";
 
 describe("Space import/export", () => {
   beforeEach(async () => {
@@ -40,7 +44,10 @@ describe("Space import/export", () => {
       platform: "Example"
     });
 
-    const exported = await exportSpacePackage({ spaceId: "source", includeEntries: true });
+    const exported = await exportSpacePackage({
+      spaceId: "source",
+      includeEntries: true
+    });
     expect(exported.groups).toMatchObject([{ name: "代码托管" }]);
 
     const batch = await importSpacePackage({

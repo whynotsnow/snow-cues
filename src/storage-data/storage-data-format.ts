@@ -1,4 +1,7 @@
-import { sanitizeStorageDataContent, stripForbiddenKeys } from "./storage-data-security";
+import {
+  sanitizeStorageDataContent,
+  stripForbiddenKeys
+} from "./storage-data-security";
 import {
   STORAGE_DATA_DRAFT_FORMAT,
   STORAGE_DATA_FORMAT,
@@ -9,11 +12,17 @@ import {
   type StorageDataFile,
   createEmptyStorageDataContent
 } from "./storage-data-types";
-import { canonicalizeJson, verifyStorageDataHash, withStorageDataHash } from "./storage-data-hash";
+import {
+  canonicalizeJson,
+  verifyStorageDataHash,
+  withStorageDataHash
+} from "./storage-data-hash";
 
 export class StorageDataFormatError extends Error {}
 
-export async function createInitialStorageDataFile(storageDataId = `storage_data_${crypto.randomUUID()}`): Promise<StorageDataFile> {
+export async function createInitialStorageDataFile(
+  storageDataId = `storage_data_${crypto.randomUUID()}`
+): Promise<StorageDataFile> {
   return withStorageDataHash({
     format: STORAGE_DATA_FORMAT,
     schemaVersion: STORAGE_DATA_SCHEMA_VERSION,
@@ -24,7 +33,9 @@ export async function createInitialStorageDataFile(storageDataId = `storage_data
   });
 }
 
-export async function parseStorageDataFileText(text: string): Promise<StorageDataFile> {
+export async function parseStorageDataFileText(
+  text: string
+): Promise<StorageDataFile> {
   const parsed = parseJsonObject(text);
   if (parsed.format === STORAGE_DATA_DRAFT_FORMAT) {
     throw new StorageDataFormatError("草稿文件不能作为当前存储数据打开。");
@@ -39,7 +50,11 @@ export async function parseStorageDataFileText(text: string): Promise<StorageDat
   assertNumber(parsed.revision, "revision");
   assertString(parsed.updatedAt, "updatedAt");
   assertString(parsed.contentHash, "contentHash");
-  if (!parsed.data || typeof parsed.data !== "object" || Array.isArray(parsed.data)) {
+  if (
+    !parsed.data ||
+    typeof parsed.data !== "object" ||
+    Array.isArray(parsed.data)
+  ) {
     throw new StorageDataFormatError("存储数据内容无效。");
   }
   assertDataArrays(parsed.data as Record<string, unknown>);
@@ -52,13 +67,15 @@ export async function parseStorageDataFileText(text: string): Promise<StorageDat
     contentHash: parsed.contentHash,
     data: sanitizeStorageDataContent(parsed.data as Partial<StorageDataContent>)
   };
-  if (!await verifyStorageDataHash(file)) {
+  if (!(await verifyStorageDataHash(file))) {
     throw new StorageDataFormatError("存储数据文件完整性校验失败。");
   }
   return file;
 }
 
-export function parseStorageDataDraftFileText(text: string): StorageDataDraftFile {
+export function parseStorageDataDraftFileText(
+  text: string
+): StorageDataDraftFile {
   const parsed = parseJsonObject(text);
   if (parsed.format !== STORAGE_DATA_DRAFT_FORMAT) {
     throw new StorageDataFormatError("不是 Snow Cues 存储数据草稿文件。");
@@ -73,7 +90,11 @@ export function parseStorageDataDraftFileText(text: string): StorageDataDraftFil
   if (!isDraftReason(parsed.reason)) {
     throw new StorageDataFormatError("存储数据草稿原因无效。");
   }
-  if (!parsed.draftContent || typeof parsed.draftContent !== "object" || Array.isArray(parsed.draftContent)) {
+  if (
+    !parsed.draftContent ||
+    typeof parsed.draftContent !== "object" ||
+    Array.isArray(parsed.draftContent)
+  ) {
     throw new StorageDataFormatError("存储数据草稿内容无效。");
   }
   return {
@@ -84,7 +105,9 @@ export function parseStorageDataDraftFileText(text: string): StorageDataDraftFil
     baseHash: parsed.baseHash,
     createdAt: parsed.createdAt,
     reason: parsed.reason,
-    draftContent: sanitizeStorageDataContent(parsed.draftContent as Partial<StorageDataContent>)
+    draftContent: sanitizeStorageDataContent(
+      parsed.draftContent as Partial<StorageDataContent>
+    )
   };
 }
 
@@ -125,7 +148,9 @@ export function serializeStorageDataFile(file: StorageDataFile): string {
   return `${canonicalizeJson(stripForbiddenKeys(file))}\n`;
 }
 
-export function serializeStorageDataDraftFile(file: StorageDataDraftFile): string {
+export function serializeStorageDataDraftFile(
+  file: StorageDataDraftFile
+): string {
   return `${canonicalizeJson(stripForbiddenKeys(file))}\n`;
 }
 
@@ -173,6 +198,9 @@ function assertDataArrays(data: Record<string, unknown>) {
 }
 
 function isDraftReason(value: unknown): value is StorageDataDraftReason {
-  return value === "save-failed" || value === "external-change-detected" || value === "manual-export";
+  return (
+    value === "save-failed" ||
+    value === "external-change-detected" ||
+    value === "manual-export"
+  );
 }
-

@@ -11,15 +11,24 @@ function hasAny(password: string, characters: string) {
 
 describe("密码输出适配", () => {
   it("同一核心密码和同一策略会生成稳定输出", async () => {
-    const first = await adaptPasswordOutput("core-password", DEFAULT_PASSWORD_OUTPUT_POLICY);
-    const second = await adaptPasswordOutput("core-password", DEFAULT_PASSWORD_OUTPUT_POLICY);
+    const first = await adaptPasswordOutput(
+      "core-password",
+      DEFAULT_PASSWORD_OUTPUT_POLICY
+    );
+    const second = await adaptPasswordOutput(
+      "core-password",
+      DEFAULT_PASSWORD_OUTPUT_POLICY
+    );
 
     expect(first).toBe(second);
     expect(first).toHaveLength(16);
   });
 
   it("不同策略会生成不同输出", async () => {
-    const first = await adaptPasswordOutput("core-password", DEFAULT_PASSWORD_OUTPUT_POLICY);
+    const first = await adaptPasswordOutput(
+      "core-password",
+      DEFAULT_PASSWORD_OUTPUT_POLICY
+    );
     const second = await adaptPasswordOutput("core-password", {
       ...DEFAULT_PASSWORD_OUTPUT_POLICY,
       length: 20,

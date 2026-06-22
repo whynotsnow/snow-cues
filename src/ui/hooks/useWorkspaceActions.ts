@@ -52,9 +52,16 @@ export function useWorkspaceActions({
   const testCleanupAllowed = canRunTestCleanup(basePolicyInput);
   const [testToolSpaceId, setTestToolSpaceId] = useState("");
 
-  function ensurePolicyAllowed(allowed: boolean, fallbackMessage = "当前空间状态不允许执行此操作。") {
+  function ensurePolicyAllowed(
+    allowed: boolean,
+    fallbackMessage = "当前空间状态不允许执行此操作。"
+  ) {
     if (!allowed) {
-      throw new Error(verificationPending ? "当前空间已有密码，请先完成空间校验后再进行写入或修改操作。" : fallbackMessage);
+      throw new Error(
+        verificationPending
+          ? "当前空间已有密码，请先完成空间校验后再进行写入或修改操作。"
+          : fallbackMessage
+      );
     }
   }
 
@@ -72,7 +79,11 @@ export function useWorkspaceActions({
     }
     if (!createEntryAllowed) {
       setShowCreateForm(false);
-      setStatus(verificationPending ? "当前空间已有密码，请先完成空间校验后再进行写入或修改操作。" : "当前空间状态不允许新建密码。");
+      setStatus(
+        verificationPending
+          ? "当前空间已有密码，请先完成空间校验后再进行写入或修改操作。"
+          : "当前空间状态不允许新建密码。"
+      );
       return;
     }
     setShowCreateForm((value) => !value);
@@ -89,7 +100,9 @@ export function useWorkspaceActions({
       setVisiblePassword("");
       setStatus("测试操作已清空已存储密码。");
     } catch (resetError) {
-      setError(resetError instanceof Error ? resetError.message : "无法清空密码数据。");
+      setError(
+        resetError instanceof Error ? resetError.message : "无法清空密码数据。"
+      );
     }
   }
 
@@ -103,7 +116,11 @@ export function useWorkspaceActions({
       setShowCreateForm(false);
       setStatus("测试操作已重置当前空间规则链配置。");
     } catch (resetError) {
-      setError(resetError instanceof Error ? resetError.message : "无法重置规则链配置。");
+      setError(
+        resetError instanceof Error
+          ? resetError.message
+          : "无法重置规则链配置。"
+      );
     }
   }
 
@@ -111,7 +128,9 @@ export function useWorkspaceActions({
     setError("");
     setStatus("");
     try {
-      if (!window.confirm("测试操作会清空当前打开的存储数据草稿，确定继续吗？")) {
+      if (
+        !window.confirm("测试操作会清空当前打开的存储数据草稿，确定继续吗？")
+      ) {
         return;
       }
       await resetLocalData();
@@ -127,7 +146,9 @@ export function useWorkspaceActions({
       }
       setStatus("测试操作已清空全部本地数据。");
     } catch (resetError) {
-      setError(resetError instanceof Error ? resetError.message : "无法清空本地数据。");
+      setError(
+        resetError instanceof Error ? resetError.message : "无法清空本地数据。"
+      );
     }
   }
 
@@ -139,7 +160,11 @@ export function useWorkspaceActions({
       if (!targetSpaceId) {
         throw new Error("请输入要删除的存储空间 ID。");
       }
-      if (!window.confirm(`测试操作会删除存储空间 ${targetSpaceId} 及其相关本地数据，确定继续吗？`)) {
+      if (
+        !window.confirm(
+          `测试操作会删除存储空间 ${targetSpaceId} 及其相关本地数据，确定继续吗？`
+        )
+      ) {
         return;
       }
       await deleteSpaceData(targetSpaceId);
@@ -150,7 +175,11 @@ export function useWorkspaceActions({
       }
       setStatus(`测试操作已删除存储空间 ${targetSpaceId}。`);
     } catch (deleteError) {
-      setError(deleteError instanceof Error ? deleteError.message : "无法删除存储空间。");
+      setError(
+        deleteError instanceof Error
+          ? deleteError.message
+          : "无法删除存储空间。"
+      );
     }
   }
 

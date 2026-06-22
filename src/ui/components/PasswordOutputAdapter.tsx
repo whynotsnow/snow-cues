@@ -14,7 +14,10 @@ type PasswordOutputAdapterProps = {
   corePassword: string;
   group?: PasswordGroup;
   groupManagementAllowed: boolean;
-  onSaveGroupPolicy: (groupId: string, policy: PasswordOutputPolicy) => Promise<void>;
+  onSaveGroupPolicy: (
+    groupId: string,
+    policy: PasswordOutputPolicy
+  ) => Promise<void>;
 };
 
 export function PasswordOutputAdapter({
@@ -23,9 +26,14 @@ export function PasswordOutputAdapter({
   groupManagementAllowed,
   onSaveGroupPolicy
 }: PasswordOutputAdapterProps) {
-  const defaultPolicy = useMemo(() => group?.outputPolicy ?? DEFAULT_PASSWORD_OUTPUT_POLICY, [group?.outputPolicy]);
+  const defaultPolicy = useMemo(
+    () => group?.outputPolicy ?? DEFAULT_PASSWORD_OUTPUT_POLICY,
+    [group?.outputPolicy]
+  );
   const [policy, setPolicy] = useState<PasswordOutputPolicy>(defaultPolicy);
-  const [presetId, setPresetId] = useState<PasswordOutputPresetId | "custom">(getPresetIdForPolicy(defaultPolicy));
+  const [presetId, setPresetId] = useState<PasswordOutputPresetId | "custom">(
+    getPresetIdForPolicy(defaultPolicy)
+  );
   const [adaptedPassword, setAdaptedPassword] = useState("");
   const [adapterError, setAdapterError] = useState("");
   const [editingPolicy, setEditingPolicy] = useState(false);
@@ -49,7 +57,9 @@ export function PasswordOutputAdapter({
       .catch((error) => {
         if (!cancelled) {
           setAdaptedPassword("");
-          setAdapterError(error instanceof Error ? error.message : "密码输出适配失败。");
+          setAdapterError(
+            error instanceof Error ? error.message : "密码输出适配失败。"
+          );
         }
       });
     return () => {
@@ -75,7 +85,11 @@ export function PasswordOutputAdapter({
       <div className="output-adapter-header">
         <div>
           <strong>密码输出适配</strong>
-          <span>{group ? `使用“${group.name}”组策略，已应用到适配密码。` : "未归属密码组，使用临时策略生成适配密码。"}</span>
+          <span>
+            {group
+              ? `使用“${group.name}”组策略，已应用到适配密码。`
+              : "未归属密码组，使用临时策略生成适配密码。"}
+          </span>
         </div>
       </div>
       <div className="adapted-password-box">
@@ -98,7 +112,9 @@ export function PasswordOutputAdapter({
                   setPresetId("custom");
                   return;
                 }
-                const preset = PASSWORD_OUTPUT_PRESETS.find((item) => item.id === event.target.value);
+                const preset = PASSWORD_OUTPUT_PRESETS.find(
+                  (item) => item.id === event.target.value
+                );
                 if (preset) {
                   setPresetId(preset.id);
                   setPolicy(preset.policy);
@@ -123,11 +139,18 @@ export function PasswordOutputAdapter({
             policy={policy}
           />
           {presetId !== "custom" ? (
-            <p className="field-note">内置常见策略不可直接改动；切换到“自定义当前策略”后可基于当前参数调整。</p>
+            <p className="field-note">
+              内置常见策略不可直接改动；切换到“自定义当前策略”后可基于当前参数调整。
+            </p>
           ) : null}
           {group ? (
             <ActionGroup variant="entry">
-              <Button disabled={!groupManagementAllowed} loading={saving} loadingLabel="保存中..." onClick={() => void saveGroupPolicy()}>
+              <Button
+                disabled={!groupManagementAllowed}
+                loading={saving}
+                loadingLabel="保存中..."
+                onClick={() => void saveGroupPolicy()}
+              >
                 保存为组输出策略
               </Button>
             </ActionGroup>
@@ -138,10 +161,19 @@ export function PasswordOutputAdapter({
   );
 }
 
-function getPresetIdForPolicy(policy: PasswordOutputPolicy): PasswordOutputPresetId | "custom" {
-  return PASSWORD_OUTPUT_PRESETS.find((preset) => policiesEqual(preset.policy, policy))?.id ?? "custom";
+function getPresetIdForPolicy(
+  policy: PasswordOutputPolicy
+): PasswordOutputPresetId | "custom" {
+  return (
+    PASSWORD_OUTPUT_PRESETS.find((preset) =>
+      policiesEqual(preset.policy, policy)
+    )?.id ?? "custom"
+  );
 }
 
-function policiesEqual(left: PasswordOutputPolicy, right: PasswordOutputPolicy) {
+function policiesEqual(
+  left: PasswordOutputPolicy,
+  right: PasswordOutputPolicy
+) {
   return JSON.stringify(left) === JSON.stringify(right);
 }

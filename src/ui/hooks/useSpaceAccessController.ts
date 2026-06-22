@@ -103,18 +103,21 @@ export function useSpaceAccessController({
     setEntries(await listPasswordEntriesBySpace(currentSpaceId));
   }, [currentSpaceId, setEntries]);
 
-  const inspectSpace = useCallback(async (spaceId: string): Promise<SpaceState> => {
-    const normalizedSpaceId = normalizeSpaceId(spaceId);
-    if (!normalizedSpaceId) {
-      return "unknown";
-    }
-    const [space, profile, storedEntries] = await Promise.all([
-      getSpace(normalizedSpaceId),
-      listSpaceProfile(normalizedSpaceId),
-      listPasswordEntriesBySpace(normalizedSpaceId)
-    ]);
-    return space || profile || storedEntries.length > 0 ? "existing" : "new";
-  }, []);
+  const inspectSpace = useCallback(
+    async (spaceId: string): Promise<SpaceState> => {
+      const normalizedSpaceId = normalizeSpaceId(spaceId);
+      if (!normalizedSpaceId) {
+        return "unknown";
+      }
+      const [space, profile, storedEntries] = await Promise.all([
+        getSpace(normalizedSpaceId),
+        listSpaceProfile(normalizedSpaceId),
+        listPasswordEntriesBySpace(normalizedSpaceId)
+      ]);
+      return space || profile || storedEntries.length > 0 ? "existing" : "new";
+    },
+    []
+  );
 
   useEffect(() => {
     if (!session) {
@@ -131,7 +134,7 @@ export function useSpaceAccessController({
   }, [leaveSpace, session]);
 
   const withLiveSession = useCallback(
-    <T,>(operation: (liveSession: Session) => Promise<T>): Promise<T> => {
+    <T>(operation: (liveSession: Session) => Promise<T>): Promise<T> => {
       if (!session) {
         return Promise.reject(new Error("请先输入空间主密码。"));
       }
@@ -181,7 +184,8 @@ export function useSpaceAccessController({
         listSpaceProfile(nextSpaceId),
         getSpace(nextSpaceId)
       ]);
-      const nextSpaceState = storedSpace || profile || storedEntries.length > 0 ? "existing" : "new";
+      const nextSpaceState =
+        storedSpace || profile || storedEntries.length > 0 ? "existing" : "new";
       const nextSpace =
         storedSpace ??
         (nextSpaceState === "existing"
@@ -227,7 +231,9 @@ export function useSpaceAccessController({
     }
   }
 
-  async function handleStartSpaceSession(masterPassword: string): Promise<boolean> {
+  async function handleStartSpaceSession(
+    masterPassword: string
+  ): Promise<boolean> {
     setError("");
     setStatus("");
 
@@ -240,7 +246,11 @@ export function useSpaceAccessController({
       return true;
     } catch (sessionError) {
       setSession(wipeSession());
-      setError(sessionError instanceof Error ? sessionError.message : "无法校验空间主密码。");
+      setError(
+        sessionError instanceof Error
+          ? sessionError.message
+          : "无法校验空间主密码。"
+      );
       return false;
     }
   }

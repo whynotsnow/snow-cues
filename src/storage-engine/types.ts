@@ -124,7 +124,11 @@ export type SpaceRelationInput = {
 
 export type MigrationSourceType = "clone" | "import";
 
-export type MigrationBatchStatus = "draft" | "ready" | "in_progress" | "completed";
+export type MigrationBatchStatus =
+  | "draft"
+  | "ready"
+  | "in_progress"
+  | "completed";
 
 export type MigrationEntryStatus = "pending" | "migrated" | "skipped";
 

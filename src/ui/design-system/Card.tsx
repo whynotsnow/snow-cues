@@ -20,7 +20,9 @@ export function Card<TElement extends ElementType = "section">({
   const classNames = [
     tone === "section" ? "section-card" : "ds-card-subtle",
     className
-  ].filter(Boolean).join(" ");
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <Component {...props} className={classNames}>

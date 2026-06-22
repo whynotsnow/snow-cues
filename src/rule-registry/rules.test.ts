@@ -1,7 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { generatePassword, generatePasswordWithRuleChain } from "../crypto-engine/crypto-engine";
+import {
+  generatePassword,
+  generatePasswordWithRuleChain
+} from "../crypto-engine/crypto-engine";
 import { createSession } from "../session-manager/session-manager";
-import { createImportedRule, getRule, parseImportedRuleManifest } from "./rules";
+import {
+  createImportedRule,
+  getRule,
+  parseImportedRuleManifest
+} from "./rules";
 
 describe("rule-registry 规则注册表", () => {
   it("拒绝不可用规则", () => {
@@ -10,23 +17,44 @@ describe("rule-registry 规则注册表", () => {
 
   it("同一 key、salt 与 rule 会生成确定性输出", async () => {
     const session = await createSession("master");
-    const first = await generatePassword(session.cryptoKey, "example.com:alice", "v1-hmac", {
-      mode: "base62",
-      maxLength: 24
-    });
-    const second = await generatePassword(session.cryptoKey, "example.com:alice", "v1-hmac", {
-      mode: "base62",
-      maxLength: 24
-    });
+    const first = await generatePassword(
+      session.cryptoKey,
+      "example.com:alice",
+      "v1-hmac",
+      {
+        mode: "base62",
+        maxLength: 24
+      }
+    );
+    const second = await generatePassword(
+      session.cryptoKey,
+      "example.com:alice",
+      "v1-hmac",
+      {
+        mode: "base62",
+        maxLength: 24
+      }
+    );
 
     expect(first.encodedPassword).toBe(second.encodedPassword);
   });
 
   it("salt 或 rule 改变时输出也会改变", async () => {
     const session = await createSession("master");
-    const first = await generatePassword(session.cryptoKey, "one", "v1-hmac", { mode: "base62", maxLength: 24 });
-    const second = await generatePassword(session.cryptoKey, "two", "v1-hmac", { mode: "base62", maxLength: 24 });
-    const third = await generatePassword(session.cryptoKey, "one", "v2-pbkdf2", { mode: "base62", maxLength: 24 });
+    const first = await generatePassword(session.cryptoKey, "one", "v1-hmac", {
+      mode: "base62",
+      maxLength: 24
+    });
+    const second = await generatePassword(session.cryptoKey, "two", "v1-hmac", {
+      mode: "base62",
+      maxLength: 24
+    });
+    const third = await generatePassword(
+      session.cryptoKey,
+      "one",
+      "v2-pbkdf2",
+      { mode: "base62", maxLength: 24 }
+    );
 
     expect(first.encodedPassword).not.toBe(second.encodedPassword);
     expect(first.encodedPassword).not.toBe(third.encodedPassword);
@@ -34,14 +62,24 @@ describe("rule-registry 规则注册表", () => {
 
   it("多规则链会按顺序影响最终输出", async () => {
     const session = await createSession("master");
-    const first = await generatePasswordWithRuleChain(session.cryptoKey, "one", ["v1-hmac", "v2-pbkdf2"], {
-      mode: "base62",
-      maxLength: 24
-    });
-    const second = await generatePasswordWithRuleChain(session.cryptoKey, "one", ["v2-pbkdf2", "v1-hmac"], {
-      mode: "base62",
-      maxLength: 24
-    });
+    const first = await generatePasswordWithRuleChain(
+      session.cryptoKey,
+      "one",
+      ["v1-hmac", "v2-pbkdf2"],
+      {
+        mode: "base62",
+        maxLength: 24
+      }
+    );
+    const second = await generatePasswordWithRuleChain(
+      session.cryptoKey,
+      "one",
+      ["v2-pbkdf2", "v1-hmac"],
+      {
+        mode: "base62",
+        maxLength: 24
+      }
+    );
 
     expect(first.encodedPassword).not.toBe(second.encodedPassword);
     expect(first.appliedRuleIds).toEqual(["v1-hmac", "v2-pbkdf2"]);

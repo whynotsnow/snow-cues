@@ -18,7 +18,10 @@ export function SystemNoticeHost({ controller }: SystemNoticeHostProps) {
         <div className="system-notice-item" key={notice.id}>
           <Notice notice={notice} />
           {notice.id ? (
-            <button onClick={() => dismissSystemNotice(notice.id!)} type="button">
+            <button
+              onClick={() => dismissSystemNotice(notice.id!)}
+              type="button"
+            >
               关闭
             </button>
           ) : null}

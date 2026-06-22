@@ -10,8 +10,13 @@ type DescriptionListProps = {
   items: DescriptionListItem[];
 };
 
-export function DescriptionList({ className = "", items }: DescriptionListProps) {
-  const classNames = ["entry-readonly-grid", className].filter(Boolean).join(" ");
+export function DescriptionList({
+  className = "",
+  items
+}: DescriptionListProps) {
+  const classNames = ["entry-readonly-grid", className]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <div className={classNames}>

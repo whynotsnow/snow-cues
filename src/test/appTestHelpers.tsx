@@ -1,11 +1,28 @@
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within
+} from "@testing-library/react";
 import { expect, vi } from "vitest";
 import App from "../App";
-import { decryptPassword, deriveRuntimeStorageKey, encryptPassword, generatePasswordWithRuleChain } from "../crypto-engine/crypto-engine";
+import {
+  decryptPassword,
+  deriveRuntimeStorageKey,
+  encryptPassword,
+  generatePasswordWithRuleChain
+} from "../crypto-engine/crypto-engine";
 import { createSession } from "../session-manager/session-manager";
-import { createPasswordEntry, getSpace, resetLocalData } from "../storage-engine/storage-engine";
+import {
+  createPasswordEntry,
+  getSpace,
+  resetLocalData
+} from "../storage-engine/storage-engine";
 
 export async function resetAppTestEnvironment() {
+  cleanup();
   vi.restoreAllMocks();
   Reflect.deleteProperty(window, "Notification");
   window.history.replaceState(null, "", "/");
@@ -31,12 +48,16 @@ export async function enterSpace(spaceId = "default") {
   let spaceCard: HTMLElement | undefined;
   if (existingSpace) {
     await waitFor(() => {
-      spaceCard = screen.getAllByRole("article").find((article) => article.textContent?.includes(spaceId));
+      spaceCard = screen
+        .getAllByRole("article")
+        .find((article) => article.textContent?.includes(spaceId));
       expect(spaceCard).toBeTruthy();
     });
   }
   if (spaceCard) {
-    fireEvent.click(within(spaceCard).getByRole("button", { name: "进入空间" }));
+    fireEvent.click(
+      within(spaceCard).getByRole("button", { name: "进入空间" })
+    );
   } else {
     fireEvent.click(screen.getByRole("button", { name: "新建空间" }));
     fireEvent.change(screen.getByLabelText("目标存储空间 ID"), {
@@ -48,23 +69,38 @@ export async function enterSpace(spaceId = "default") {
 }
 
 export async function establishSpaceSession(masterPassword = "master") {
-  if (!screen.queryByRole("heading", { name: "设置空间主密码" })) {
+  if (!screen.queryByRole("button", { name: "建立空间会话" })) {
     fireEvent.click(screen.getByRole("button", { name: "空间主页" }));
-    await screen.findByRole("heading", { name: "设置空间主密码" });
+    await screen.findByRole("button", { name: "建立空间会话" });
   }
-  const setupPanel = screen.queryByRole("heading", { name: "设置空间主密码" })?.closest("section");
+  const setupPanel = screen
+    .queryByRole("button", { name: "建立空间会话" })
+    ?.closest("section");
   if (!setupPanel) {
     return;
   }
-  fireEvent.change(within(setupPanel as HTMLElement).getByLabelText("空间主密码"), {
-    target: { value: masterPassword }
-  });
-  fireEvent.click(within(setupPanel as HTMLElement).getByRole("button", { name: "建立空间会话" }));
-  await waitFor(() => expect(screen.getByText("空间主密码已设置，本次空间会话已建立。")).toBeInTheDocument());
+  fireEvent.change(
+    within(setupPanel as HTMLElement).getByLabelText("空间主密码"),
+    {
+      target: { value: masterPassword }
+    }
+  );
+  fireEvent.click(
+    within(setupPanel as HTMLElement).getByRole("button", {
+      name: "建立空间会话"
+    })
+  );
+  await waitFor(() =>
+    expect(
+      screen.getByText("空间主密码已设置，本次空间会话已建立。")
+    ).toBeInTheDocument()
+  );
 }
 
 export async function confirmRuleProfileWithMaster(masterPassword = "master") {
-  if (screen.getByRole("button", { name: "确认初始化" }).hasAttribute("disabled")) {
+  if (
+    screen.getByRole("button", { name: "确认初始化" }).hasAttribute("disabled")
+  ) {
     await establishSpaceSession(masterPassword);
     fireEvent.click(screen.getByRole("button", { name: "规则管理" }));
   }
@@ -75,7 +111,13 @@ export async function confirmRuleProfileWithMaster(masterPassword = "master") {
     });
   }
   fireEvent.click(screen.getByRole("button", { name: "确认初始化" }));
-  await waitFor(() => expect(screen.getByText("规则链已初始化并保存。本空间后续进入会继续使用这组规则。")).toBeInTheDocument());
+  await waitFor(() =>
+    expect(
+      screen.getByText(
+        "规则链已初始化并保存。本空间后续进入会继续使用这组规则。"
+      )
+    ).toBeInTheDocument()
+  );
   fireEvent.click(screen.getByRole("button", { name: "密码管理" }));
   await screen.findByRole("heading", { name: "密码管理" });
 }
@@ -86,7 +128,12 @@ export function fillFirstSpaceMasterPassword(masterPassword = "master") {
   });
 }
 
-export async function seedEncryptedPasswordEntry(spaceId: string, entryId: string, platform: string, entrySecret: string) {
+export async function seedEncryptedPasswordEntry(
+  spaceId: string,
+  entryId: string,
+  platform: string,
+  entrySecret: string
+) {
   const encrypted_password = await encryptPasswordForEntrySecret(entrySecret);
   await createPasswordEntry({
     id: entryId,
@@ -98,22 +145,38 @@ export async function seedEncryptedPasswordEntry(spaceId: string, entryId: strin
 
 export async function encryptPasswordForEntrySecret(entrySecret: string) {
   const seedSession = await createSession("master");
-  const result = await generatePasswordWithRuleChain(seedSession.cryptoKey, entrySecret, ["v1-hmac"], {
-    mode: "base62",
-    maxLength: 24
-  });
-  const runtimeStorageKey = await deriveRuntimeStorageKey(seedSession.cryptoKey, entrySecret);
+  const result = await generatePasswordWithRuleChain(
+    seedSession.cryptoKey,
+    entrySecret,
+    ["v1-hmac"],
+    {
+      mode: "base62",
+      maxLength: 24
+    }
+  );
+  const runtimeStorageKey = await deriveRuntimeStorageKey(
+    seedSession.cryptoKey,
+    entrySecret
+  );
   return encryptPassword(runtimeStorageKey, result.encodedPassword);
 }
 
-export async function decryptPasswordForEntrySecret(encryptedPassword: string, entrySecret: string) {
+export async function decryptPasswordForEntrySecret(
+  encryptedPassword: string,
+  entrySecret: string
+) {
   const session = await createSession("master");
-  const runtimeKey = await deriveRuntimeStorageKey(session.cryptoKey, entrySecret);
+  const runtimeKey = await deriveRuntimeStorageKey(
+    session.cryptoKey,
+    entrySecret
+  );
   return decryptPassword(runtimeKey, encryptedPassword);
 }
 
 export function getSourceVerificationPanel() {
-  return screen.getByRole("heading", { name: "来源空间校验" }).closest(".verification-panel") as HTMLElement;
+  return screen
+    .getByRole("heading", { name: "来源空间校验" })
+    .closest(".verification-panel") as HTMLElement;
 }
 
 export function expectPageNotice(text: string) {
@@ -129,7 +192,9 @@ export function expectNoPageNotice() {
   if (!currentPage) {
     return;
   }
-  expect(within(currentPage).queryByLabelText("页面通知")).not.toBeInTheDocument();
+  expect(
+    within(currentPage).queryByLabelText("页面通知")
+  ).not.toBeInTheDocument();
 }
 
 export function getGuidancePanel() {

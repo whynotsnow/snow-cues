@@ -1,5 +1,10 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { decryptPassword, deriveRuntimeStorageKey, encryptPassword, generatePasswordWithRuleChain } from "../crypto-engine/crypto-engine";
+import {
+  decryptPassword,
+  deriveRuntimeStorageKey,
+  encryptPassword,
+  generatePasswordWithRuleChain
+} from "../crypto-engine/crypto-engine";
 import { createSession } from "../session-manager/session-manager";
 import {
   createPasswordEntry,
@@ -60,7 +65,8 @@ describe("Space migration", () => {
   });
 
   it("preserve_password 模式会保持平台密码明文并重新加密到目标空间", async () => {
-    const { sourceSession, targetSession } = await seedSourceEntry("old-password");
+    const { sourceSession, targetSession } =
+      await seedSourceEntry("old-password");
     const batch = await createMigrationBatchFromSpace({
       sourceSpaceId: "source",
       targetSpaceId: "target",
@@ -85,9 +91,19 @@ describe("Space migration", () => {
 
     const [targetEntry] = await listPasswordEntriesBySpace("target");
     expect(targetEntry.groupId).toBe(migrationEntry.groupId);
-    const targetKey = await deriveRuntimeStorageKey(targetSession.cryptoKey, "new-secret");
-    await expect(decryptPassword(targetKey, targetEntry.encrypted_password)).resolves.toBe("old-password");
-    await expect(decryptPassword(await deriveRuntimeStorageKey(targetSession.cryptoKey, "wrong"), targetEntry.encrypted_password)).rejects.toThrow();
+    const targetKey = await deriveRuntimeStorageKey(
+      targetSession.cryptoKey,
+      "new-secret"
+    );
+    await expect(
+      decryptPassword(targetKey, targetEntry.encrypted_password)
+    ).resolves.toBe("old-password");
+    await expect(
+      decryptPassword(
+        await deriveRuntimeStorageKey(targetSession.cryptoKey, "wrong"),
+        targetEntry.encrypted_password
+      )
+    ).rejects.toThrow();
     expect(await getSpace("source")).toMatchObject({ status: "deprecated" });
     expect(await listSuccessorsOfSpace("source")).toMatchObject([
       {
@@ -99,7 +115,8 @@ describe("Space migration", () => {
   });
 
   it("regenerate_password 模式按目标规则生成新平台密码", async () => {
-    const { sourceSession, targetSession } = await seedSourceEntry("old-password");
+    const { sourceSession, targetSession } =
+      await seedSourceEntry("old-password");
     const batch = await createMigrationBatchFromSpace({
       sourceSpaceId: "source",
       targetSpaceId: "target",
@@ -108,10 +125,15 @@ describe("Space migration", () => {
     });
     await markMigrationBatchReady(batch?.id ?? "");
     const [migrationEntry] = await listMigrationEntriesByBatch(batch?.id ?? "");
-    const expected = await generatePasswordWithRuleChain(targetSession.cryptoKey, "new-secret", ["v1-hmac"], {
-      mode: "base62",
-      maxLength: 24
-    });
+    const expected = await generatePasswordWithRuleChain(
+      targetSession.cryptoKey,
+      "new-secret",
+      ["v1-hmac"],
+      {
+        mode: "base62",
+        maxLength: 24
+      }
+    );
 
     await migrateEntry({
       batchId: batch?.id ?? "",
@@ -127,12 +149,18 @@ describe("Space migration", () => {
     });
 
     const [targetEntry] = await listPasswordEntriesBySpace("target");
-    const targetKey = await deriveRuntimeStorageKey(targetSession.cryptoKey, "new-secret");
-    await expect(decryptPassword(targetKey, targetEntry.encrypted_password)).resolves.toBe(expected.encodedPassword);
+    const targetKey = await deriveRuntimeStorageKey(
+      targetSession.cryptoKey,
+      "new-secret"
+    );
+    await expect(
+      decryptPassword(targetKey, targetEntry.encrypted_password)
+    ).resolves.toBe(expected.encodedPassword);
   });
 
   it("迁移批次可以关闭自动流转并由用户手动流转来源空间状态", async () => {
-    const { sourceSession, targetSession } = await seedSourceEntry("old-password");
+    const { sourceSession, targetSession } =
+      await seedSourceEntry("old-password");
     const batch = await createMigrationBatchFromSpace({
       sourceSpaceId: "source",
       targetSpaceId: "target",
@@ -174,7 +202,10 @@ describe("Space migration", () => {
 async function seedSourceEntry(password: string) {
   const sourceSession = await createSession("old-master");
   const targetSession = await createSession("new-master");
-  const sourceKey = await deriveRuntimeStorageKey(sourceSession.cryptoKey, "old-secret");
+  const sourceKey = await deriveRuntimeStorageKey(
+    sourceSession.cryptoKey,
+    "old-secret"
+  );
   await saveSpace({ spaceId: "source", status: "active" });
   await saveSpaceProfile({
     spaceId: "source",

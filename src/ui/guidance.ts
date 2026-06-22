@@ -150,9 +150,10 @@ function buildOutsideSpaceGuidance(input: GuidanceInput): GuidanceCard[] {
         id: "storage-data-save",
         priority: guidancePriority.spaceVerification,
         title: "保存存储数据",
-        body: input.storageDataMode === "download"
-          ? "当前使用下载新版模式。保存会生成新版 current.json，请手动放回同步文件夹并确认 Syncthing 状态。"
-          : "当前有未保存改动。保存前会展示摘要 diff，确认后先写 revision 再更新 current.json。",
+        body:
+          input.storageDataMode === "download"
+            ? "当前使用下载新版模式。保存会生成新版 current.json，请手动放回同步文件夹并确认 Syncthing 状态。"
+            : "当前有未保存改动。保存前会展示摘要 diff，确认后先写 revision 再更新 current.json。",
         status: "active",
         steps: [
           { label: "查看保存摘要", status: "current" },
@@ -195,7 +196,9 @@ function buildOutsideSpaceGuidance(input: GuidanceInput): GuidanceCard[] {
   ];
 }
 
-function buildSpaceRestrictionGuidance(input: GuidanceInput): GuidanceCard | null {
+function buildSpaceRestrictionGuidance(
+  input: GuidanceInput
+): GuidanceCard | null {
   if (input.currentSpaceStatus === "deprecated") {
     return {
       id: "deprecated-space",
@@ -204,8 +207,16 @@ function buildSpaceRestrictionGuidance(input: GuidanceInput): GuidanceCard | nul
       body: "当前可以查看历史列表、按需解密已有密码，或从空间主页 clone/export 到新的正常空间继续维护。",
       status: "ready",
       steps: [],
-      primaryAction: { type: "navigate", label: "查看密码列表", targetPage: "passwords" },
-      secondaryAction: { type: "navigate", label: "回到空间主页", targetPage: "space" }
+      primaryAction: {
+        type: "navigate",
+        label: "查看密码列表",
+        targetPage: "passwords"
+      },
+      secondaryAction: {
+        type: "navigate",
+        label: "回到空间主页",
+        targetPage: "space"
+      }
     };
   }
 
@@ -217,7 +228,11 @@ function buildSpaceRestrictionGuidance(input: GuidanceInput): GuidanceCard | nul
       body: "当前主要用于查看空间状态和已有列表；归档空间不支持密码解密、日常派生或写入维护。建立本次空间会话后，可按权限查看已保存的记忆提示。",
       status: "blocked",
       steps: [],
-      primaryAction: { type: "navigate", label: "查看空间主页", targetPage: "space" },
+      primaryAction: {
+        type: "navigate",
+        label: "查看空间主页",
+        targetPage: "space"
+      },
       blockedReason: "当前空间已归档，写入类操作不可用。"
     };
   }
@@ -225,7 +240,9 @@ function buildSpaceRestrictionGuidance(input: GuidanceInput): GuidanceCard | nul
   return null;
 }
 
-function buildDeprecatedSpaceDecryptGuidance(input: GuidanceInput): GuidanceCard | null {
+function buildDeprecatedSpaceDecryptGuidance(
+  input: GuidanceInput
+): GuidanceCard | null {
   if (input.currentSpaceStatus !== "deprecated" || input.entries.length === 0) {
     return null;
   }
@@ -238,8 +255,16 @@ function buildDeprecatedSpaceDecryptGuidance(input: GuidanceInput): GuidanceCard
       body: "查看历史列表不需要校验；若要解密历史密码，请先在空间主页的历史密码校验区域输入空间主密码和一条已知关键密钥，完成本次会话的解密准备。",
       status: "ready",
       steps: [],
-      primaryAction: { type: "navigate", label: "前往历史密码校验", targetPage: "space" },
-      secondaryAction: { type: "navigate", label: "查看密码列表", targetPage: "passwords" }
+      primaryAction: {
+        type: "navigate",
+        label: "前往历史密码校验",
+        targetPage: "space"
+      },
+      secondaryAction: {
+        type: "navigate",
+        label: "查看密码列表",
+        targetPage: "passwords"
+      }
     };
   }
 
@@ -251,8 +276,16 @@ function buildDeprecatedSpaceDecryptGuidance(input: GuidanceInput): GuidanceCard
       body: "查看列表不需要校验。若要解密多条历史密码，请先用一条你记得关键密钥的条目完成一次解密准备；完成后，本次会话内可以继续按条目输入关键密钥解密其他历史密码。",
       status: "ready",
       steps: [],
-      primaryAction: { type: "navigate", label: "前往历史密码校验", targetPage: "space" },
-      secondaryAction: { type: "navigate", label: "查看密码列表", targetPage: "passwords" }
+      primaryAction: {
+        type: "navigate",
+        label: "前往历史密码校验",
+        targetPage: "space"
+      },
+      secondaryAction: {
+        type: "navigate",
+        label: "查看密码列表",
+        targetPage: "passwords"
+      }
     };
   }
 
@@ -263,11 +296,17 @@ function buildDeprecatedSpaceDecryptGuidance(input: GuidanceInput): GuidanceCard
     body: "本次会话已完成历史密码解密准备。你可以在密码列表中按条目输入关键密钥，继续解密其他历史密码。",
     status: "ready",
     steps: [],
-    primaryAction: { type: "navigate", label: "查看密码列表", targetPage: "passwords" }
+    primaryAction: {
+      type: "navigate",
+      label: "查看密码列表",
+      targetPage: "passwords"
+    }
   };
 }
 
-function buildSpaceVerificationGuidance(input: GuidanceInput): GuidanceCard | null {
+function buildSpaceVerificationGuidance(
+  input: GuidanceInput
+): GuidanceCard | null {
   if (input.currentSpaceStatus !== "active" || !input.verificationPending) {
     return null;
   }
@@ -283,13 +322,21 @@ function buildSpaceVerificationGuidance(input: GuidanceInput): GuidanceCard | nu
       { label: "完成空间校验", status: "current" },
       { label: "继续管理密码", status: "pending" }
     ],
-    primaryAction: { type: "navigate", label: "查看空间校验", targetPage: "space" },
+    primaryAction: {
+      type: "navigate",
+      label: "查看空间校验",
+      targetPage: "space"
+    },
     blockedReason: "校验完成前只能查看列表状态和待校验条目的记忆提示。"
   };
 }
 
 function buildSessionGuidance(input: GuidanceInput): GuidanceCard | null {
-  if (input.currentSpaceStatus !== "active" || input.verificationPending || input.sessionAlive) {
+  if (
+    input.currentSpaceStatus !== "active" ||
+    input.verificationPending ||
+    input.sessionAlive
+  ) {
     return null;
   }
 
@@ -304,7 +351,11 @@ function buildSessionGuidance(input: GuidanceInput): GuidanceCard | null {
       { label: "设置空间主密码", status: "current" },
       { label: "初始化规则链或创建密码", status: "pending" }
     ],
-    primaryAction: { type: "navigate", label: "前往空间主页", targetPage: "space" }
+    primaryAction: {
+      type: "navigate",
+      label: "前往空间主页",
+      targetPage: "space"
+    }
   };
 }
 
@@ -329,20 +380,31 @@ function buildRuleSetupGuidance(input: GuidanceInput): GuidanceCard | null {
       { label: "确认规则链", status: "current" },
       { label: "创建密码", status: "pending" }
     ],
-    primaryAction: { type: "navigate", label: "前往规则管理", targetPage: "rules" }
+    primaryAction: {
+      type: "navigate",
+      label: "前往规则管理",
+      targetPage: "rules"
+    }
   };
 }
 
 function buildMigrationGuidance(input: GuidanceInput): GuidanceCard | null {
   const batch = input.selectedMigrationBatch;
-  if (input.currentSpaceStatus !== "active" || input.migrationBatches.length === 0 || !batch) {
+  if (
+    input.currentSpaceStatus !== "active" ||
+    input.migrationBatches.length === 0 ||
+    !batch
+  ) {
     return null;
   }
 
-  const pendingEntries = input.migrationEntries.filter((entry) => entry.status === "pending");
+  const pendingEntries = input.migrationEntries.filter(
+    (entry) => entry.status === "pending"
+  );
   const batchIsDraft = batch.status === "draft";
   const sourceFinalized = Boolean(batch.sourceFinalizedAt);
-  const allEntriesHandled = input.migrationEntries.length > 0 && pendingEntries.length === 0;
+  const allEntriesHandled =
+    input.migrationEntries.length > 0 && pendingEntries.length === 0;
   const sourceAlreadyFinalizedByRelation = input.spaceRelations.some(
     (relation) =>
       relation.type === "successor_of" &&
@@ -350,26 +412,53 @@ function buildMigrationGuidance(input: GuidanceInput): GuidanceCard | null {
       relation.toSpaceId === batch.sourceSpaceId
   );
 
-  if (sourceAlreadyFinalizedByRelation || ((batch.status === "completed" || allEntriesHandled) && sourceFinalized)) {
+  if (
+    sourceAlreadyFinalizedByRelation ||
+    ((batch.status === "completed" || allEntriesHandled) && sourceFinalized)
+  ) {
     return null;
   }
 
   const blockedState = getMigrationBlockedState(input, batchIsDraft);
   const steps: GuidanceStep[] = [
-    { label: "设置目标空间主密码", status: input.sessionAlive ? "done" : "blocked" },
+    {
+      label: "设置目标空间主密码",
+      status: input.sessionAlive ? "done" : "blocked"
+    },
     {
       label: "初始化目标规则链",
-      status: !input.sessionAlive ? "pending" : input.ruleProfileConfirmed ? "done" : "blocked"
+      status: !input.sessionAlive
+        ? "pending"
+        : input.ruleProfileConfirmed
+          ? "done"
+          : "blocked"
     },
     {
       label: "校验来源空间",
-      status: !input.ruleProfileConfirmed || batchIsDraft ? "pending" : input.sourceSessionVerified ? "done" : "current"
+      status:
+        !input.ruleProfileConfirmed || batchIsDraft
+          ? "pending"
+          : input.sourceSessionVerified
+            ? "done"
+            : "current"
     },
     {
       label: "逐条迁移或跳过",
-      status: !input.sourceSessionVerified ? "pending" : pendingEntries.length > 0 ? "current" : "done"
+      status: !input.sourceSessionVerified
+        ? "pending"
+        : pendingEntries.length > 0
+          ? "current"
+          : "done"
     },
-    { label: "完成来源空间流转", status: pendingEntries.length > 0 ? "pending" : sourceFinalized ? "done" : "current" }
+    {
+      label: "完成来源空间流转",
+      status:
+        pendingEntries.length > 0
+          ? "pending"
+          : sourceFinalized
+            ? "done"
+            : "current"
+    }
   ];
 
   if (blockedState) {
@@ -393,7 +482,11 @@ function buildMigrationGuidance(input: GuidanceInput): GuidanceCard | null {
       body: "目标规则链已经准备好，系统会自动把迁移批次切换到可迁移状态。就绪后下一步是校验来源空间。",
       status: "active",
       steps,
-      primaryAction: { type: "navigate", label: "前往迁移情况", targetPage: "space" }
+      primaryAction: {
+        type: "navigate",
+        label: "前往迁移情况",
+        targetPage: "space"
+      }
     };
   }
 
@@ -405,7 +498,11 @@ function buildMigrationGuidance(input: GuidanceInput): GuidanceCard | null {
       body: "选择一条旧空间密码，输入旧空间主密码和这条密码的旧关键密钥。校验通过后，迁移时只需为每条密码填写对应旧关键密钥。",
       status: "active",
       steps,
-      primaryAction: { type: "navigate", label: "前往来源空间校验", targetPage: "space" }
+      primaryAction: {
+        type: "navigate",
+        label: "前往来源空间校验",
+        targetPage: "space"
+      }
     };
   }
 
@@ -417,7 +514,11 @@ function buildMigrationGuidance(input: GuidanceInput): GuidanceCard | null {
       body: "为每条待迁移密码选择保持原平台密码或按目标规则重新生成。重新生成前请先确认外部平台已经更新。",
       status: "active",
       steps,
-      primaryAction: { type: "navigate", label: "前往迁移列表", targetPage: "space" }
+      primaryAction: {
+        type: "navigate",
+        label: "前往迁移列表",
+        targetPage: "space"
+      }
     };
   }
 
@@ -428,11 +529,18 @@ function buildMigrationGuidance(input: GuidanceInput): GuidanceCard | null {
     body: "所有迁移条目已经处理完成。你选择了手动流转，需要在空间主页点击“手动流转来源空间状态”来创建接替关系，并把来源空间标记为历史空间。",
     status: "active",
     steps,
-    primaryAction: { type: "navigate", label: "前往迁移情况", targetPage: "space" }
+    primaryAction: {
+      type: "navigate",
+      label: "前往迁移情况",
+      targetPage: "space"
+    }
   };
 }
 
-function getMigrationBlockedState(input: GuidanceInput, batchIsDraft: boolean): Pick<
+function getMigrationBlockedState(
+  input: GuidanceInput,
+  batchIsDraft: boolean
+): Pick<
   GuidanceCard,
   "title" | "body" | "primaryAction" | "blockedReason"
 > | null {
@@ -440,7 +548,11 @@ function getMigrationBlockedState(input: GuidanceInput, batchIsDraft: boolean): 
     return {
       title: "迁移流程待继续",
       body: "当前空间存在迁移批次，但需要先完成当前空间校验后才能继续处理迁移条目。",
-      primaryAction: { type: "navigate", label: "查看空间校验", targetPage: "space" },
+      primaryAction: {
+        type: "navigate",
+        label: "查看空间校验",
+        targetPage: "space"
+      },
       blockedReason: "当前空间校验未完成，完成校验后才能继续迁移。"
     };
   }
@@ -448,15 +560,24 @@ function getMigrationBlockedState(input: GuidanceInput, batchIsDraft: boolean): 
     return {
       title: "继续迁移前先设置目标空间主密码",
       body: "目标空间需要先建立本次会话，才能开启迁移批次或写入迁移后的正式密码。",
-      primaryAction: { type: "navigate", label: "前往空间主页", targetPage: "space" },
-      blockedReason: "目标空间主密码尚未设置，迁移写入前需要先建立本次空间会话。"
+      primaryAction: {
+        type: "navigate",
+        label: "前往空间主页",
+        targetPage: "space"
+      },
+      blockedReason:
+        "目标空间主密码尚未设置，迁移写入前需要先建立本次空间会话。"
     };
   }
   if (!input.ruleProfileConfirmed) {
     return {
       title: "先初始化目标规则链",
       body: "目标空间规则链决定重新生成模式的输出，也会作为新空间后续密码的稳定生成路径。",
-      primaryAction: { type: "navigate", label: "前往规则管理", targetPage: "rules" },
+      primaryAction: {
+        type: "navigate",
+        label: "前往规则管理",
+        targetPage: "rules"
+      },
       blockedReason: "目标规则链尚未初始化，迁移前需要先确认目标空间规则链。"
     };
   }
@@ -488,8 +609,15 @@ function buildReadySpaceGuidance(input: GuidanceInput): GuidanceCard | null {
         { label: "初始化规则链", status: "done" },
         { label: "创建第一条密码", status: "current" }
       ],
-      primaryAction: { type: "open-create-password", label: "打开新建密码表单" },
-      secondaryAction: { type: "navigate", label: "前往密码管理", targetPage: "passwords" }
+      primaryAction: {
+        type: "open-create-password",
+        label: "打开新建密码表单"
+      },
+      secondaryAction: {
+        type: "navigate",
+        label: "前往密码管理",
+        targetPage: "passwords"
+      }
     };
   }
 
@@ -511,7 +639,11 @@ function getReadySpaceCard(activePage: AppPage): GuidanceCard {
       body: "当前规则链已经初始化。为保持已有密码可追溯，本次会话内不再改动规则。",
       status: "ready",
       steps: baseSteps,
-      primaryAction: { type: "navigate", label: "前往密码管理", targetPage: "passwords" }
+      primaryAction: {
+        type: "navigate",
+        label: "前往密码管理",
+        targetPage: "passwords"
+      }
     };
   }
 
@@ -523,7 +655,11 @@ function getReadySpaceCard(activePage: AppPage): GuidanceCard {
       body: "可以创建密码组并设置声明式输出策略。适配只在解密核心密码后临时应用，不覆盖已保存密文。",
       status: "ready",
       steps: baseSteps,
-      primaryAction: { type: "navigate", label: "前往密码管理", targetPage: "passwords" }
+      primaryAction: {
+        type: "navigate",
+        label: "前往密码管理",
+        targetPage: "passwords"
+      }
     };
   }
 
@@ -535,8 +671,15 @@ function getReadySpaceCard(activePage: AppPage): GuidanceCard {
       body: "你可以新建密码、解密已有密码、查看记忆提示或编辑普通元数据。每次解密仍需要输入对应关键密钥。",
       status: "ready",
       steps: baseSteps,
-      primaryAction: { type: "open-create-password", label: "打开新建密码表单" },
-      secondaryAction: { type: "navigate", label: "管理输出适配", targetPage: "groups" }
+      primaryAction: {
+        type: "open-create-password",
+        label: "打开新建密码表单"
+      },
+      secondaryAction: {
+        type: "navigate",
+        label: "管理输出适配",
+        targetPage: "groups"
+      }
     };
   }
 
@@ -547,7 +690,15 @@ function getReadySpaceCard(activePage: AppPage): GuidanceCard {
     body: "当前空间已经完成必要准备。你可以管理密码、维护输出适配，或在空间主页处理 clone、导出和迁移。",
     status: "ready",
     steps: baseSteps,
-    primaryAction: { type: "navigate", label: "前往密码管理", targetPage: "passwords" },
-    secondaryAction: { type: "navigate", label: "管理输出适配", targetPage: "groups" }
+    primaryAction: {
+      type: "navigate",
+      label: "前往密码管理",
+      targetPage: "passwords"
+    },
+    secondaryAction: {
+      type: "navigate",
+      label: "管理输出适配",
+      targetPage: "groups"
+    }
   };
 }

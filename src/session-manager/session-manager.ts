@@ -28,9 +28,13 @@ export async function createSession(
     throw new Error("请输入 master_password。");
   }
 
-  const keyMaterial = await crypto.subtle.importKey("raw", utf8ToBytes(masterPassword), "PBKDF2", false, [
-    "deriveKey"
-  ]);
+  const keyMaterial = await crypto.subtle.importKey(
+    "raw",
+    utf8ToBytes(masterPassword),
+    "PBKDF2",
+    false,
+    ["deriveKey"]
+  );
 
   const cryptoKey = await crypto.subtle.deriveKey(
     {
@@ -69,12 +73,16 @@ export async function createSession(
     cryptoKey,
     storageKey,
     createdAt: now,
-    expiresAt: now + (timeouts.absoluteTimeoutMs ?? DEFAULT_ABSOLUTE_TIMEOUT_MS),
+    expiresAt:
+      now + (timeouts.absoluteTimeoutMs ?? DEFAULT_ABSOLUTE_TIMEOUT_MS),
     idleExpiresAt: now + (timeouts.idleTimeoutMs ?? DEFAULT_IDLE_TIMEOUT_MS)
   };
 }
 
-export function isSessionExpired(session: Session | null, now = Date.now()): boolean {
+export function isSessionExpired(
+  session: Session | null,
+  now = Date.now()
+): boolean {
   return !session || now >= session.expiresAt || now >= session.idleExpiresAt;
 }
 

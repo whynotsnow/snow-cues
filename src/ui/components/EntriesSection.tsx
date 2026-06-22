@@ -7,11 +7,11 @@ type EntriesSectionProps = {
   hideVerificationControls?: boolean;
 };
 
-export function EntriesSection({ controller, hideVerificationControls = false }: EntriesSectionProps) {
-  const {
-    entries,
-    refreshEntries
-  } = controller;
+export function EntriesSection({
+  controller,
+  hideVerificationControls = false
+}: EntriesSectionProps) {
+  const { entries, refreshEntries } = controller;
 
   return (
     <section className="entries-section" aria-label="已存储的加密密码">

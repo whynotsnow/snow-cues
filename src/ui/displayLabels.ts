@@ -1,5 +1,9 @@
 import { RuleRegistry, type ActiveRuleId } from "../rule-registry/rules";
-import type { MigrationBatchStatus, MigrationProfileSnapshot, SpaceRelationType } from "../storage-engine/storage-engine";
+import type {
+  MigrationBatchStatus,
+  MigrationProfileSnapshot,
+  SpaceRelationType
+} from "../storage-engine/storage-engine";
 
 const relationTypeLabels: Record<SpaceRelationType, string> = {
   cloned_from: "克隆自",
@@ -16,20 +20,42 @@ const migrationBatchStatusLabels: Record<MigrationBatchStatus, string> = {
   completed: "已完成"
 };
 
-export function formatSpaceRelationLabel(fromSpaceId: string, toSpaceId: string, type: SpaceRelationType): string {
+export function formatSpaceRelationLabel(
+  fromSpaceId: string,
+  toSpaceId: string,
+  type: SpaceRelationType
+): string {
   return `${fromSpaceId} → ${toSpaceId} · ${relationTypeLabels[type]}`;
 }
 
-export function formatMigrationBatchStatus(status: MigrationBatchStatus): string {
+export function formatMigrationBatchStatus(
+  status: MigrationBatchStatus
+): string {
   return migrationBatchStatusLabels[status];
 }
 
-export function formatMigrationRuleSnapshot(snapshot: MigrationProfileSnapshot): string {
-  const importedRuleNames = new Map(snapshot.importedRuleManifests.map((manifest) => [manifest.id, manifest.name]));
-  const labels = snapshot.ruleChain.map((ruleId) => formatRuleId(ruleId, importedRuleNames));
+export function formatMigrationRuleSnapshot(
+  snapshot: MigrationProfileSnapshot
+): string {
+  const importedRuleNames = new Map(
+    snapshot.importedRuleManifests.map((manifest) => [
+      manifest.id,
+      manifest.name
+    ])
+  );
+  const labels = snapshot.ruleChain.map((ruleId) =>
+    formatRuleId(ruleId, importedRuleNames)
+  );
   return labels.join(" → ") || "未保存规则链";
 }
 
-function formatRuleId(ruleId: ActiveRuleId, importedRuleNames: Map<string, string>): string {
-  return RuleRegistry[ruleId as keyof typeof RuleRegistry]?.label ?? importedRuleNames.get(ruleId) ?? `未知规则（${ruleId}）`;
+function formatRuleId(
+  ruleId: ActiveRuleId,
+  importedRuleNames: Map<string, string>
+): string {
+  return (
+    RuleRegistry[ruleId as keyof typeof RuleRegistry]?.label ??
+    importedRuleNames.get(ruleId) ??
+    `未知规则（${ruleId}）`
+  );
 }

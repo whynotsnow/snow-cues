@@ -7,13 +7,16 @@ type NoticeProps = {
 };
 
 export function Notice({ notice, className = "", onAction }: NoticeProps) {
-  const role = notice.tone === "warning" || notice.tone === "error" ? "alert" : "status";
+  const role =
+    notice.tone === "warning" || notice.tone === "error" ? "alert" : "status";
   const classNames = [
     "notice",
     `notice-${notice.scope}`,
     `notice-${notice.tone}`,
     className
-  ].filter(Boolean).join(" ");
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <div className={classNames} role={role}>
@@ -22,7 +25,11 @@ export function Notice({ notice, className = "", onAction }: NoticeProps) {
         {notice.body ? <span>{notice.body}</span> : null}
       </div>
       {notice.action && onAction ? (
-        <button className="notice-action-button" onClick={onAction} type="button">
+        <button
+          className="notice-action-button"
+          onClick={onAction}
+          type="button"
+        >
           {notice.action.label}
         </button>
       ) : null}

@@ -1,4 +1,8 @@
-import type { SpacePersistedStatus, SpacePolicyInput, SpaceRuntimeVerificationStatus } from "./types";
+import type {
+  SpacePersistedStatus,
+  SpacePolicyInput,
+  SpaceRuntimeVerificationStatus
+} from "./types";
 
 type PolicyContext = {
   spaceStatus: SpacePersistedStatus;
@@ -38,7 +42,11 @@ export function canViewMemoryHint(input: SpacePolicyInput): boolean {
   if (input.verificationStatus === "pending") {
     return Boolean(input.isVerificationTarget);
   }
-  return input.spaceStatus === "active" || input.spaceStatus === "deprecated" || input.spaceStatus === "archived";
+  return (
+    input.spaceStatus === "active" ||
+    input.spaceStatus === "deprecated" ||
+    input.spaceStatus === "archived"
+  );
 }
 
 export function canEditMemoryHint(input: SpacePolicyInput): boolean {
@@ -49,11 +57,20 @@ export function canDeprecateEntry(input: SpacePolicyInput): boolean {
   return hasActiveWritableSpace(input) && !input.entryDeprecated;
 }
 
-export function canCloneSpace(input: Pick<SpacePolicyInput, "spaceStatus" | "sessionAlive">): boolean {
-  return input.sessionAlive && (input.spaceStatus === "active" || input.spaceStatus === "deprecated" || input.spaceStatus === "archived");
+export function canCloneSpace(
+  input: Pick<SpacePolicyInput, "spaceStatus" | "sessionAlive">
+): boolean {
+  return (
+    input.sessionAlive &&
+    (input.spaceStatus === "active" ||
+      input.spaceStatus === "deprecated" ||
+      input.spaceStatus === "archived")
+  );
 }
 
-export function canCreateSuccessorSpace(input: Pick<SpacePolicyInput, "spaceStatus" | "sessionAlive">): boolean {
+export function canCreateSuccessorSpace(
+  input: Pick<SpacePolicyInput, "spaceStatus" | "sessionAlive">
+): boolean {
   return input.sessionAlive && input.spaceStatus === "active";
 }
 

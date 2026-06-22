@@ -16,4 +16,6 @@ export type NoticeMessage = {
   };
 };
 
-export type SystemNotificationPermission = NotificationPermission | "unsupported";
+export type SystemNotificationPermission =
+  | NotificationPermission
+  | "unsupported";

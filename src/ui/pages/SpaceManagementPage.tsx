@@ -18,8 +18,14 @@ export function SpaceManagementPage({ controller }: SpaceManagementPageProps) {
     migrationBatches,
     sessionAlive
   } = controller;
-  const totalCount = migrationBatches.reduce((sum, batch) => sum + batch.totalCount, 0);
-  const doneCount = migrationBatches.reduce((sum, batch) => sum + batch.migratedCount, 0);
+  const totalCount = migrationBatches.reduce(
+    (sum, batch) => sum + batch.totalCount,
+    0
+  );
+  const doneCount = migrationBatches.reduce(
+    (sum, batch) => sum + batch.migratedCount,
+    0
+  );
   const pendingCount = Math.max(totalCount - doneCount, 0);
   const verificationEntry = loginVerificationEntryId
     ? entries.find((entry) => entry.id === loginVerificationEntryId)
@@ -39,12 +45,18 @@ export function SpaceManagementPage({ controller }: SpaceManagementPageProps) {
             selectLabel="用于校验的密码条目"
             onSelectEntry={handleSelectLoginVerificationEntry}
           >
-            <EntryCard controller={controller} entry={verificationEntry} autoOpenVerification />
+            <EntryCard
+              controller={controller}
+              entry={verificationEntry}
+              autoOpenVerification
+            />
           </EntryVerificationPanel>
         </section>
       ) : null}
 
-      {!verificationEntry && !sessionAlive ? <SpaceSessionSetupCard controller={controller} /> : null}
+      {!verificationEntry && !sessionAlive ? (
+        <SpaceSessionSetupCard controller={controller} />
+      ) : null}
 
       <SpaceMigrationCard
         controller={controller}

@@ -1,5 +1,10 @@
 import { DEFAULT_SPACE_ID, PROFILE_STORE_NAME } from "./constants";
-import { openDatabase, requestToPromise, runTransaction, transactionDone } from "./database";
+import {
+  openDatabase,
+  requestToPromise,
+  runTransaction,
+  transactionDone
+} from "./database";
 import { sanitizeSpaceProfile } from "./sanitize";
 import type { SpaceProfile, SpaceProfileInput } from "./types";
 
@@ -7,18 +12,26 @@ export async function listSystemProfile(): Promise<SpaceProfile | null> {
   return listSpaceProfile(DEFAULT_SPACE_ID);
 }
 
-export async function listSpaceProfile(spaceId: string): Promise<SpaceProfile | null> {
+export async function listSpaceProfile(
+  spaceId: string
+): Promise<SpaceProfile | null> {
   const profile = await runTransaction(PROFILE_STORE_NAME, "readonly", (tx) =>
-    requestToPromise<SpaceProfile | undefined>(tx.objectStore(PROFILE_STORE_NAME).get(spaceId))
+    requestToPromise<SpaceProfile | undefined>(
+      tx.objectStore(PROFILE_STORE_NAME).get(spaceId)
+    )
   );
   return profile ? sanitizeSpaceProfile(profile) : null;
 }
 
-export async function saveSystemProfile(input: Omit<SpaceProfileInput, "spaceId">): Promise<SpaceProfile> {
+export async function saveSystemProfile(
+  input: Omit<SpaceProfileInput, "spaceId">
+): Promise<SpaceProfile> {
   return saveSpaceProfile({ ...input, spaceId: DEFAULT_SPACE_ID });
 }
 
-export async function saveSpaceProfile(input: SpaceProfileInput): Promise<SpaceProfile> {
+export async function saveSpaceProfile(
+  input: SpaceProfileInput
+): Promise<SpaceProfile> {
   const db = await openDatabase();
   const now = Date.now();
   const existing = await listSpaceProfile(input.spaceId);

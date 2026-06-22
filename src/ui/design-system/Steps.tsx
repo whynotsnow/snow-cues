@@ -18,7 +18,10 @@ export function Steps({ className = "", steps }: StepsProps) {
   return (
     <ol className={classNames}>
       {steps.map((step, index) => (
-        <li className={`guidance-step guidance-step-${step.status}`} key={index}>
+        <li
+          className={`guidance-step guidance-step-${step.status}`}
+          key={index}
+        >
           <span className="guidance-step-marker" aria-hidden="true" />
           <span>{step.label}</span>
         </li>

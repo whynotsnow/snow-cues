@@ -21,7 +21,9 @@ export type CloneSpaceConfigInput = {
 
 export type CreateSuccessorSpaceInput = CloneSpaceConfigInput;
 
-export async function cloneSpaceConfig(input: CloneSpaceConfigInput): Promise<SpaceRecord> {
+export async function cloneSpaceConfig(
+  input: CloneSpaceConfigInput
+): Promise<SpaceRecord> {
   const sourceSpace = await getRequiredSpace(input.sourceSpaceId);
   if (!canCloneSpace({ spaceStatus: sourceSpace.status, sessionAlive: true })) {
     throw new Error("当前存储空间不允许克隆配置。");
@@ -40,9 +42,16 @@ export async function cloneSpaceConfig(input: CloneSpaceConfigInput): Promise<Sp
   return targetSpace;
 }
 
-export async function createSuccessorSpace(input: CreateSuccessorSpaceInput): Promise<SpaceRecord> {
+export async function createSuccessorSpace(
+  input: CreateSuccessorSpaceInput
+): Promise<SpaceRecord> {
   const sourceSpace = await getRequiredSpace(input.sourceSpaceId);
-  if (!canCreateSuccessorSpace({ spaceStatus: sourceSpace.status, sessionAlive: true })) {
+  if (
+    !canCreateSuccessorSpace({
+      spaceStatus: sourceSpace.status,
+      sessionAlive: true
+    })
+  ) {
     throw new Error("当前存储空间不允许创建后继空间。");
   }
   await assertTargetSpaceAvailable(input.targetSpaceId);
@@ -88,7 +97,10 @@ async function assertTargetSpaceAvailable(spaceId: string): Promise<void> {
   }
 }
 
-async function copyPasswordGroups(sourceSpaceId: string, targetSpaceId: string): Promise<void> {
+async function copyPasswordGroups(
+  sourceSpaceId: string,
+  targetSpaceId: string
+): Promise<void> {
   const sourceGroups = await listPasswordGroupsBySpace(sourceSpaceId);
   await Promise.all(
     sourceGroups.map((group) =>
@@ -102,7 +114,10 @@ async function copyPasswordGroups(sourceSpaceId: string, targetSpaceId: string):
   );
 }
 
-async function copySpaceProfile(sourceSpaceId: string, targetSpaceId: string): Promise<void> {
+async function copySpaceProfile(
+  sourceSpaceId: string,
+  targetSpaceId: string
+): Promise<void> {
   const sourceProfile = await listSpaceProfile(sourceSpaceId);
   if (!sourceProfile) {
     return;
@@ -110,6 +125,8 @@ async function copySpaceProfile(sourceSpaceId: string, targetSpaceId: string): P
   await saveSpaceProfile({
     spaceId: targetSpaceId,
     ruleChain: [...sourceProfile.ruleChain],
-    importedRuleManifests: sourceProfile.importedRuleManifests.map((manifest) => ({ ...manifest }))
+    importedRuleManifests: sourceProfile.importedRuleManifests.map(
+      (manifest) => ({ ...manifest })
+    )
   });
 }

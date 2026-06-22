@@ -12,7 +12,10 @@ type WorkspaceViewProps = {
   navigateToPage: (page: AppPage) => void;
 };
 
-export function WorkspaceView({ controller, navigateToPage }: WorkspaceViewProps) {
+export function WorkspaceView({
+  controller,
+  navigateToPage
+}: WorkspaceViewProps) {
   const { activePage } = controller;
   const pageNotice = getPageNotice(controller);
   const pageNoticeAction = pageNotice?.action;
@@ -24,7 +27,11 @@ export function WorkspaceView({ controller, navigateToPage }: WorkspaceViewProps
           <div className="page-notice-area" aria-label="页面通知">
             <Notice
               notice={pageNotice}
-              onAction={pageNoticeAction ? () => navigateToPage(pageNoticeAction.targetPage) : undefined}
+              onAction={
+                pageNoticeAction
+                  ? () => navigateToPage(pageNoticeAction.targetPage)
+                  : undefined
+              }
             />
           </div>
         ) : null}

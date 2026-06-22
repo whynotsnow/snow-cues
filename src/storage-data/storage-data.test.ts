@@ -20,7 +20,9 @@ import type { StorageDataContent } from "./storage-data-types";
 
 describe("storage-data core", () => {
   it("canonicalizes object keys while preserving array order", () => {
-    expect(canonicalizeJson({ b: 1, a: [{ d: 2, c: 1 }] })).toBe('{"a":[{"c":1,"d":2}],"b":1}');
+    expect(canonicalizeJson({ b: 1, a: [{ d: 2, c: 1 }] })).toBe(
+      '{"a":[{"c":1,"d":2}],"b":1}'
+    );
   });
 
   it("creates and verifies content hashes", async () => {
@@ -29,12 +31,14 @@ describe("storage-data core", () => {
     await expect(verifyStorageDataHash(file)).resolves.toBe(true);
     const changed = await buildNextStorageDataFile(file, {
       ...file.data,
-      spaces: [{
-        spaceId: "alpha",
-        status: "active",
-        createdAt: 1,
-        updatedAt: 1
-      }]
+      spaces: [
+        {
+          spaceId: "alpha",
+          status: "active",
+          createdAt: 1,
+          updatedAt: 1
+        }
+      ]
     });
     expect(changed.contentHash).not.toBe(file.contentHash);
   });
@@ -51,27 +55,35 @@ describe("storage-data core", () => {
       reason: "manual-export",
       draftContent: file.data
     });
-    await expect(parseStorageDataFileText(draftText)).rejects.toThrow("草稿文件不能作为当前存储数据打开");
-    expect(parseStorageDataDraftFileText(draftText).format).toBe("snow-cues-storage-data-draft");
-    await expect(parseStorageDataFileText(serializeStorageDataFile({ ...file, contentHash: "sha256:bad" }))).rejects.toThrow(
-      "完整性校验失败"
+    await expect(parseStorageDataFileText(draftText)).rejects.toThrow(
+      "草稿文件不能作为当前存储数据打开"
     );
+    expect(parseStorageDataDraftFileText(draftText).format).toBe(
+      "snow-cues-storage-data-draft"
+    );
+    await expect(
+      parseStorageDataFileText(
+        serializeStorageDataFile({ ...file, contentHash: "sha256:bad" })
+      )
+    ).rejects.toThrow("完整性校验失败");
   });
 
   it("strips forbidden password derivation fields", async () => {
     const file = await createInitialStorageDataFile("storage_data_test");
     const next = await buildNextStorageDataFile(file, {
       ...file.data,
-      passwordEntries: [{
-        id: "entry",
-        spaceId: "default",
-        encrypted_password: "ciphertext",
-        createdAt: 1,
-        updatedAt: 1,
-        entrySecret: "secret",
-        ruleId: "v1-hmac",
-        memory_hint: "plain hint"
-      } as never]
+      passwordEntries: [
+        {
+          id: "entry",
+          spaceId: "default",
+          encrypted_password: "ciphertext",
+          createdAt: 1,
+          updatedAt: 1,
+          entrySecret: "secret",
+          ruleId: "v1-hmac",
+          memory_hint: "plain hint"
+        } as never
+      ]
     });
     const text = serializeStorageDataFile(next);
     expect(text).not.toContain("entrySecret");
@@ -96,7 +108,10 @@ describe("storage-data core", () => {
       groupId: "group",
       platform: "Private Platform"
     });
-    const summary = diffStorageDataContent(repository.baseSnapshot(), repository.snapshot());
+    const summary = diffStorageDataContent(
+      repository.baseSnapshot(),
+      repository.snapshot()
+    );
     expect(hasStorageDataChanges(summary)).toBe(true);
     expect(summary.addedPasswordEntries).toBe(1);
     expect(summary.addedPasswordGroups).toBe(1);
@@ -107,20 +122,24 @@ describe("storage-data core", () => {
   it("derives the local space index from imported business data without explicit space records", async () => {
     const repository = createStorageDataRepository({
       spaces: [],
-      spaceProfiles: [{
-        spaceId: "Vault",
-        ruleChain: ["v1-hmac"],
-        importedRuleManifests: [],
-        createdAt: 10,
-        updatedAt: 20
-      }],
-      passwordEntries: [{
-        id: "entry",
-        spaceId: "Vault",
-        encrypted_password: "ciphertext",
-        createdAt: 30,
-        updatedAt: 40
-      }],
+      spaceProfiles: [
+        {
+          spaceId: "Vault",
+          ruleChain: ["v1-hmac"],
+          importedRuleManifests: [],
+          createdAt: 10,
+          updatedAt: 20
+        }
+      ],
+      passwordEntries: [
+        {
+          id: "entry",
+          spaceId: "Vault",
+          encrypted_password: "ciphertext",
+          createdAt: 30,
+          updatedAt: 40
+        }
+      ],
       passwordGroups: [],
       spaceRelations: [],
       migrationBatches: [],
@@ -139,26 +158,32 @@ describe("storage-data core", () => {
       spaceId: "vault",
       status: "active"
     });
-    await expect(repository.listPasswordEntriesBySpace("vault")).resolves.toHaveLength(1);
+    await expect(
+      repository.listPasswordEntriesBySpace("vault")
+    ).resolves.toHaveLength(1);
     expect(repository.isDirty()).toBe(false);
   });
 
   it("uses the latest space-scoped business timestamp in the local space index", async () => {
     const repository = createStorageDataRepository({
-      spaces: [{
-        spaceId: "vault",
-        status: "active",
-        createdAt: 1,
-        updatedAt: 2
-      }],
+      spaces: [
+        {
+          spaceId: "vault",
+          status: "active",
+          createdAt: 1,
+          updatedAt: 2
+        }
+      ],
       spaceProfiles: [],
-      passwordEntries: [{
-        id: "entry",
-        spaceId: "vault",
-        encrypted_password: "ciphertext",
-        createdAt: 3,
-        updatedAt: 50
-      }],
+      passwordEntries: [
+        {
+          id: "entry",
+          spaceId: "vault",
+          encrypted_password: "ciphertext",
+          createdAt: 3,
+          updatedAt: 50
+        }
+      ],
       passwordGroups: [],
       spaceRelations: [],
       migrationBatches: [],
@@ -194,14 +219,20 @@ describe("storage-data folder access", () => {
   it("refuses empty saves and external changes", async () => {
     const root = createMockDirectoryHandle();
     const workspace = await createStorageDataFolder(root);
-    await expect(saveStorageDataWorkspace(workspace)).rejects.toThrow("没有可保存");
+    await expect(saveStorageDataWorkspace(workspace)).rejects.toThrow(
+      "没有可保存"
+    );
     await workspace.repository.saveSpace({ spaceId: "alpha" });
     const external = await buildNextStorageDataFile(workspace.file, {
       ...workspace.file.data,
-      spaces: [{ spaceId: "other", status: "active", createdAt: 1, updatedAt: 1 }]
+      spaces: [
+        { spaceId: "other", status: "active", createdAt: 1, updatedAt: 1 }
+      ]
     });
     root.setFile("current.json", serializeStorageDataFile(external));
-    await expect(saveStorageDataWorkspace(workspace)).rejects.toThrow(EXTERNAL_CHANGE_MESSAGE);
+    await expect(saveStorageDataWorkspace(workspace)).rejects.toThrow(
+      EXTERNAL_CHANGE_MESSAGE
+    );
   });
 });
 
@@ -215,7 +246,10 @@ type MockDirectoryHandle = FileSystemDirectoryHandle & {
   setFile(path: string, content: string): void;
 };
 
-function createMockDirectoryHandle(name = "", root?: { files: Map<string, string>; writeLog: string[] }): MockDirectoryHandle {
+function createMockDirectoryHandle(
+  name = "",
+  root?: { files: Map<string, string>; writeLog: string[] }
+): MockDirectoryHandle {
   const state = root ?? { files: new Map<string, string>(), writeLog: [] };
   return {
     writeLog: state.writeLog,

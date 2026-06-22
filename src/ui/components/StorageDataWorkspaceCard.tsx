@@ -6,7 +6,7 @@ import {
   DescriptionList,
   SectionHeader,
   TextareaField,
-  TextField,
+  TextField
 } from "../design-system";
 import { formatStorageDataSummary } from "../storageDataSummary";
 import type { AppController } from "../useAppController";
@@ -16,7 +16,9 @@ type StorageDataWorkspaceCardProps = {
   controller: AppController;
 };
 
-export function StorageDataWorkspaceCard({ controller }: StorageDataWorkspaceCardProps) {
+export function StorageDataWorkspaceCard({
+  controller
+}: StorageDataWorkspaceCardProps) {
   const {
     outsideSpace,
     storageDataOpened,
@@ -32,7 +34,7 @@ export function StorageDataWorkspaceCard({ controller }: StorageDataWorkspaceCar
     handleCreateStorageData,
     handleOpenStorageDataText,
     handleOpenStorageDataFolder,
-    handleCompareStorageDataText,
+    handleCompareStorageDataText
   } = controller;
   const [compareLeft, setCompareLeft] = useState("");
   const [compareRight, setCompareRight] = useState("");
@@ -44,7 +46,10 @@ export function StorageDataWorkspaceCard({ controller }: StorageDataWorkspaceCar
   if (!outsideSpace) {
     const compactItems = [
       { label: "数据集", value: formatCompactStorageDataId(storageDataId) },
-      { label: "revision", value: storageDataOpened ? String(storageDataRevision) : "无" },
+      {
+        label: "revision",
+        value: storageDataOpened ? String(storageDataRevision) : "无"
+      },
       {
         label: "保存模式",
         value:
@@ -52,17 +57,20 @@ export function StorageDataWorkspaceCard({ controller }: StorageDataWorkspaceCar
             ? "直接保存"
             : storageDataMode === "download"
               ? "下载新版"
-              : "待选择",
+              : "待选择"
       },
       {
         label: "改动",
         value: storageDataDirty ? "未保存" : "已同步",
-        tone: storageDataDirty ? "dirty" : "clean",
-      },
+        tone: storageDataDirty ? "dirty" : "clean"
+      }
     ];
 
     return (
-      <Card className="storage-data-card storage-data-card-compact" aria-label="当前存储数据文件">
+      <Card
+        className="storage-data-card storage-data-card-compact"
+        aria-label="当前存储数据文件"
+      >
         <div className="storage-data-compact-header">
           <div>
             <h2>存储数据</h2>
@@ -73,13 +81,22 @@ export function StorageDataWorkspaceCard({ controller }: StorageDataWorkspaceCar
         <div className="storage-data-compact-body">
           <dl className="storage-data-compact-list">
             {compactItems.map((item) => (
-              <div className={item.tone ? `storage-data-compact-item storage-data-compact-item-${item.tone}` : "storage-data-compact-item"} key={item.label}>
+              <div
+                className={
+                  item.tone
+                    ? `storage-data-compact-item storage-data-compact-item-${item.tone}`
+                    : "storage-data-compact-item"
+                }
+                key={item.label}
+              >
                 <dt>{item.label}</dt>
                 <dd>{item.value}</dd>
               </div>
             ))}
           </dl>
-          {storageDataOpened ? <StorageDataSaveControls controller={controller} /> : null}
+          {storageDataOpened ? (
+            <StorageDataSaveControls controller={controller} />
+          ) : null}
         </div>
       </Card>
     );
@@ -90,10 +107,16 @@ export function StorageDataWorkspaceCard({ controller }: StorageDataWorkspaceCar
       <SectionHeader
         actions={
           <ActionGroup variant="tool">
-            <Button disabled={!canChangeLoadedStorageData} onClick={() => void handleCreateStorageData()}>
+            <Button
+              disabled={!canChangeLoadedStorageData}
+              onClick={() => void handleCreateStorageData()}
+            >
               新建存储数据文件夹
             </Button>
-            <Button disabled={!canChangeLoadedStorageData} onClick={() => void handleOpenStorageDataFolder()}>
+            <Button
+              disabled={!canChangeLoadedStorageData}
+              onClick={() => void handleOpenStorageDataFolder()}
+            >
               打开存储数据文件夹
             </Button>
           </ActionGroup>
@@ -104,7 +127,11 @@ export function StorageDataWorkspaceCard({ controller }: StorageDataWorkspaceCar
       <div className="form-stack">
         <TextField
           disabled={!canChangeLoadedStorageData}
-          hint={!canChangeLoadedStorageData ? "请先离开空间，再更换或重新加载 current.json。" : undefined}
+          hint={
+            !canChangeLoadedStorageData
+              ? "请先离开空间，再更换或重新加载 current.json。"
+              : undefined
+          }
           label="打开 current.json（下载新版模式）"
           onChange={(event) => {
             const file = event.target.files?.[0];
@@ -123,29 +150,44 @@ export function StorageDataWorkspaceCard({ controller }: StorageDataWorkspaceCar
                 {
                   label: "最近保存",
                   value: storageDataUpdatedAt
-                    ? new Date(storageDataUpdatedAt).toLocaleString("zh-CN", { hour12: false })
-                    : "未保存",
+                    ? new Date(storageDataUpdatedAt).toLocaleString("zh-CN", {
+                        hour12: false
+                      })
+                    : "未保存"
                 },
                 {
                   label: "保存模式",
-                  value: storageDataMode === "direct-folder" ? "直接保存" : "下载新版",
+                  value:
+                    storageDataMode === "direct-folder"
+                      ? "直接保存"
+                      : "下载新版"
                 },
                 {
                   label: "改动状态",
-                  value: storageDataDirty ? "有未保存改动" : "已同步到当前草稿",
+                  value: storageDataDirty ? "有未保存改动" : "已同步到当前草稿"
                 },
                 {
                   label: "加载状态",
-                  value: canChangeLoadedStorageData ? "可更换文件" : "空间内已锁定",
-                },
+                  value: canChangeLoadedStorageData
+                    ? "可更换文件"
+                    : "空间内已锁定"
+                }
               ]}
             />
             <StorageDataSaveControls controller={controller} />
             {storageDataDownloadText ? (
-              <TextareaField label="生成的新版 current.json" onChange={() => undefined} value={storageDataDownloadText} />
+              <TextareaField
+                label="生成的新版 current.json"
+                onChange={() => undefined}
+                value={storageDataDownloadText}
+              />
             ) : null}
             {storageDataDraftText ? (
-              <TextareaField label="未保存草稿文件内容" onChange={() => undefined} value={storageDataDraftText} />
+              <TextareaField
+                label="未保存草稿文件内容"
+                onChange={() => undefined}
+                value={storageDataDraftText}
+              />
             ) : null}
           </>
         ) : (
@@ -155,10 +197,17 @@ export function StorageDataWorkspaceCard({ controller }: StorageDataWorkspaceCar
           </p>
         )}
 
-        <div className="storage-compare-block" aria-label="比较两个存储数据文件">
+        <div
+          className="storage-compare-block"
+          aria-label="比较两个存储数据文件"
+        >
           <SectionHeader
             description="比较工具只展示摘要差异，不会修改文件，也不会自动合并 Syncthing 冲突。"
-            title={storageDataOpened ? "比较其他存储数据文件" : "比较两个存储数据文件"}
+            title={
+              storageDataOpened
+                ? "比较其他存储数据文件"
+                : "比较两个存储数据文件"
+            }
           />
           <div className="field-grid">
             <TextField
@@ -183,13 +232,22 @@ export function StorageDataWorkspaceCard({ controller }: StorageDataWorkspaceCar
             />
           </div>
           <ActionGroup variant="tool">
-            <Button disabled={!compareLeft || !compareRight} onClick={() => void handleCompareStorageDataText(compareLeft, compareRight)}>
+            <Button
+              disabled={!compareLeft || !compareRight}
+              onClick={() =>
+                void handleCompareStorageDataText(compareLeft, compareRight)
+              }
+            >
               比较摘要
             </Button>
           </ActionGroup>
-          {storageDataCompareWarning ? <p className="login-note">{storageDataCompareWarning}</p> : null}
+          {storageDataCompareWarning ? (
+            <p className="login-note">{storageDataCompareWarning}</p>
+          ) : null}
           {storageDataCompareSummary ? (
-            <p className="login-note">{formatStorageDataSummary(storageDataCompareSummary)}</p>
+            <p className="login-note">
+              {formatStorageDataSummary(storageDataCompareSummary)}
+            </p>
           ) : null}
         </div>
       </div>

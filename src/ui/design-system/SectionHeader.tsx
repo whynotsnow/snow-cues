@@ -8,7 +8,13 @@ type SectionHeaderProps = {
   title: ReactNode;
 };
 
-export function SectionHeader({ actions, children, className = "", description, title }: SectionHeaderProps) {
+export function SectionHeader({
+  actions,
+  children,
+  className = "",
+  description,
+  title
+}: SectionHeaderProps) {
   const classNames = ["section-header", className].filter(Boolean).join(" ");
 
   return (

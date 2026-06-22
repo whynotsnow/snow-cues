@@ -9,7 +9,12 @@ export function GuidancePanel({ guidance, onAction }: GuidancePanelProps) {
   return (
     <section className="guidance-panel" aria-label="用户操作指引">
       {guidance.cards.map((card, index) => (
-        <GuidanceCardView card={card} isPrimary={index === 0} key={card.id} onAction={onAction} />
+        <GuidanceCardView
+          card={card}
+          isPrimary={index === 0}
+          key={card.id}
+          onAction={onAction}
+        />
       ))}
     </section>
   );
@@ -21,7 +26,11 @@ type GuidanceCardViewProps = {
   onAction: (action: GuidanceAction) => void;
 };
 
-function GuidanceCardView({ card, isPrimary, onAction }: GuidanceCardViewProps) {
+function GuidanceCardView({
+  card,
+  isPrimary,
+  onAction
+}: GuidanceCardViewProps) {
   const cardClassName = [
     "guidance-card",
     isPrimary ? "guidance-card-primary" : "guidance-card-secondary",
@@ -40,17 +49,26 @@ function GuidanceCardView({ card, isPrimary, onAction }: GuidanceCardViewProps) 
       {card.steps.length > 0 ? (
         <ol className="guidance-steps">
           {card.steps.map((step) => (
-            <li className={`guidance-step guidance-step-${step.status}`} key={step.label}>
+            <li
+              className={`guidance-step guidance-step-${step.status}`}
+              key={step.label}
+            >
               <span className="guidance-step-marker" aria-hidden="true" />
               <span>{step.label}</span>
             </li>
           ))}
         </ol>
       ) : null}
-      {card.blockedReason ? <p className="guidance-blocked">{card.blockedReason}</p> : null}
+      {card.blockedReason ? (
+        <p className="guidance-blocked">{card.blockedReason}</p>
+      ) : null}
       <div className="guidance-actions">
         {card.primaryAction ? (
-          <button className={isPrimary ? "primary-button" : undefined} onClick={() => onAction(card.primaryAction!)} type="button">
+          <button
+            className={isPrimary ? "primary-button" : undefined}
+            onClick={() => onAction(card.primaryAction!)}
+            type="button"
+          >
             {card.primaryAction.label}
           </button>
         ) : null}

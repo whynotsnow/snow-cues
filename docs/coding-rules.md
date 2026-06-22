@@ -10,6 +10,14 @@
 - 新增条目操作时，先扩展 `src/ui/entryCapabilities.ts` 和测试，再接入组件。
 - 新增全局用户操作指引时，优先在 `src/ui/guidance.ts` 新增独立 builder，明确 card 是“下一步 / 可用操作 / 相关流程 / 受阻流程”，不要把业务判断塞进 `GuidancePanel`。
 
+## 格式化与 Lint
+
+- 代码格式化由 Prettier 负责，ESLint 只负责代码质量规则和可安全自动修复的问题。
+- VS Code 保存代码时应等价于先执行 Prettier format，再执行 ESLint fix。项目级 `.vscode/settings.json` 已固定默认 formatter、`formatOnSave` 和 `source.fixAll.eslint`。
+- Prettier 使用项目级 `.prettierrc`，不要依赖个人全局编辑器配置改变项目格式。
+- 修改代码后优先运行 `npm run lint` 和 `npm run format:check`。需要自动修复时先运行 `npm run format`，再运行 `npm run lint:fix`。
+- 提交前或跨项目维护任务应运行 `npm run validate`。
+
 ## 存储与业务修改规则
 
 - 新增或调整 `PasswordEntry`、`PasswordGroup`、`spaceProfiles`、`migrationBatches` 或 `migrationEntries` 字段前，必须同时检查 `docs/security-boundaries.md`。
@@ -45,11 +53,14 @@
 - 如果 Vitest 出现长时间无输出、测试挂起或只剩 `act(...)` 警告刷屏，应立即中断当前测试，改用单文件、`-t` 单用例或更小的复现测试定位。
 - 临时 checkpoint、`console.log` 或调试断言只允许用于短时定位；定位后必须删除。
 - 全量 `npm run test` 只在跨模块改动、提交前整体回归或用户明确要求时运行。
+- 测试共享 `fake-indexeddb` 和浏览器全局状态，Vitest 关闭文件级并发。不要在未隔离 IndexedDB 名称和全局对象前重新开启 `fileParallelism`。
 
 ## 验证命令
 
 ```bash
 npm install
+npm run lint
+npm run format:check
 npm run typecheck
 npm run test -- <受影响测试文件或 -t 过滤条件>
 npm run build
