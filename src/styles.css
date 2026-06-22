@@ -181,6 +181,133 @@ label {
   display: grid;
 }
 
+.storage-data-card {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.main-column > .storage-data-card:first-of-type {
+  margin-top: 0;
+}
+
+.storage-data-card-compact {
+  background: rgb(255 255 255 / 96%);
+  box-shadow: 0 8px 22px rgb(32 37 34 / 7%);
+  padding: 0.72rem 0.85rem;
+  position: sticky;
+  top: 1rem;
+  z-index: 12;
+}
+
+.storage-data-compact-header {
+  align-items: flex-start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: space-between;
+}
+
+.storage-data-compact-header h2 {
+  font-size: 0.98rem;
+}
+
+.storage-data-compact-header p {
+  color: #667169;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  margin-top: 0.18rem;
+}
+
+.storage-data-lock-badge {
+  background: #eef3ef;
+  border: 1px solid #d8ded6;
+  border-radius: 999px;
+  color: #436251;
+  font-size: 0.76rem;
+  font-weight: 800;
+  padding: 0.28rem 0.55rem;
+  white-space: nowrap;
+}
+
+.storage-data-compact-body {
+  align-items: center;
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+  margin-top: 0.62rem;
+}
+
+.storage-data-compact-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0;
+  min-width: 0;
+}
+
+.storage-data-compact-item {
+  align-items: baseline;
+  background: #f6f8f5;
+  border: 1px solid #d8ded6;
+  border-radius: 999px;
+  display: inline-flex;
+  gap: 0.38rem;
+  max-width: 100%;
+  min-height: 2rem;
+  padding: 0.35rem 0.6rem;
+}
+
+.storage-data-compact-item dt {
+  color: #667169;
+  font-size: 0.76rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.storage-data-compact-item dd {
+  color: #26322b;
+  font-size: 0.82rem;
+  font-weight: 800;
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.storage-data-compact-item-clean {
+  background: #eef6f3;
+  border-color: #c8ded4;
+}
+
+.storage-data-compact-item-dirty {
+  background: #fff8e8;
+  border-color: #e5c97c;
+}
+
+.storage-data-compact-body .storage-save-controls {
+  gap: 0.45rem;
+  min-width: 210px;
+}
+
+.storage-data-compact-body .storage-save-controls .tool-actions {
+  display: flex;
+  gap: 0.45rem;
+}
+
+.storage-data-compact-body .storage-save-controls button,
+.storage-data-compact-body .storage-save-controls .download-link {
+  min-height: 2.1rem;
+  padding: 0.35rem 0.62rem;
+}
+
+.storage-compare-block {
+  border-top: 1px solid #e4e9e2;
+  display: grid;
+  gap: 0.85rem;
+  padding-top: 0.95rem;
+}
+
 .space-meta {
   color: #536056;
   font-size: 0.85rem;
@@ -1220,6 +1347,23 @@ h2 {
   .entry-edit-grid,
   .entry-readonly-grid {
     grid-template-columns: 1fr;
+  }
+
+  .storage-data-compact-body {
+    grid-template-columns: 1fr;
+  }
+
+  .storage-data-compact-list {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .storage-data-compact-body .storage-save-controls {
+    min-width: 0;
+  }
+
+  .storage-data-card-compact {
+    position: static;
   }
 
   .system-notice-item {

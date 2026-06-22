@@ -72,6 +72,31 @@ describe("空间外索引与创建入口", () => {
     expect(await screen.findByText("imported-space")).toBeInTheDocument();
   });
 
+  it("进入空间后锁定已加载的存储数据文件", async () => {
+    renderApp();
+
+    fireEvent.click(screen.getByRole("button", { name: "新建存储数据文件夹" }));
+    await screen.findByRole("heading", { name: "本地空间索引" });
+    expect(screen.getByRole("button", { name: "新建存储数据文件夹" })).toBeEnabled();
+
+    fireEvent.click(screen.getByRole("button", { name: "新建空间" }));
+    fireEvent.change(screen.getByLabelText("目标存储空间 ID"), {
+      target: { value: "locked-space" }
+    });
+    fireEvent.click(screen.getByRole("button", { name: "创建并进入空间" }));
+
+    await screen.findByText("空间：locked-space");
+    expect(screen.getByText(/空间内已锁定当前加载文件/)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "新建存储数据文件夹" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "打开存储数据文件夹" })).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("打开 current.json（下载新版模式）")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("存储数据保存操作")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "离开空间" }));
+    await screen.findByRole("heading", { name: "本地空间索引" });
+    expect(screen.getByRole("button", { name: "新建存储数据文件夹" })).toBeEnabled();
+  });
+
   it("空间外无空间时展示新建空间操作指引", async () => {
     renderApp();
 

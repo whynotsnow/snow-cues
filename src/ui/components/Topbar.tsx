@@ -1,7 +1,6 @@
 import type { AppController } from "../useAppController";
 import { spaceStatusLabels } from "../useAppController";
 import type { AppPage } from "../appTypes";
-import { StorageDataSaveControls } from "./StorageDataSaveControls";
 
 type TopbarProps = {
   controller: AppController;
@@ -15,10 +14,6 @@ export function Topbar({ controller, navigateToPage }: TopbarProps) {
     currentSpaceStatus,
     currentSpaceIsTemporary,
     outsideSpace,
-    storageDataOpened,
-    storageDataDirty,
-    storageDataMode,
-    storageDataRevision,
     leaveSpace
   } = controller;
 
@@ -30,11 +25,6 @@ export function Topbar({ controller, navigateToPage }: TopbarProps) {
         <p className="subtitle">以用户维护的存储数据文件夹作为唯一业务数据源。</p>
       </div>
       <div className="sidebar-status">
-        <div className="space-meta">
-          <span>存储数据：{storageDataOpened ? `revision ${storageDataRevision}` : "未打开"}</span>
-          <span>保存模式：{storageDataMode === "direct-folder" ? "直接保存" : storageDataMode === "download" ? "下载新版" : "待选择"}</span>
-          <span>改动：{storageDataDirty ? "未保存" : "已同步到当前草稿"}</span>
-        </div>
         {!outsideSpace ? (
           <div className="space-meta">
             <span>空间：{currentSpaceId}</span>
@@ -73,11 +63,6 @@ export function Topbar({ controller, navigateToPage }: TopbarProps) {
           </>
         )}
       </nav>
-      {storageDataOpened ? (
-        <div className="sidebar-actions">
-          <StorageDataSaveControls controller={controller} />
-        </div>
-      ) : null}
       {!outsideSpace ? (
         <div className="sidebar-actions">
           <button onClick={() => leaveSpace()} type="button">

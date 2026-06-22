@@ -99,6 +99,13 @@ export function useAppController() {
         ? "pending"
         : "verified";
   const currentSpaceStatus = currentSpace?.status ?? "active";
+  const assertCanChangeLoadedStorageData = useCallback(() => {
+    if (!outsideSpace) {
+      setError("已进入空间。请先离开空间，再更换或重新加载存储数据文件。");
+      return false;
+    }
+    return true;
+  }, [outsideSpace]);
   const applyStorageDataFile = useCallback(
     async (
       file: StorageDataFile,
@@ -119,6 +126,9 @@ export function useAppController() {
   );
 
   const handleCreateStorageData = useCallback(async () => {
+    if (!assertCanChangeLoadedStorageData()) {
+      return;
+    }
     try {
       if (
         typeof window !== "undefined" &&
@@ -154,10 +164,13 @@ export function useAppController() {
           : "新建存储数据失败。",
       );
     }
-  }, [applyStorageDataFile]);
+  }, [applyStorageDataFile, assertCanChangeLoadedStorageData]);
 
   const handleOpenStorageDataText = useCallback(
     async (text: string) => {
+      if (!assertCanChangeLoadedStorageData()) {
+        return;
+      }
       try {
         const file = await parseStorageDataFileText(text);
         await applyStorageDataFile(file, "download");
@@ -170,10 +183,13 @@ export function useAppController() {
         );
       }
     },
-    [applyStorageDataFile],
+    [applyStorageDataFile, assertCanChangeLoadedStorageData],
   );
 
   const handleOpenStorageDataFolder = useCallback(async () => {
+    if (!assertCanChangeLoadedStorageData()) {
+      return;
+    }
     try {
       if (
         typeof window === "undefined" ||
@@ -197,7 +213,7 @@ export function useAppController() {
           : "打开存储数据文件夹失败。",
       );
     }
-  }, []);
+  }, [assertCanChangeLoadedStorageData]);
 
   const handlePrepareStorageDataSave = useCallback(() => {
     if (!storageDataWorkspace) {

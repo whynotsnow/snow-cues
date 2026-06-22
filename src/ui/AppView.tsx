@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { MessageRow } from "./components/MessageRow";
 import { DetachedPasswordPage } from "./pages/DetachedPasswordPage";
 import { SpaceIndexPanel } from "./components/SpaceIndexPanel";
+import { StorageDataWorkspaceCard } from "./components/StorageDataWorkspaceCard";
 import { SystemNoticeHost } from "./components/SystemNoticeHost";
 import { TestDataTools } from "./components/TestDataTools";
 import { Topbar } from "./components/Topbar";
@@ -90,6 +91,7 @@ export function AppView({ controller }: AppViewProps) {
         <Topbar controller={controller} navigateToPage={navigateToPage} />
         <section className="main-column" aria-label="主要内容">
           <MessageRow controller={controller} />
+          <StorageDataWorkspaceCard controller={controller} />
           {outsideSpace && activePage === "detached" ? (
             <DetachedPasswordPage controller={controller} />
           ) : outsideSpace ? (
