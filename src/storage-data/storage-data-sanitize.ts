@@ -1,4 +1,4 @@
-import { DEFAULT_SPACE_ID } from "./constants";
+import { DEFAULT_SPACE_ID } from "./storage-data-constants";
 import {
   DEFAULT_PASSWORD_OUTPUT_POLICY,
   normalizePasswordOutputPolicy
@@ -17,7 +17,7 @@ import type {
   SpaceRecord,
   SpaceRelation,
   SpaceRelationType
-} from "./types";
+} from "./storage-data-model";
 
 export function sanitizePasswordEntry(entry: PasswordEntry): PasswordEntry {
   return {

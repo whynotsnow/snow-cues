@@ -1,6 +1,6 @@
-# Snow Cues v2.0
+# Snow Cues v2.1
 
-Snow Cues v2.0 是一个纯浏览器运行的安全本地优先密码系统。系统基于 `master_password` 与单条密码的 `entrySecret`（关键密钥，旧名 `runtime_salt`）派生密码，只在用户维护的 `storageData` 文件夹中加密保存派生后的输出，不保存关键密钥或可重建关键密钥的材料。
+Snow Cues v2.1 是一个纯浏览器运行的安全本地优先密码系统。系统基于 `master_password` 与单条密码的 `entrySecret`（关键密钥，旧名 `runtime_salt`）派生密码，只在用户维护的 `storageData` 文件夹中加密保存派生后的输出，不保存关键密钥或可重建关键密钥的材料。
 
 ## 技术栈
 
@@ -21,22 +21,21 @@ npm run build
 
 ## 项目结构
 
-| 目录 / 文件            | 职责                                                                                     |
-| ---------------------- | ---------------------------------------------------------------------------------------- |
-| `src/session-manager/` | 主密码到 WebCrypto key 的派生、会话超时与清除                                            |
-| `src/rule-registry/`   | 静态纯函数规则注册表，内置 `v1-hmac`、`v2-pbkdf2` 及预留 `v3-argon2`                     |
-| `src/crypto-engine/`   | 规则执行、输出编码（base62/base64/自定义字符集）、密码输出适配、AES-GCM 加解密           |
-| `src/recovery-aid/`    | 关键密钥记忆提示的专用加密与解密                                                         |
-| `src/storage-data/`    | 2.0 存储数据文件格式、字段清理、canonical JSON、contentHash、内存 repository、保存和比较 |
-| `src/storage-engine/`  | 存储字段白名单和兼容导出层，业务读写委托到 `storage-data` repository                     |
-| `src/space/`           | 空间 policy、诊断、克隆、导入导出和迁移编排                                              |
-| `src/lib/bytes.ts`     | 字节与编码转换工具（utf8、base64、concat）                                               |
-| `src/App.tsx`          | React 应用入口，只装配 UI controller 与视图                                              |
-| `src/ui/`              | UI 层组件、页面级 controller hook、表单、条目运行时 hook 与 UI 能力聚合                  |
-| `src/ui/pages/`        | hash 路由承载的页面入口，只负责组合 controller 状态和展示组件                            |
-| `src/ui/components/`   | 三栏工作台、全局操作指引、空间主页卡片、密码管理、规则管理、条目卡片等纯展示组件         |
-| `src/ui/hooks/`        | 空间访问、规则 profile、密码条目动作、表单输入和测试清理等 UI 逻辑 hook                  |
-| `src/styles.css`       | 手写样式，无第三方 UI 依赖                                                               |
+| 目录 / 文件            | 职责                                                                                                 |
+| ---------------------- | ---------------------------------------------------------------------------------------------------- |
+| `src/session-manager/` | 主密码到 WebCrypto key 的派生、会话超时与清除                                                        |
+| `src/rule-registry/`   | 静态纯函数规则注册表，内置 `v1-hmac`、`v2-pbkdf2` 及预留 `v3-argon2`                                 |
+| `src/crypto-engine/`   | 规则执行、输出编码（base62/base64/自定义字符集）、密码输出适配、AES-GCM 加解密                       |
+| `src/recovery-aid/`    | 关键密钥记忆提示的专用加密与解密                                                                     |
+| `src/storage-data/`    | 2.1 存储数据文件格式、存储类型、字段白名单、canonical JSON、contentHash、内存 repository、保存和比较 |
+| `src/space/`           | 空间 policy、诊断、克隆、导入导出和迁移编排                                                          |
+| `src/lib/bytes.ts`     | 字节与编码转换工具（utf8、base64、concat）                                                           |
+| `src/App.tsx`          | React 应用入口，只装配 UI controller 与视图                                                          |
+| `src/ui/`              | UI 层组件、页面级 controller hook、表单、条目运行时 hook 与 UI 能力聚合                              |
+| `src/ui/pages/`        | hash 路由承载的页面入口，只负责组合 controller 状态和展示组件                                        |
+| `src/ui/components/`   | 三栏工作台、全局操作指引、空间主页卡片、密码管理、规则管理、条目卡片等纯展示组件                     |
+| `src/ui/hooks/`        | 空间访问、规则 profile、密码条目动作、表单输入和测试清理等 UI 逻辑 hook                              |
+| `src/styles.css`       | 手写样式，无第三方 UI 依赖                                                                           |
 
 ## 安全模型
 

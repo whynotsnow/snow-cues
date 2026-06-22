@@ -14,7 +14,7 @@ import {
   updatePasswordEntry,
   type PasswordEntry,
   type SpaceRecord
-} from "../../storage-engine/storage-engine";
+} from "../../storage-data";
 import {
   canCreateEntry,
   canDeprecateEntry,

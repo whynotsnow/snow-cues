@@ -6,7 +6,7 @@ import type {
   SpaceProfile,
   SpaceRecord,
   SpaceRelation
-} from "../storage-engine/types";
+} from "./storage-data-model";
 
 export const STORAGE_DATA_FORMAT = "snow-cues-storage-data";
 export const STORAGE_DATA_DRAFT_FORMAT = "snow-cues-storage-data-draft";

@@ -39,7 +39,7 @@
 - `src/crypto-engine/crypto-engine.test.ts` 覆盖 AES-GCM 往返、不同 key 解密失败、`entrySecret` 参与条目加密 key 派生和游离密码生成。
 - `src/recovery-aid/recovery-aid.test.ts` 覆盖同 session 往返、错误 master password 失败、不同 `spaceId` / `entryId` 失败、提示加密不依赖 `entrySecret`、空提示拒绝。
 - `src/rule-registry/rules.test.ts` 覆盖不可用规则、确定性输出、salt/rule 改变输出变化、多规则链顺序影响输出、声明式导入规则和拒绝 JavaScript 算法。
-- `src/storage-engine/storage-engine.test.ts` 覆盖字段白名单、持久化前剥离禁止派生字段、空间级规则链 profile 持久化和 `spaceId` 数据隔离。
+- `src/storage-data/storage-data-service.test.ts` 覆盖字段白名单、持久化前剥离禁止派生字段、空间级规则链 profile 持久化和 `spaceId` 数据隔离。
 - `src/space/migration.test.ts` 覆盖 clone 密码条目进入迁移队列、保持平台密码不变迁移、按新规则重新生成迁移、迁移完成后的自动/手动 `successor_of` 关系和来源空间状态流转。
 
 ## 测试执行策略

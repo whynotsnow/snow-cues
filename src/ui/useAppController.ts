@@ -15,7 +15,7 @@ import {
   resetStorageDataRepository,
   type PasswordEntry,
   type SpaceRecord
-} from "../storage-engine/storage-engine";
+} from "../storage-data";
 import {
   EXTERNAL_CHANGE_MESSAGE,
   buildNextStorageDataFile,

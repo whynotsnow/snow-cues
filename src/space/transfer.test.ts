@@ -6,7 +6,7 @@ import {
   listPasswordGroupsBySpace,
   resetLocalData,
   saveSpace
-} from "../storage-engine/storage-engine";
+} from "../storage-data";
 import {
   exportSpacePackage,
   importSpacePackage,

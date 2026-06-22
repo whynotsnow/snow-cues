@@ -3,12 +3,9 @@ import type {
   SpacePersistedStatus,
   SpaceProfile,
   SpaceRecord
-} from "../storage-engine/storage-engine";
+} from "../storage-data";
 
-export type {
-  SpacePersistedStatus,
-  SpaceRecord
-} from "../storage-engine/storage-engine";
+export type { SpacePersistedStatus, SpaceRecord } from "../storage-data";
 
 export type SpaceDiagnosticStatus = "healthy" | "corrupted";
 

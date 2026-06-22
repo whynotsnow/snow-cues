@@ -13,7 +13,7 @@ import {
   saveSpace,
   type PasswordEntry,
   type SpaceRecord
-} from "../../storage-engine/storage-engine";
+} from "../../storage-data";
 import { normalizeSpaceId, type AppPage, type UiState } from "../appTypes";
 
 type SpaceEntryInput = {

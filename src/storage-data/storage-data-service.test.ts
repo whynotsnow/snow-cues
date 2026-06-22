@@ -9,8 +9,6 @@ import {
   createSpaceRelation,
   createPasswordEntry,
   deletePasswordGroup,
-  DB_NAME,
-  DB_VERSION,
   getSpace,
   listPasswordGroupsBySpace,
   listRelationsForSpace,
@@ -30,10 +28,9 @@ import {
   type PasswordEntry,
   type SpaceRecord,
   type SpaceRelation
-} from "./storage-engine";
-import { closeDatabaseConnection } from "./database";
+} from ".";
 
-describe("storage-engine 存储结构", () => {
+describe("storage-data 存储边界与 repository", () => {
   beforeEach(async () => {
     await resetLocalData();
   });
@@ -321,36 +318,6 @@ describe("storage-engine 存储结构", () => {
     await expect(deletePasswordGroup(group.id)).rejects.toThrow("仍有关联条目");
   });
 
-  it("数据库版本已存在但缺密码组仓库时会自动补齐 schema", async () => {
-    await closeDatabaseConnection();
-    await deleteCurrentDatabase();
-    await createIncompleteCurrentVersionDatabase();
-
-    await expect(listPasswordGroupsBySpace("default")).resolves.toEqual([]);
-    await createPasswordGroup({
-      spaceId: "default",
-      name: "修复后的密码组",
-      outputPolicy: {
-        length: 20,
-        useUppercase: true,
-        useLowercase: true,
-        useDigits: true,
-        useSymbols: false,
-        minUppercase: 1,
-        minLowercase: 1,
-        minDigits: 1,
-        minSymbols: 0,
-        allowedSymbols: "",
-        forbiddenChars: ""
-      }
-    });
-    expect(await listPasswordGroupsBySpace("default")).toMatchObject([
-      {
-        name: "修复后的密码组"
-      }
-    ]);
-  });
-
   it("可以更新加密记忆提示，废弃后仍允许更新描述和提示但不允许改平台", async () => {
     const entry = await createPasswordEntry({
       spaceId: "default",
@@ -378,35 +345,3 @@ describe("storage-engine 存储结构", () => {
     expect(updated.encrypted_memory_hint).toBeUndefined();
   });
 });
-
-async function deleteCurrentDatabase() {
-  const request = indexedDB.deleteDatabase(DB_NAME);
-  await new Promise<void>((resolve, reject) => {
-    request.onsuccess = () => resolve();
-    request.onerror = () => reject(request.error);
-    request.onblocked = () => reject(new Error("测试数据库删除被阻止。"));
-  });
-}
-
-async function createIncompleteCurrentVersionDatabase() {
-  const request = indexedDB.open(DB_NAME, DB_VERSION);
-  request.onupgradeneeded = () => {
-    const db = request.result;
-    db.createObjectStore("password_entries", { keyPath: "id" });
-    db.createObjectStore("space_profiles", { keyPath: "spaceId" });
-    db.createObjectStore("spaces", { keyPath: "spaceId" });
-    db.createObjectStore("space_relations", { keyPath: "id" });
-    db.createObjectStore("migration_batches", { keyPath: "id" });
-    db.createObjectStore("migration_entries", { keyPath: "id" });
-  };
-  const db = await requestToDb(request);
-  db.close();
-}
-
-function requestToDb(request: IDBOpenDBRequest): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-    request.onblocked = () => reject(new Error("测试数据库打开被阻止。"));
-  });
-}

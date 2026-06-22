@@ -7,7 +7,7 @@ import {
   updatePasswordGroup,
   type PasswordGroup,
   type SpaceRecord
-} from "../../storage-engine/storage-engine";
+} from "../../storage-data";
 import {
   DEFAULT_PASSWORD_OUTPUT_POLICY,
   type PasswordOutputPolicy,

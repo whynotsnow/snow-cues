@@ -1,4 +1,4 @@
-import { DEFAULT_SPACE_ID } from "../storage-engine/constants";
+import { DEFAULT_SPACE_ID } from "./storage-data-constants";
 import {
   normalizeStoredSpaceId,
   sanitizeMigrationBatch,
@@ -8,7 +8,7 @@ import {
   sanitizeSpaceProfile,
   sanitizeSpaceRecord,
   sanitizeSpaceRelation
-} from "../storage-engine/sanitize";
+} from "./storage-data-sanitize";
 import type {
   MigrationBatch,
   MigrationBatchInput,
@@ -29,7 +29,7 @@ import type {
   SpaceRecordPatch,
   SpaceRelation,
   SpaceRelationInput
-} from "../storage-engine/types";
+} from "./storage-data-model";
 import {
   diffStorageDataContent,
   hasStorageDataChanges

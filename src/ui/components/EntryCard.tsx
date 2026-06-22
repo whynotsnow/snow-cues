@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import type { PasswordEntry } from "../../storage-engine/storage-engine";
+import type { PasswordEntry } from "../../storage-data";
 import {
   ActionGroup,
   Button,

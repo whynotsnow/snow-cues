@@ -6,7 +6,7 @@ import {
   type PasswordOutputPolicy,
   type PasswordOutputPresetId
 } from "../../crypto-engine/output-policy";
-import type { PasswordGroup } from "../../storage-engine/storage-engine";
+import type { PasswordGroup } from "../../storage-data";
 import { ActionGroup, Button, SelectField } from "../design-system";
 import { PasswordOutputPolicyFields } from "./PasswordOutputPolicyFields";
 

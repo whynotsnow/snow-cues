@@ -3,7 +3,7 @@ import type {
   MigrationBatchStatus,
   MigrationProfileSnapshot,
   SpaceRelationType
-} from "../storage-engine/storage-engine";
+} from "../storage-data";
 
 const relationTypeLabels: Record<SpaceRelationType, string> = {
   cloned_from: "克隆自",

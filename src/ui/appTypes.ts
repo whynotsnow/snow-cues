@@ -3,7 +3,7 @@ import type {
   ImportedRuleManifest,
   RuleDefinition
 } from "../rule-registry/rules";
-import type { SpacePersistedStatus } from "../storage-engine/storage-engine";
+import type { SpacePersistedStatus } from "../storage-data";
 
 export type UiState = "OUT_OF_SPACE" | "IN_SPACE" | "ACTIVE" | "LEFT_SPACE";
 export type AppPage = "passwords" | "rules" | "groups" | "space" | "detached";

@@ -11,7 +11,7 @@ import {
   resetLocalData,
   saveSpace,
   saveSpaceProfile
-} from "../storage-engine/storage-engine";
+} from "../storage-data";
 import { cloneSpaceConfig, createSuccessorSpace } from "./clone";
 
 describe("Space config-only clone 与 successor", () => {

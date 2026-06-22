@@ -10,7 +10,7 @@ import {
   listSpaceProfile,
   saveSpace,
   saveSpaceProfile
-} from "./storage-engine/storage-engine";
+} from "./storage-data";
 import { createSession } from "./session-manager/session-manager";
 import {
   decryptPassword,

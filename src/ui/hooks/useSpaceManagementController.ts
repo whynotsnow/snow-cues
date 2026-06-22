@@ -14,7 +14,7 @@ import {
   type MigrationEntry,
   type MigrationMode,
   type SpaceRelation
-} from "../../storage-engine/storage-engine";
+} from "../../storage-data";
 import { canManageMigration } from "../../space/policy";
 import {
   createMigrationBatchFromSpace,

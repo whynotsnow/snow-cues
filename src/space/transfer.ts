@@ -16,7 +16,7 @@ import {
   type SpaceProfile,
   type SpaceRecord,
   type SpaceRelation
-} from "../storage-engine/storage-engine";
+} from "../storage-data";
 
 export type SpaceExportPackage = {
   format: "snow-cues-space-export";

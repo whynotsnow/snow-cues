@@ -5,7 +5,7 @@ import {
   listSpaces,
   type SpaceRecord,
   type SpaceRelation
-} from "../../storage-engine/storage-engine";
+} from "../../storage-data";
 import { createMigrationBatchFromSpace } from "../../space/migration";
 import { importSpacePackage } from "../../space/transfer";
 

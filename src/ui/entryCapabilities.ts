@@ -6,7 +6,7 @@ import {
   canEditMemoryHint,
   canViewMemoryHint
 } from "../space/policy";
-import type { PasswordEntry } from "../storage-engine/storage-engine";
+import type { PasswordEntry } from "../storage-data";
 import type { SpacePolicyInput } from "../space/types";
 
 export type EntryCapabilities = {

@@ -6,7 +6,7 @@ import {
   sanitizeSpaceProfile,
   sanitizeSpaceRecord,
   sanitizeSpaceRelation
-} from "../storage-engine/sanitize";
+} from "./storage-data-sanitize";
 import type { StorageDataContent } from "./storage-data-types";
 
 const FORBIDDEN_KEYS = new Set([

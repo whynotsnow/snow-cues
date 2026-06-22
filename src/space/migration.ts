@@ -38,7 +38,7 @@ import {
   type MigrationEntry,
   type MigrationMode,
   type MigrationProfileSnapshot
-} from "../storage-engine/storage-engine";
+} from "../storage-data";
 import { canCreateSuccessorSpace } from "./policy";
 
 const DEFAULT_MIGRATION_ENCODING: EncodingPolicy = {

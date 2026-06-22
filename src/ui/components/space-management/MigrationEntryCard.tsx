@@ -1,7 +1,4 @@
-import type {
-  MigrationEntry,
-  MigrationMode
-} from "../../../storage-engine/storage-engine";
+import type { MigrationEntry, MigrationMode } from "../../../storage-data";
 import {
   ActionGroup,
   Button,

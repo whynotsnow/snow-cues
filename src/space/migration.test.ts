@@ -19,7 +19,7 @@ import {
   resetLocalData,
   saveSpace,
   saveSpaceProfile
-} from "../storage-engine/storage-engine";
+} from "../storage-data";
 import {
   createMigrationBatchFromSpace,
   finalizeMigrationBatchManually,

@@ -5,7 +5,7 @@ import {
   deleteSpaceData,
   resetLocalData,
   type PasswordEntry
-} from "../../storage-engine/storage-engine";
+} from "../../storage-data";
 import { canCreateEntry, canRunTestCleanup } from "../../space/policy";
 import type { SpacePolicyInput } from "../../space/types";
 import { normalizeSpaceId, type AppPage, type UiState } from "../appTypes";

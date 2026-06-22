@@ -9,7 +9,7 @@ import {
   saveSpaceProfile,
   updateSpace,
   type SpaceRecord
-} from "../storage-engine/storage-engine";
+} from "../storage-data";
 import { canCloneSpace, canCreateSuccessorSpace } from "./policy";
 
 export type CloneSpaceConfigInput = {

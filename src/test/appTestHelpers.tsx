@@ -15,11 +15,7 @@ import {
   generatePasswordWithRuleChain
 } from "../crypto-engine/crypto-engine";
 import { createSession } from "../session-manager/session-manager";
-import {
-  createPasswordEntry,
-  getSpace,
-  resetLocalData
-} from "../storage-engine/storage-engine";
+import { createPasswordEntry, getSpace, resetLocalData } from "../storage-data";
 
 export async function resetAppTestEnvironment() {
   cleanup();

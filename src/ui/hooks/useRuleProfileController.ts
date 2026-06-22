@@ -11,7 +11,7 @@ import {
   saveSpace,
   saveSpaceProfile,
   type SpaceRecord
-} from "../../storage-engine/storage-engine";
+} from "../../storage-data";
 import { canEditRuleProfile } from "../../space/policy";
 import type { SpacePolicyInput } from "../../space/types";
 import {
