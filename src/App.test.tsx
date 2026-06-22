@@ -26,6 +26,12 @@ describe("Snow Cues 应用冒烟流程", () => {
     fireEvent.click(screen.getByRole("button", { name: /生成并保存/i }));
     await waitFor(() => expect(screen.getByText("新密码已生成并加密保存。")).toBeInTheDocument());
 
+    fireEvent.click(screen.getByRole("button", { name: "生成新版 current.json" }));
+    await screen.findByRole("heading", { name: "保存前摘要" });
+    fireEvent.click(screen.getByRole("button", { name: "确认生成新版 current.json" }));
+    await waitFor(() => expect(screen.getByText("已生成新版存储数据文件。请确认 Syncthing 状态后手动替换 current.json。")).toBeInTheDocument());
+    expect(screen.getByRole("link", { name: "下载 current.json" })).toHaveAttribute("download", "current.json");
+
     fireEvent.click(screen.getByRole("button", { name: "解密" }));
     fireEvent.change(screen.getByLabelText("解密关键密钥"), {
       target: { value: "example.com:alice" }

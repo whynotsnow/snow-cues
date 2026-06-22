@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { createMigrationBatch, createMigrationEntry, createSpaceRelation, createPasswordEntry, getSpace, listPasswordEntriesBySpace, listSpaceProfile, saveSpace, saveSpaceProfile } from "../../storage-engine/storage-engine";
 import { createSession } from "../../session-manager/session-manager";
 import { decryptPassword, deriveRuntimeStorageKey, generatePasswordWithRuleChain } from "../../crypto-engine/crypto-engine";
+import { buildNextStorageDataFile, createInitialStorageDataFile, serializeStorageDataFile } from "../../storage-data";
 import { confirmRuleProfileWithMaster, encryptPasswordForEntrySecret, enterSpace, establishSpaceSession, expectNoPageNotice, expectPageNotice, fillFirstSpaceMasterPassword, getGuidancePanel, getSourceVerificationPanel, mockBrowserNotification, renderApp, resetAppTestEnvironment, seedEncryptedPasswordEntry } from "../../test/appTestHelpers";
 
 beforeEach(resetAppTestEnvironment);
@@ -32,13 +33,43 @@ describe("空间外索引与创建入口", () => {
     expect(screen.getByText("正常")).toBeInTheDocument();
     expect(screen.getByText("历史")).toBeInTheDocument();
     expect(screen.getAllByText("target → source · 接替自")).toHaveLength(2);
-    expect(screen.getAllByText("更新时间")).toHaveLength(2);
+    expect(screen.getAllByText("空间数据更新时间")).toHaveLength(2);
     expect(screen.getByRole("button", { name: "新建空间" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "导出当前空间完整备份 JSON" })).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "已存储密码" })).not.toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "开发测试数据工具" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "测试：删除指定空间" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "测试：清空全部本地数据" })).toBeInTheDocument();
+  });
+
+  it("打开 current.json 后刷新本地空间索引", async () => {
+    const emptyFile = await createInitialStorageDataFile("storage_data_imported");
+    const importedFile = await buildNextStorageDataFile(emptyFile, {
+      ...emptyFile.data,
+      spaces: [{
+        spaceId: "imported-space",
+        status: "active",
+        createdAt: 1,
+        updatedAt: 2
+      }]
+    });
+
+    renderApp();
+
+    const currentJsonInput = screen.getByLabelText("打开 current.json（下载新版模式）");
+    const importedFileText = serializeStorageDataFile(importedFile);
+    const uploadedFile = new File([importedFileText], "current.json", { type: "application/json" });
+    Object.defineProperty(uploadedFile, "text", {
+      value: async () => importedFileText
+    });
+    fireEvent.change(currentJsonInput, {
+      target: {
+        files: [uploadedFile]
+      }
+    });
+
+    await screen.findByText("已打开存储数据文件。保存时会生成新版文件下载。");
+    expect(await screen.findByText("imported-space")).toBeInTheDocument();
   });
 
   it("空间外无空间时展示新建空间操作指引", async () => {

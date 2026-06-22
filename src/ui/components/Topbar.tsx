@@ -1,6 +1,7 @@
 import type { AppController } from "../useAppController";
 import { spaceStatusLabels } from "../useAppController";
 import type { AppPage } from "../appTypes";
+import { StorageDataSaveControls } from "./StorageDataSaveControls";
 
 type TopbarProps = {
   controller: AppController;
@@ -72,6 +73,11 @@ export function Topbar({ controller, navigateToPage }: TopbarProps) {
           </>
         )}
       </nav>
+      {storageDataOpened ? (
+        <div className="sidebar-actions">
+          <StorageDataSaveControls controller={controller} />
+        </div>
+      ) : null}
       {!outsideSpace ? (
         <div className="sidebar-actions">
           <button onClick={() => leaveSpace()} type="button">

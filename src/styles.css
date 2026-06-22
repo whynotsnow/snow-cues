@@ -60,6 +60,18 @@ button {
   padding: 0.58rem 0.9rem;
 }
 
+.download-link {
+  align-items: center;
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-control);
+  display: inline-flex;
+  font-weight: 650;
+  justify-content: center;
+  min-height: 2.55rem;
+  padding: 0.58rem 0.9rem;
+  text-decoration: none;
+}
+
 button:hover:not(:disabled) {
   border-color: #66756b;
 }
@@ -158,6 +170,15 @@ label {
 .space-meta {
   display: grid;
   gap: 0.55rem;
+}
+
+.storage-save-controls {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.storage-save-controls .tool-actions {
+  display: grid;
 }
 
 .space-meta {
