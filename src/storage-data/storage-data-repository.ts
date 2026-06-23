@@ -39,6 +39,7 @@ import {
   createEmptyStorageDataContent,
   type StorageDataContent
 } from "./storage-data-types";
+import { createRandomUuid } from "../lib/random-id";
 
 export type StorageDataRepository = ReturnType<
   typeof createStorageDataRepository
@@ -74,7 +75,7 @@ export function createStorageDataRepository(
     ): Promise<PasswordEntry> {
       const now = Date.now();
       const entry = sanitizePasswordEntry({
-        id: input.id ?? crypto.randomUUID(),
+        id: input.id ?? createRandomUuid(),
         spaceId: input.spaceId,
         encrypted_password: input.encrypted_password,
         encrypted_memory_hint: input.encrypted_memory_hint,
@@ -154,7 +155,7 @@ export function createStorageDataRepository(
     ): Promise<PasswordGroup> {
       const now = Date.now();
       const group = sanitizePasswordGroup({
-        id: input.id ?? crypto.randomUUID(),
+        id: input.id ?? createRandomUuid(),
         spaceId: input.spaceId,
         name: input.name,
         description: input.description,
@@ -349,7 +350,7 @@ export function createStorageDataRepository(
       input: SpaceRelationInput
     ): Promise<SpaceRelation> {
       const relation = sanitizeSpaceRelation({
-        id: input.id ?? crypto.randomUUID(),
+        id: input.id ?? createRandomUuid(),
         fromSpaceId: input.fromSpaceId,
         toSpaceId: input.toSpaceId,
         type: input.type,
@@ -397,7 +398,7 @@ export function createStorageDataRepository(
     ): Promise<MigrationBatch> {
       const now = Date.now();
       const batch = sanitizeMigrationBatch({
-        id: input.id ?? crypto.randomUUID(),
+        id: input.id ?? createRandomUuid(),
         sourceSpaceId: input.sourceSpaceId,
         targetSpaceId: input.targetSpaceId,
         sourceType: input.sourceType,
@@ -456,7 +457,7 @@ export function createStorageDataRepository(
     ): Promise<MigrationEntry> {
       const now = Date.now();
       const entry = sanitizeMigrationEntry({
-        id: input.id ?? crypto.randomUUID(),
+        id: input.id ?? createRandomUuid(),
         batchId: input.batchId,
         sourceSpaceId: input.sourceSpaceId,
         targetSpaceId: input.targetSpaceId,

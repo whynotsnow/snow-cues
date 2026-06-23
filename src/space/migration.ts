@@ -39,6 +39,7 @@ import {
   type MigrationMode,
   type MigrationProfileSnapshot
 } from "../storage-data";
+import { createRandomUuid } from "../lib/random-id";
 import { canCreateSuccessorSpace } from "./policy";
 
 const DEFAULT_MIGRATION_ENCODING: EncodingPolicy = {
@@ -208,7 +209,7 @@ export async function migrateEntry(
     throw new Error("重新生成模式需要先确认外部平台密码已经更新。");
   }
 
-  const newEntryId = crypto.randomUUID();
+  const newEntryId = createRandomUuid();
   const targetStorageKey = await deriveRuntimeStorageKey(
     input.targetSession.cryptoKey,
     input.newEntrySecret

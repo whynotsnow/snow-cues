@@ -26,6 +26,14 @@
 - 所有敏感操作都通过 `withLiveSession` 包装执行：先检查会话是否过期，若过期则调用 `leaveSpace` 拒绝操作；若存活则 `touchSession` 续期空闲计时器，再将 live session 引用传给回调。
 - 迁移期间的来源空间 session 只保存在内存中，用于解密旧空间密文；离开空间、切换迁移批次、过期或完成迁移后必须清除。
 
+## WebCrypto 与安全上下文
+
+- Snow Cues 核心密码学链路必须依赖浏览器原生 WebCrypto：PBKDF2、HMAC-SHA256、AES-GCM、SHA-256 和 non-extractable `CryptoKey`。不得用纯 JavaScript 密码学库替代核心链路，也不得为了兼容非安全上下文降低 key 生命周期边界。
+- 正式推荐通过 Cloudflare Pages HTTPS 地址运行，以满足移动端浏览器对 WebCrypto 安全上下文的要求。Cloudflare Pages 只分发静态前端代码，不保存用户 `storageData`、主密码、关键密钥或业务数据。
+- `crypto.randomUUID` 缺失可以退回到基于 `crypto.getRandomValues()` 的 UUID v4 生成，因为这不改变核心密码学边界；不得退回到 `Math.random()`。
+- `crypto.subtle` 缺失不可降级继续执行。应用应在启动或执行敏感操作前检测并给出中文阻断提示，引导用户使用 Cloudflare Pages HTTPS 正式地址、已安装 PWA 或受信任的 `localhost` / `127.0.0.1` 环境。
+- 普通局域网 HTTP、移动端 App 内置浏览器和直接打开打包 HTML 文件可能缺少 `crypto.subtle` 或 File System Access API，不作为安全可靠的正式运行环境。
+
 ## 密码生成与加密
 
 - `generatePasswordWithRuleChain` 要求非空 `entrySecret` 和至少一条规则。

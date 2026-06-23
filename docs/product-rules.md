@@ -1,5 +1,14 @@
 # 产品规则 / Product Rules
 
+## 运行环境与分发
+
+- Snow Cues 的普通用户推荐入口是 Cloudflare Pages HTTPS 正式地址，或从该地址安装的 PWA。Cloudflare Pages 只用于分发静态前端代码，不提供账号、后端同步或业务数据存储。
+- 产品表述应强调“本地优先”而不是“必须直接打开本地 HTML”。用户的 `storageData`、主密码、关键密钥和业务数据仍只由本地浏览器和用户显式维护的文件承担。
+- 移动端不推荐普通用户自行安装 Termux、HTTP Server App 或配置局域网 HTTPS 证书来运行静态服务；这些方式只属于开发者或高级用户测试路径。
+- 普通局域网 HTTP（例如 `http://192.168.x.x`）、移动端 App 内置浏览器、文件管理器预览和直接打开 `file://` 打包 HTML 都不是可靠运行环境。它们可能导致 `crypto.randomUUID is not a function`、`crypto.subtle` 缺失、文件夹访问不可用或页面只显示标题。
+- 应用检测到当前环境缺少 WebCrypto 核心能力时，应展示明确阻断提示，说明需要使用 Cloudflare Pages HTTPS 正式地址或受信任的本机 `localhost` / `127.0.0.1` 环境，不要把底层异常直接展示给用户。
+- 应用检测到 File System Access API 不可用时，应提示当前浏览器不支持文件夹直接保存，并引导使用可用的导入/下载文件模式；不得把该限制解释为密码学失败。
+
 ## 空间与 storageData
 
 - 未打开 `storageData` 时，不从 IndexedDB 或其他旧本地存储加载业务数据，不展示旧空间索引。空间工作台优先展示“新建存储数据文件夹 / 打开存储数据文件夹”。

@@ -17,11 +17,12 @@ import {
   verifyStorageDataHash,
   withStorageDataHash
 } from "./storage-data-hash";
+import { createStorageDataId } from "../lib/random-id";
 
 export class StorageDataFormatError extends Error {}
 
 export async function createInitialStorageDataFile(
-  storageDataId = `storage_data_${crypto.randomUUID()}`
+  storageDataId = createStorageDataId()
 ): Promise<StorageDataFile> {
   return withStorageDataHash({
     format: STORAGE_DATA_FORMAT,

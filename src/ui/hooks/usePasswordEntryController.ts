@@ -27,6 +27,7 @@ import {
 import type { SpacePolicyInput } from "../../space/types";
 import type { Session } from "../../session-manager/session-manager";
 import type { ActiveRuleId, RuleDefinition } from "../../rule-registry/rules";
+import { createRandomUuid } from "../../lib/random-id";
 import type { CreatePasswordInput } from "./useCreatePasswordForm";
 import type { useEntryRuntimeState } from "./useEntryRuntimeState";
 import type { UiState } from "../appTypes";
@@ -154,7 +155,7 @@ export function usePasswordEntryController({
         "当前空间不能创建密码。"
       );
 
-      const entryId = crypto.randomUUID();
+      const entryId = createRandomUuid();
       const result = await generatePasswordWithRuleChain(
         liveSession.cryptoKey,
         input.entrySecret,

@@ -17,7 +17,6 @@ import {
   StorageDataSaveError,
   verifyStorageDataHash
 } from "./index";
-import type { StorageDataContent } from "./storage-data-types";
 
 describe("storage-data core", () => {
   it("canonicalizes object keys while preserving array order", () => {
@@ -42,6 +41,38 @@ describe("storage-data core", () => {
       ]
     });
     expect(changed.contentHash).not.toBe(file.contentHash);
+  });
+
+  it("creates ids when crypto.randomUUID is unavailable", async () => {
+    const originalCrypto = globalThis.crypto;
+    Object.defineProperty(globalThis, "crypto", {
+      value: {
+        getRandomValues: originalCrypto.getRandomValues.bind(originalCrypto),
+        subtle: originalCrypto.subtle
+      } as Crypto,
+      configurable: true
+    });
+
+    try {
+      const file = await createInitialStorageDataFile();
+      expect(file.storageDataId).toMatch(
+        /^storage_data_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
+      );
+
+      const repository = createStorageDataRepository();
+      const entry = await repository.createPasswordEntry({
+        spaceId: "default",
+        encrypted_password: "ciphertext"
+      });
+      expect(entry.id).toMatch(
+        /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
+      );
+    } finally {
+      Object.defineProperty(globalThis, "crypto", {
+        value: originalCrypto,
+        configurable: true
+      });
+    }
   });
 
   it("rejects drafts and invalid hashes in the main open flow", async () => {

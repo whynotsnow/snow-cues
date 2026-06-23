@@ -10,6 +10,14 @@
 - 新增条目操作时，先扩展 `src/ui/entryCapabilities.ts` 和测试，再接入组件。
 - 新增全局用户操作指引时，优先在 `src/ui/guidance.ts` 新增独立 builder，明确 card 是“下一步 / 可用操作 / 相关流程 / 受阻流程”，不要把业务判断塞进 `GuidancePanel`。
 
+## 浏览器能力与移动端兼容
+
+- 正式移动端兼容策略是 Cloudflare Pages HTTPS 分发，不是在代码中绕过 WebCrypto 安全上下文。不要为了普通局域网 HTTP、App 内置浏览器或直接打开 HTML 文件引入核心密码学降级实现。
+- WebCrypto 核心能力缺失时，必须转化为明确中文环境错误；不要让 `Cannot read properties of undefined (reading 'digest')`、`crypto.subtle is undefined` 等底层异常直接暴露给用户。
+- `crypto.randomUUID` 缺失可以由 `src/lib/random-id.ts` 使用 `crypto.getRandomValues()` 生成 UUID v4 兼容；禁止使用 `Math.random()` 生成 `storageDataId`、条目 ID、迁移 ID 或其他业务 ID。
+- `crypto.subtle` 缺失不可用纯 JS SHA、PBKDF2、HMAC 或 AES-GCM 替代继续运行。后续应在应用启动、创建/打开 `storageData`、建立 session、密码生成、解密和比较工具入口前统一检测能力。
+- File System Access API 缺失属于存储交互能力限制，应在 UI 中引导下载/导入模式；不要和 WebCrypto 缺失混为同一个错误。
+
 ## 格式化与 Lint
 
 - 代码格式化由 Prettier 负责，ESLint 只负责代码质量规则和可安全自动修复的问题。
