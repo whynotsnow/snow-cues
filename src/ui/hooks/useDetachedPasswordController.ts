@@ -9,6 +9,8 @@ import {
 } from "../../crypto-engine/output-policy";
 
 type UseDetachedPasswordControllerInput = {
+  coreCryptoAvailable: boolean;
+  coreCryptoUnavailableMessage: string;
   setStatus: (message: string) => void;
   setError: (message: string) => void;
 };
@@ -17,6 +19,8 @@ const DEFAULT_CUSTOM_CHARSET =
   "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%+=?";
 
 export function useDetachedPasswordController({
+  coreCryptoAvailable,
+  coreCryptoUnavailableMessage,
   setStatus,
   setError
 }: UseDetachedPasswordControllerInput) {
@@ -47,6 +51,10 @@ export function useDetachedPasswordController({
     setError("");
     setStatus("");
     setDetachedCopyStatus("");
+    if (!coreCryptoAvailable) {
+      setError(coreCryptoUnavailableMessage);
+      return;
+    }
     setDetachedGenerating(true);
     try {
       const generated = await generateDetachedPassword(detachedDerivationKey, {

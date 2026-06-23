@@ -36,6 +36,54 @@ import {
 beforeEach(resetAppTestEnvironment);
 
 describe("Snow Cues 应用冒烟流程", () => {
+  it("缺少 WebCrypto 核心能力时阻断存储数据入口", () => {
+    const originalCrypto = globalThis.crypto;
+    Object.defineProperty(globalThis, "crypto", {
+      value: {
+        getRandomValues: originalCrypto.getRandomValues.bind(originalCrypto)
+      } as Crypto,
+      configurable: true
+    });
+
+    try {
+      renderApp();
+
+      expect(
+        screen.getAllByText("当前环境不支持安全加密")[0]
+      ).toBeInTheDocument();
+      expect(
+        screen.getAllByText(/请使用 Cloudflare Pages HTTPS 正式地址/)[0]
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "新建存储数据文件夹" })
+      ).toBeDisabled();
+      expect(
+        screen.getByLabelText("打开 current.json（下载新版模式）")
+      ).toBeDisabled();
+    } finally {
+      Object.defineProperty(globalThis, "crypto", {
+        value: originalCrypto,
+        configurable: true
+      });
+    }
+  });
+
+  it("缺少文件夹访问能力时提示下载模式但不阻断新建存储数据", async () => {
+    renderApp();
+
+    expect(screen.getByText("文件夹直接保存不可用")).toBeInTheDocument();
+    expect(
+      screen.getByText(/请使用打开 current.json 和下载新版 current.json/)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "打开存储数据文件夹" })
+    ).toBeDisabled();
+
+    fireEvent.click(screen.getByRole("button", { name: "新建存储数据文件夹" }));
+    await screen.findByText(/存储数据 ID/);
+    expect(screen.getByText("下载新版")).toBeInTheDocument();
+  });
+
   it("可以完成空间主链路冒烟", async () => {
     renderApp();
 

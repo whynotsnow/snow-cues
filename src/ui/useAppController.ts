@@ -3,6 +3,7 @@ import {
   parseImportedRuleManifest,
   type ActiveRuleId
 } from "../rule-registry/rules";
+import { detectBrowserCapabilities } from "../lib/browser-capabilities";
 import {
   createSession,
   isSessionExpired,
@@ -85,6 +86,7 @@ export function useAppController() {
     useState("");
   const systemNotifications = useSystemNotifications();
   const { notifySystem } = systemNotifications;
+  const browserCapabilities = useMemo(() => detectBrowserCapabilities(), []);
 
   const sessionAlive = Boolean(session && !isSessionExpired(session));
   const outsideSpace = uiState === "OUT_OF_SPACE" || uiState === "LEFT_SPACE";
@@ -111,6 +113,13 @@ export function useAppController() {
     }
     return true;
   }, [outsideSpace]);
+  const assertCoreCryptoAvailable = useCallback(() => {
+    if (browserCapabilities.coreCryptoAvailable) {
+      return true;
+    }
+    setError(browserCapabilities.coreCryptoUnavailableMessage);
+    return false;
+  }, [browserCapabilities]);
   const applyStorageDataFile = useCallback(
     async (
       file: StorageDataFile,
@@ -133,6 +142,9 @@ export function useAppController() {
   );
 
   const handleCreateStorageData = useCallback(async () => {
+    if (!assertCoreCryptoAvailable()) {
+      return;
+    }
     if (!assertCanChangeLoadedStorageData()) {
       return;
     }
@@ -171,10 +183,17 @@ export function useAppController() {
           : "新建存储数据失败。"
       );
     }
-  }, [applyStorageDataFile, assertCanChangeLoadedStorageData]);
+  }, [
+    applyStorageDataFile,
+    assertCanChangeLoadedStorageData,
+    assertCoreCryptoAvailable
+  ]);
 
   const handleOpenStorageDataText = useCallback(
     async (text: string) => {
+      if (!assertCoreCryptoAvailable()) {
+        return;
+      }
       if (!assertCanChangeLoadedStorageData()) {
         return;
       }
@@ -190,10 +209,17 @@ export function useAppController() {
         );
       }
     },
-    [applyStorageDataFile, assertCanChangeLoadedStorageData]
+    [
+      applyStorageDataFile,
+      assertCanChangeLoadedStorageData,
+      assertCoreCryptoAvailable
+    ]
   );
 
   const handleOpenStorageDataFolder = useCallback(async () => {
+    if (!assertCoreCryptoAvailable()) {
+      return;
+    }
     if (!assertCanChangeLoadedStorageData()) {
       return;
     }
@@ -220,9 +246,12 @@ export function useAppController() {
           : "打开存储数据文件夹失败。"
       );
     }
-  }, [assertCanChangeLoadedStorageData]);
+  }, [assertCanChangeLoadedStorageData, assertCoreCryptoAvailable]);
 
   const handlePrepareStorageDataSave = useCallback(() => {
+    if (!assertCoreCryptoAvailable()) {
+      return;
+    }
     if (!storageDataWorkspace) {
       setError("请先打开或新建存储数据。");
       return;
@@ -237,9 +266,12 @@ export function useAppController() {
     }
     setStorageDataSaveSummary(summary);
     setStatus("请确认存储数据保存摘要。");
-  }, [storageDataWorkspace]);
+  }, [assertCoreCryptoAvailable, storageDataWorkspace]);
 
   const handleConfirmStorageDataSave = useCallback(async () => {
+    if (!assertCoreCryptoAvailable()) {
+      return;
+    }
     if (!storageDataWorkspace) {
       setError("请先打开或新建存储数据。");
       return;
@@ -281,13 +313,16 @@ export function useAppController() {
         });
       }
     }
-  }, [notifySystem, storageDataWorkspace]);
+  }, [assertCoreCryptoAvailable, notifySystem, storageDataWorkspace]);
 
   const handleCancelStorageDataSave = useCallback(() => {
     setStorageDataSaveSummary(null);
   }, []);
 
   const handleExportStorageDataDraft = useCallback(async () => {
+    if (!assertCoreCryptoAvailable()) {
+      return;
+    }
     if (!storageDataWorkspace) {
       setError("请先打开或新建存储数据。");
       return;
@@ -307,10 +342,13 @@ export function useAppController() {
           : "导出存储数据草稿失败。"
       );
     }
-  }, [storageDataWorkspace]);
+  }, [assertCoreCryptoAvailable, storageDataWorkspace]);
 
   const handleCompareStorageDataText = useCallback(
     async (leftText: string, rightText: string) => {
+      if (!assertCoreCryptoAvailable()) {
+        return;
+      }
       try {
         const left = await parseStorageDataFileText(leftText);
         const right = await parseStorageDataFileText(rightText);
@@ -331,7 +369,7 @@ export function useAppController() {
         );
       }
     },
-    []
+    [assertCoreCryptoAvailable]
   );
   // 离开空间或会话过期时统一清理内存中的敏感运行时状态。
   const clearSensitiveState = useCallback(() => {
@@ -353,6 +391,10 @@ export function useAppController() {
   );
   const ensureLiveSession = useCallback(
     async (masterPassword?: string): Promise<Session> => {
+      if (!browserCapabilities.coreCryptoAvailable) {
+        setError(browserCapabilities.coreCryptoUnavailableMessage);
+        throw new Error(browserCapabilities.coreCryptoUnavailableMessage);
+      }
       if (session && !isSessionExpired(session)) {
         const liveSession = touchSession(session);
         setSession(liveSession);
@@ -381,7 +423,7 @@ export function useAppController() {
       setSession(nextSession);
       return nextSession;
     },
-    [clearSensitiveState, notifySystem, session]
+    [browserCapabilities, clearSensitiveState, notifySystem, session]
   );
   // 应用级策略输入集中在这里生成，子 hook 只消费结果，避免各自重复推导门禁状态。
   const basePolicyInput = useMemo(
@@ -509,6 +551,9 @@ export function useAppController() {
   }, [outsideSpace, spaceIndex.refreshSpaceIndex, storageDataWorkspace]);
 
   const detachedPasswordController = useDetachedPasswordController({
+    coreCryptoAvailable: browserCapabilities.coreCryptoAvailable,
+    coreCryptoUnavailableMessage:
+      browserCapabilities.coreCryptoUnavailableMessage,
     setError,
     setStatus
   });
@@ -774,6 +819,7 @@ export function useAppController() {
     storageDataCompareWarning,
     storageDataConflictDetected,
     storageDataConflictFileName,
+    browserCapabilities,
     handleCreateStorageData,
     handleOpenStorageDataText,
     handleOpenStorageDataFolder,

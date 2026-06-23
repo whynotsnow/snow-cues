@@ -8,6 +8,11 @@ Object.defineProperty(globalThis, "crypto", {
   configurable: true
 });
 
+Object.defineProperty(window, "isSecureContext", {
+  value: true,
+  configurable: true
+});
+
 if (!("btoa" in globalThis)) {
   Object.defineProperty(globalThis, "btoa", {
     value: (value: string) => Buffer.from(value, "binary").toString("base64")

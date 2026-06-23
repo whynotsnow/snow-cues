@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 import { MessageRow } from "./components/MessageRow";
+import { Notice } from "./notifications/Notice";
 import { SpaceIndexPanel } from "./components/SpaceIndexPanel";
 import { StorageDataWorkspaceCard } from "./components/StorageDataWorkspaceCard";
 import { SystemNoticeHost } from "./components/SystemNoticeHost";
@@ -107,6 +108,17 @@ export function AppView({ controller }: AppViewProps) {
         <Topbar controller={controller} navigateToPage={navigateToPage} />
         <section className="main-column" aria-label="主要内容">
           <MessageRow controller={controller} />
+          {!controller.browserCapabilities.coreCryptoAvailable ? (
+            <Notice
+              notice={{
+                scope: "page",
+                tone: "error",
+                title: "当前环境不支持安全加密",
+                body: controller.browserCapabilities
+                  .coreCryptoUnavailableMessage
+              }}
+            />
+          ) : null}
           {activePage === "tools" ? null : (
             <StorageDataWorkspaceCard controller={controller} />
           )}

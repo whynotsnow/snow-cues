@@ -7,6 +7,7 @@ import {
   TextareaField,
   TextField
 } from "../design-system";
+import { Notice } from "../notifications/Notice";
 import type { AppController } from "../useAppController";
 import { StorageDataSaveControls } from "./StorageDataSaveControls";
 
@@ -27,14 +28,21 @@ export function StorageDataWorkspaceCard({
     storageDataUpdatedAt,
     storageDataDownloadText,
     storageDataDraftText,
+    browserCapabilities,
     handleCreateStorageData,
     handleOpenStorageDataText,
     handleOpenStorageDataFolder
   } = controller;
-  const canChangeLoadedStorageData = outsideSpace;
+  const canUseCoreCrypto = browserCapabilities.coreCryptoAvailable;
+  const canChangeLoadedStorageData = outsideSpace && canUseCoreCrypto;
+  const canUseFolderAccess =
+    canChangeLoadedStorageData &&
+    browserCapabilities.storageFolderAccessAvailable;
   const changeLockedHint = canChangeLoadedStorageData
     ? "打开和保存前请先确认 Syncthing 已完成同步。"
-    : "已进入空间。为了避免会话与文件内容错位，切换或重新加载存储数据前需要先离开空间。";
+    : canUseCoreCrypto
+      ? "已进入空间。为了避免会话与文件内容错位，切换或重新加载存储数据前需要先离开空间。"
+      : "当前运行环境缺少核心加密能力，不能打开或创建存储数据。";
 
   if (!outsideSpace) {
     const compactItems = [
@@ -107,7 +115,7 @@ export function StorageDataWorkspaceCard({
               新建存储数据文件夹
             </Button>
             <Button
-              disabled={!canChangeLoadedStorageData}
+              disabled={!canUseFolderAccess}
               onClick={() => void handleOpenStorageDataFolder()}
             >
               打开存储数据文件夹
@@ -118,12 +126,35 @@ export function StorageDataWorkspaceCard({
         title="存储数据"
       />
       <div className="form-stack">
+        {!canUseCoreCrypto ? (
+          <Notice
+            notice={{
+              scope: "action",
+              tone: "error",
+              title: "当前环境不支持安全加密",
+              body: browserCapabilities.coreCryptoUnavailableMessage
+            }}
+          />
+        ) : null}
+        {canUseCoreCrypto &&
+        !browserCapabilities.storageFolderAccessAvailable ? (
+          <Notice
+            notice={{
+              scope: "action",
+              tone: "warning",
+              title: "文件夹直接保存不可用",
+              body: browserCapabilities.storageFolderAccessUnavailableMessage
+            }}
+          />
+        ) : null}
         <TextField
           disabled={!canChangeLoadedStorageData}
           hint={
-            !canChangeLoadedStorageData
-              ? "请先离开空间，再更换或重新加载 current.json。"
-              : undefined
+            !canUseCoreCrypto
+              ? "当前环境不支持安全加密能力，无法读取或校验 current.json。"
+              : !canChangeLoadedStorageData
+                ? "请先离开空间，再更换或重新加载 current.json。"
+                : undefined
           }
           label="打开 current.json（下载新版模式）"
           onChange={(event) => {
