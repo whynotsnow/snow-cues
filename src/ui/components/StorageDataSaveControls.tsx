@@ -1,4 +1,3 @@
-import { storageDataFileToDownloadUrl } from "../../storage-data";
 import { ActionGroup, Button, Card, SectionHeader } from "../design-system";
 import { formatStorageDataSummary } from "../storageDataSummary";
 import type { AppController } from "../useAppController";
@@ -12,16 +11,13 @@ export function StorageDataSaveControls({
 }: StorageDataSaveControlsProps) {
   const {
     storageDataDirty,
-    storageDataDownloadText,
+    storageDataDownloadPackage,
     storageDataSaveSummary,
     handleCancelStorageDataSave,
     handleConfirmStorageDataSave,
     handleExportStorageDataDraft,
     handlePrepareStorageDataSave
   } = controller;
-  const downloadUrl = storageDataDownloadText
-    ? storageDataFileToDownloadUrl(storageDataDownloadText)
-    : "";
 
   return (
     <div className="storage-save-controls" aria-label="存储数据保存操作">
@@ -62,14 +58,24 @@ export function StorageDataSaveControls({
         </Card>
       ) : null}
 
-      {downloadUrl ? (
-        <a
-          className="download-link primary-button"
-          download="current.json"
-          href={downloadUrl}
-        >
-          下载 current.json
-        </a>
+      {storageDataDownloadPackage ? (
+        <Card tone="subtle" aria-label="下载保存包">
+          <SectionHeader
+            description={
+              storageDataDownloadPackage.desktopScriptsIncluded
+                ? "桌面保存包包含固定脚本模板。先编辑 storageData-path.txt，再运行对应系统脚本。"
+                : "移动端保存包不包含脚本。请按 README 手动放置 current 和 revision 文件。"
+            }
+            title="保存包已生成"
+          />
+          <a
+            className="download-link primary-button"
+            download={storageDataDownloadPackage.fileName}
+            href={storageDataDownloadPackage.downloadUrl}
+          >
+            下载保存包 .zip
+          </a>
+        </Card>
       ) : null}
     </div>
   );

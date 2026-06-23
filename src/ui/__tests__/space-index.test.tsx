@@ -119,7 +119,7 @@ describe("空间外索引与创建入口", () => {
     });
 
     await screen.findByText(
-      "已导入 current.json。后续保存会提供新的 current.json 下载。"
+      "已导入 current.json。后续保存会提供新的保存包下载。"
     );
     expect(await screen.findByText("imported-space")).toBeInTheDocument();
   });

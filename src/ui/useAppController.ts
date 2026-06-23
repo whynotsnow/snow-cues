@@ -24,14 +24,15 @@ import {
   createInitialStorageDataFile,
   createStorageDataFolder,
   createStorageDataWorkspaceFromFile,
+  buildStorageDataSavePackage,
   diffStorageDataContent,
   exportStorageDataDraft,
   hasStorageDataChanges,
   openStorageDataFolder,
   parseStorageDataFileText,
   saveStorageDataWorkspace,
-  serializeStorageDataFile,
   type StorageDataFile,
+  type StorageDataSavePackage,
   type StorageDataSaveSummary,
   type StorageDataWorkspace
 } from "../storage-data";
@@ -74,7 +75,8 @@ export function useAppController() {
     useState<StorageDataWorkspace | null>(null);
   const [storageDataSaveSummary, setStorageDataSaveSummary] =
     useState<StorageDataSaveSummary | null>(null);
-  const [storageDataDownloadText, setStorageDataDownloadText] = useState("");
+  const [storageDataDownloadPackage, setStorageDataDownloadPackage] =
+    useState<StorageDataSavePackage | null>(null);
   const [storageDataDraftText, setStorageDataDraftText] = useState("");
   const [storageDataCompareSummary, setStorageDataCompareSummary] =
     useState<StorageDataSaveSummary | null>(null);
@@ -130,7 +132,7 @@ export function useAppController() {
       workspace.repository = getStorageDataRepository();
       setStorageDataWorkspace(workspace);
       setStorageDataSaveSummary(null);
-      setStorageDataDownloadText("");
+      setStorageDataDownloadPackage(null);
       setStorageDataDraftText("");
       setStorageDataCompareSummary(null);
       setStorageDataCompareWarning("");
@@ -171,8 +173,19 @@ export function useAppController() {
           ? await buildNextStorageDataFile(emptyFile, snapshot)
           : emptyFile;
       await applyStorageDataFile(file, "download");
-      setStorageDataDownloadText(serializeStorageDataFile(file));
-      setStatus("已生成初始 current.json，请下载后放入你的 storageData。");
+      setStorageDataDownloadPackage(
+        await buildStorageDataSavePackage({
+          file,
+          openedRevision: 0,
+          openedHash: "",
+          mobileLike: browserCapabilities.isMobileLike
+        })
+      );
+      setStatus(
+        browserCapabilities.isMobileLike
+          ? "已生成移动端保存包。请下载 zip 后按 README 手动放入 storageData。"
+          : "已生成桌面保存包。请下载 zip，编辑 storageData-path.txt 后运行脚本。"
+      );
     } catch (storageError) {
       setError(
         storageError instanceof Error
@@ -183,7 +196,8 @@ export function useAppController() {
   }, [
     applyStorageDataFile,
     assertCanChangeLoadedStorageData,
-    assertCoreCryptoAvailable
+    assertCoreCryptoAvailable,
+    browserCapabilities.isMobileLike
   ]);
 
   const handleOpenStorageDataText = useCallback(
@@ -197,9 +211,7 @@ export function useAppController() {
       try {
         const file = await parseStorageDataFileText(text);
         await applyStorageDataFile(file, "download");
-        setStatus(
-          "已导入 current.json。后续保存会提供新的 current.json 下载。"
-        );
+        setStatus("已导入 current.json。后续保存会提供新的保存包下载。");
       } catch (storageError) {
         setError(
           storageError instanceof Error
@@ -281,10 +293,25 @@ export function useAppController() {
       setStorageDataWorkspace({ ...storageDataWorkspace });
       setStorageDataSaveSummary(null);
       if (result.mode === "download") {
-        setStorageDataDownloadText(result.content);
-        setStatus("已保存存储数据。请下载 current.json 并放回 storageData。");
+        setStorageDataDownloadPackage(
+          await buildStorageDataSavePackage({
+            file: result.file,
+            openedRevision: result.openedRevision,
+            openedHash: result.openedHash,
+            mobileLike: browserCapabilities.isMobileLike
+          })
+        );
+        setStatus(
+          browserCapabilities.isMobileLike
+            ? "已保存存储数据并生成移动端保存包。请下载 zip 后按 README 手动放入 storageData。"
+            : "已保存存储数据并生成桌面保存包。请下载 zip，编辑 storageData-path.txt 后运行脚本。"
+        );
       } else {
-        setStatus("已保存存储数据。切换设备前请等待外部同步完成。");
+        setStatus(
+          result.cleanupWarning
+            ? `已保存存储数据。${result.cleanupWarning}`
+            : "已保存存储数据。切换设备前请等待外部同步完成。"
+        );
       }
     } catch (storageError) {
       const message =
@@ -308,7 +335,12 @@ export function useAppController() {
         });
       }
     }
-  }, [assertCoreCryptoAvailable, notifySystem, storageDataWorkspace]);
+  }, [
+    assertCoreCryptoAvailable,
+    browserCapabilities.isMobileLike,
+    notifySystem,
+    storageDataWorkspace
+  ]);
 
   const handleCancelStorageDataSave = useCallback(() => {
     setStorageDataSaveSummary(null);
@@ -807,7 +839,7 @@ export function useAppController() {
     storageDataRevision,
     storageDataUpdatedAt,
     storageDataSaveSummary,
-    storageDataDownloadText,
+    storageDataDownloadPackage,
     storageDataDraftText,
     storageDataCompareSummary,
     storageDataCompareWarning,

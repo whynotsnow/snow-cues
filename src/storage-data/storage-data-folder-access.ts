@@ -14,6 +14,11 @@ import {
   createStorageDataRepository,
   type StorageDataRepository
 } from "./storage-data-repository";
+import {
+  createConflictFileName,
+  DEFAULT_REVISION_RETENTION,
+  createRevisionFileName
+} from "./storage-data-file-names";
 import type {
   StorageDataDraftFile,
   StorageDataDraftReason,
@@ -24,7 +29,6 @@ import type {
 
 export const EXTERNAL_CHANGE_MESSAGE =
   "当前存储数据已在页面打开后发生变化。为避免覆盖其他设备的修改，本次保存已停止。请确认 Syncthing 已同步完成后重新打开存储数据文件夹。";
-
 export type FileSystemAccessMode = "direct-folder" | "download-only";
 
 export type StorageDataWorkspace = {
@@ -42,6 +46,7 @@ export type StorageDataSaveResult =
       file: StorageDataFile;
       revisionFileName: string;
       summary: StorageDataSaveSummary;
+      cleanupWarning?: string;
     }
   | {
       mode: "download";
@@ -49,6 +54,8 @@ export type StorageDataSaveResult =
       fileName: string;
       content: string;
       summary: StorageDataSaveSummary;
+      openedRevision: number;
+      openedHash: string;
     };
 
 export type StorageDataDraftExport = {
@@ -86,6 +93,7 @@ declare global {
       name: string,
       options?: { create?: boolean }
     ): Promise<FileSystemFileHandle>;
+    entries?: () => AsyncIterableIterator<[string, unknown]>;
   }
 
   interface FileSystemFileHandle {
@@ -175,6 +183,8 @@ export async function saveStorageDataWorkspace(
   if (!hasStorageDataChanges(summary)) {
     throw new StorageDataSaveError("没有可保存的存储数据改动。", "empty-save");
   }
+  const openedRevision = workspace.openedRevision;
+  const openedHash = workspace.openedHash;
   const nextFile = await buildNextStorageDataFile(
     workspace.file,
     workspace.repository.snapshot()
@@ -202,8 +212,15 @@ export async function saveStorageDataWorkspace(
       }),
       serializeStorageDataFile(nextFile)
     );
+    const cleanupWarning = await cleanupOldRevisions(revisions);
     markWorkspaceSaved(workspace, nextFile);
-    return { mode: "direct-folder", file: nextFile, revisionFileName, summary };
+    return {
+      mode: "direct-folder",
+      file: nextFile,
+      revisionFileName,
+      summary,
+      cleanupWarning
+    };
   }
 
   markWorkspaceSaved(workspace, nextFile);
@@ -212,7 +229,9 @@ export async function saveStorageDataWorkspace(
     file: nextFile,
     fileName: "current.json",
     content: serializeStorageDataFile(nextFile),
-    summary
+    summary,
+    openedRevision,
+    openedHash
   };
 }
 
@@ -284,6 +303,32 @@ async function ensureStorageDataDirectories(
   await directoryHandle.getDirectoryHandle("conflicts", { create: true });
 }
 
+async function cleanupOldRevisions(
+  revisions: FileSystemDirectoryHandle,
+  retention = DEFAULT_REVISION_RETENTION
+): Promise<string | undefined> {
+  try {
+    if (!revisions.entries || !revisions.removeEntry) {
+      return undefined;
+    }
+    const revisionFiles: string[] = [];
+    for await (const [name] of revisions.entries()) {
+      if (/^storage-data-rev-\d{6}\.json$/.test(name)) {
+        revisionFiles.push(name);
+      }
+    }
+    revisionFiles.sort().reverse();
+    for (const name of revisionFiles.slice(retention)) {
+      await revisions.removeEntry(name);
+    }
+    return undefined;
+  } catch (error) {
+    return error instanceof Error
+      ? `历史版本清理失败：${error.message}`
+      : "历史版本清理失败。";
+  }
+}
+
 async function writeFile(fileHandle: FileSystemFileHandle, content: string) {
   try {
     const writable = await fileHandle.createWritable();
@@ -307,28 +352,9 @@ function markWorkspaceSaved(
   workspace.repository.markClean(file.data);
 }
 
-export function createRevisionFileName(revision: number): string {
-  return `storage-data-rev-${String(revision).padStart(6, "0")}.json`;
-}
-
 export function createDraftFileName(isoString: string): string {
   return `storage-data-draft-${isoString
     .replace(/\.\d{3}Z$/, "Z")
     .replace(/[-:]/g, "")
     .replace("T", "T")}.json`;
-}
-
-export function createConflictFileName({
-  openedRevision,
-  currentRevision,
-  nextRevision,
-  createdAt
-}: {
-  openedRevision: number;
-  currentRevision: number;
-  nextRevision: number;
-  createdAt: string;
-}): string {
-  const stamp = createdAt.replace(/\.\d{3}Z$/, "Z").replace(/[-:]/g, "");
-  return `conflict-o${openedRevision}-c${currentRevision}-n${nextRevision}-${stamp}.json`;
 }

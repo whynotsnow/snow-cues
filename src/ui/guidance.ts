@@ -199,7 +199,7 @@ function buildOutsideSpaceGuidance(input: GuidanceInput): GuidanceCard[] {
         id: "storage-data-save",
         priority: guidancePriority.spaceVerification,
         title: "保存存储数据",
-        body: "当前有未保存改动。保存前会展示摘要 diff，确认后按当前浏览器能力完成写入或提供 current.json 下载。",
+        body: "当前有未保存改动。保存前会展示摘要 diff，确认后按当前浏览器能力完成写入或提供保存包下载。",
         status: "active",
         steps: [
           { label: "查看保存摘要", status: "current" },

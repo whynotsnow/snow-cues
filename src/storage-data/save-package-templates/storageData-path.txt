@@ -1,0 +1,5 @@
+# 请把下一行改成你的 storageData 文件夹绝对路径。
+# macOS 示例：/Users/your-name/Documents/storageData
+# Windows 示例：C:\Users\your-name\Documents\storageData
+# Linux 示例：/home/your-name/Documents/storageData
+

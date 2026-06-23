@@ -71,7 +71,7 @@ describe("Snow Cues 应用冒烟流程", () => {
 
     expect(screen.getByText("当前使用文件导入导出")).toBeInTheDocument();
     expect(
-      screen.getByText(/将通过导入和下载 current.json/)
+      screen.getByText(/将通过导入 current.json 和下载保存包/)
     ).toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: "打开存储数据" })
@@ -80,8 +80,8 @@ describe("Snow Cues 应用冒烟流程", () => {
     fireEvent.click(screen.getByRole("button", { name: "新建存储数据" }));
     await screen.findByText(/存储数据 ID/);
     expect(
-      screen.getByRole("link", { name: "下载 current.json" })
-    ).toHaveAttribute("download", "current.json");
+      screen.getByRole("link", { name: "下载保存包 .zip" })
+    ).toHaveAttribute("download", expect.stringMatching(/\.zip$/));
   });
 
   it("可以完成空间主链路冒烟", async () => {
@@ -110,13 +110,13 @@ describe("Snow Cues 应用冒烟流程", () => {
     await waitFor(() =>
       expect(
         screen.getByText(
-          "已保存存储数据。请下载 current.json 并放回 storageData。"
+          "已保存存储数据并生成桌面保存包。请下载 zip，编辑 storageData-path.txt 后运行脚本。"
         )
       ).toBeInTheDocument()
     );
     expect(
-      screen.getByRole("link", { name: "下载 current.json" })
-    ).toHaveAttribute("download", "current.json");
+      screen.getByRole("link", { name: "下载保存包 .zip" })
+    ).toHaveAttribute("download", expect.stringMatching(/\.zip$/));
 
     fireEvent.click(screen.getByRole("button", { name: "解密" }));
     fireEvent.change(screen.getByLabelText("解密关键密钥"), {

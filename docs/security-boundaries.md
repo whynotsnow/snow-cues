@@ -64,7 +64,9 @@
 - 新建 `storageData` 默认生成 revision `1`，并写入初始 `current.json`。
 - 直接保存模式必须先写 `revisions/storage-data-rev-xxxxxx.json`，成功后再更新 `current.json`。
 - 保存前必须重读 `current.json`，用打开时的 revision/hash 检测外部变化。若检测到变化，必须拒绝覆盖，保留内存草稿，并将本次待保存的正式文件写入 `conflicts/` 作为冲突候选版本。
-- 下载模式只生成新版正式文件内容，由用户手动替换 `current.json` 或放置 revision，并确认外部同步已完成；应用不自动写入同步文件夹。
+- 下载模式生成 zip 保存包，由用户手动放置文件，或在桌面端使用保存包内固定脚本模板辅助复制。应用不自动写入同步文件夹。
+- 桌面保存包脚本模板必须来自 `src/storage-data/save-package-templates/`，页面只把模板原样打入 zip，不动态拼接脚本逻辑。脚本只能读取同目录 `manifest.json`、`storageData-path.txt`、候选文件和目标 `storageData/current.json` 的 `revision/contentHash`，匹配后才覆盖 `current.json` 并写入 `revisions/`；不匹配时只能写入 `conflicts/`，不得覆盖当前文件。脚本不得联网、不得读取主密码或关键密钥、不得扫描无关目录、不得删除 `current.json` 或 `conflicts/`。
+- 移动端或类移动端保存包不得包含 `.sh`、`.command`、`.ps1` 等可执行脚本。
 - 安全摘要 diff 和比较工具只展示集合数量级摘要，不展示密文字段、明文秘密或隐私元数据全文。只读比较工具不得合并、不得写文件。
 - 旧 IndexedDB 模块不再作为业务真源。残留旧浏览器数据不得出现在 2.1 UI 业务流；清空或忽略 IndexedDB 不应影响通过 `storageData` 打开的业务状态。
 

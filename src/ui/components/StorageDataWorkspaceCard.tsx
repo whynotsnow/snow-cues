@@ -25,7 +25,6 @@ export function StorageDataWorkspaceCard({
     storageDataId,
     storageDataRevision,
     storageDataUpdatedAt,
-    storageDataDownloadText,
     storageDataDraftText,
     browserCapabilities,
     handleCreateStorageData,
@@ -188,13 +187,6 @@ export function StorageDataWorkspaceCard({
               ]}
             />
             <StorageDataSaveControls controller={controller} />
-            {storageDataDownloadText ? (
-              <TextareaField
-                label="保存后的 current.json 内容"
-                onChange={() => undefined}
-                value={storageDataDownloadText}
-              />
-            ) : null}
             {storageDataDraftText ? (
               <TextareaField
                 label="未保存草稿文件内容"

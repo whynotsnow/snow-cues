@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
+import { base64ToBytes, bytesToUtf8 } from "../lib/bytes";
 import { DEFAULT_PASSWORD_OUTPUT_POLICY } from "../crypto-engine/output-policy";
 import {
   EXTERNAL_CHANGE_MESSAGE,
+  buildStorageDataSavePackage,
   buildNextStorageDataFile,
   canonicalizeJson,
   createInitialStorageDataFile,
@@ -14,6 +16,7 @@ import {
   saveStorageDataWorkspace,
   serializeStorageDataDraftFile,
   serializeStorageDataFile,
+  shortHash,
   StorageDataSaveError,
   verifyStorageDataHash
 } from "./index";
@@ -248,6 +251,23 @@ describe("storage-data folder access", () => {
     ]);
   });
 
+  it("keeps only the latest 50 revision files after direct folder saves", async () => {
+    const root = createMockDirectoryHandle();
+    const workspace = await createStorageDataFolder(root);
+    for (let index = 0; index < 55; index += 1) {
+      await workspace.repository.saveSpace({ spaceId: `space-${index}` });
+      await saveStorageDataWorkspace(workspace);
+    }
+
+    const revisionFiles = root
+      .listFiles("revisions")
+      .filter((path) => /storage-data-rev-\d{6}\.json$/.test(path))
+      .sort();
+    expect(revisionFiles).toHaveLength(50);
+    expect(revisionFiles[0]).toBe("revisions/storage-data-rev-000007.json");
+    expect(revisionFiles.at(-1)).toBe("revisions/storage-data-rev-000056.json");
+  });
+
   it("refuses empty saves and external changes", async () => {
     const root = createMockDirectoryHandle();
     const workspace = await createStorageDataFolder(root);
@@ -266,7 +286,9 @@ describe("storage-data folder access", () => {
       EXTERNAL_CHANGE_MESSAGE
     );
     const conflictPath = root.writeLog.find((path) =>
-      path.startsWith("conflicts/conflict-o1-c2-n2-")
+      path.startsWith(
+        "conflicts/storage-data-conflict-o000001-c000002-n000002-"
+      )
     );
     expect(conflictPath).toBeTruthy();
     expect(root.writeLog).not.toContain(
@@ -307,9 +329,84 @@ describe("storage-data folder access", () => {
     } catch (error) {
       expect(error).toBeInstanceOf(StorageDataSaveError);
       expect((error as StorageDataSaveError).details.conflictFileName).toMatch(
-        /^conflict-o1-c2-n2-\d{8}T\d{6}Z\.json$/
+        /^storage-data-conflict-o000001-c000002-n000002-\d{8}T\d{6}Z\.json$/
       );
     }
+  });
+
+  it("builds desktop save packages with manifest, data files, and scripts", async () => {
+    const file = await createInitialStorageDataFile("storage_data_test");
+    const next = await buildNextStorageDataFile(file, {
+      ...file.data,
+      spaces: [
+        { spaceId: "alpha", status: "active", createdAt: 1, updatedAt: 1 }
+      ]
+    });
+    const savePackage = await buildStorageDataSavePackage({
+      file: next,
+      openedRevision: file.revision,
+      openedHash: file.contentHash,
+      mobileLike: false,
+      generatedAt: new Date("2026-06-23T10:00:00.000Z")
+    });
+    const entries = unzipStoredDataUrl(savePackage.downloadUrl);
+    const manifest = JSON.parse(entries.get("manifest.json") ?? "{}");
+    const expectedCandidateFileName = `storage-data-current-o000001-h${shortHash(
+      file.contentHash
+    )}-n000002.json`;
+
+    expect(savePackage.fileName).toBe(
+      "snow-cues-save-package-rev-000002-20260623T100000Z.zip"
+    );
+    expect(savePackage.desktopScriptsIncluded).toBe(true);
+    expect(entries.has("apply-save.command")).toBe(true);
+    expect(entries.has("apply-save.sh")).toBe(true);
+    expect(entries.has("apply-save.ps1")).toBe(true);
+    expect(entries.has("storageData-path.txt")).toBe(true);
+    expect(entries.has("README.txt")).toBe(true);
+    expect(entries.has(expectedCandidateFileName)).toBe(true);
+    expect(entries.has("revisions/storage-data-rev-000002.json")).toBe(true);
+    expect(manifest).toMatchObject({
+      storageDataId: "storage_data_test",
+      openedRevision: 1,
+      openedHash: file.contentHash,
+      nextRevision: 2,
+      nextHash: next.contentHash,
+      revisionRetention: 50,
+      candidateFileName: expectedCandidateFileName,
+      revisionFileName: "storage-data-rev-000002.json"
+    });
+    expect(manifest.conflictFileName).toMatch(
+      new RegExp(
+        `^storage-data-conflict-o000001-h${shortHash(
+          file.contentHash
+        )}-n000002-20260623T100000Z\\.json$`
+      )
+    );
+    expect(entries.get("apply-save.sh")).toContain("storageData-path.txt");
+    expect(entries.get("apply-save.sh")).toContain("contentHash");
+    expect(entries.get("apply-save.sh")).not.toMatch(/\bcurl\b|\bwget\b/);
+  });
+
+  it("builds mobile save packages without executable scripts", async () => {
+    const file = await createInitialStorageDataFile("storage_data_test");
+    const savePackage = await buildStorageDataSavePackage({
+      file,
+      openedRevision: 0,
+      openedHash: "",
+      mobileLike: true,
+      generatedAt: new Date("2026-06-23T10:00:00.000Z")
+    });
+    const entries = unzipStoredDataUrl(savePackage.downloadUrl);
+
+    expect(savePackage.desktopScriptsIncluded).toBe(false);
+    expect(entries.has("apply-save.command")).toBe(false);
+    expect(entries.has("apply-save.sh")).toBe(false);
+    expect(entries.has("apply-save.ps1")).toBe(false);
+    expect(entries.get("README.txt")).toContain("不包含可执行脚本");
+    expect(
+      entries.has("storage-data-current-o000000-h00000000-n000001.json")
+    ).toBe(true);
   });
 });
 
@@ -322,6 +419,7 @@ type MockDirectoryHandle = FileSystemDirectoryHandle & {
   writeLog: string[];
   setFile(path: string, content: string): void;
   getFile(path: string): string;
+  listFiles(path?: string): string[];
 };
 
 function createMockDirectoryHandle(
@@ -337,8 +435,24 @@ function createMockDirectoryHandle(
     getFile(path: string) {
       return state.files.get(path) ?? "";
     },
-    async getDirectoryHandle(childName: string) {
-      return createMockDirectoryHandle(pathJoin(name, childName), state);
+    listFiles(path = "") {
+      const prefix = path ? `${path}/` : "";
+      return Array.from(state.files.keys()).filter((filePath) =>
+        filePath.startsWith(prefix)
+      );
+    },
+    async getDirectoryHandle(
+      childName: string,
+      options?: { create?: boolean }
+    ) {
+      const path = pathJoin(name, childName);
+      if (options?.create) {
+        state.files.set(
+          pathJoin(path, ".keep"),
+          state.files.get(pathJoin(path, ".keep")) ?? ""
+        );
+      }
+      return createMockDirectoryHandle(path, state);
     },
     async getFileHandle(fileName: string, options?: { create?: boolean }) {
       const path = pathJoin(name, fileName);
@@ -370,10 +484,66 @@ function createMockDirectoryHandle(
           };
         }
       } as MockFileHandle;
+    },
+    async *entries() {
+      const prefix = name ? `${name}/` : "";
+      const childNames = new Set<string>();
+      for (const filePath of state.files.keys()) {
+        if (!filePath.startsWith(prefix)) {
+          continue;
+        }
+        const childName = filePath.slice(prefix.length).split("/")[0];
+        if (childName && childName !== ".keep") {
+          childNames.add(childName);
+        }
+      }
+      for (const childName of childNames) {
+        yield [childName, {}] as [string, unknown];
+      }
+    },
+    async removeEntry(fileName: string) {
+      state.files.delete(pathJoin(name, fileName));
     }
   } as unknown as MockDirectoryHandle;
 }
 
 function pathJoin(parent: string, child: string): string {
   return parent ? `${parent}/${child}` : child;
+}
+
+function unzipStoredDataUrl(downloadUrl: string): Map<string, string> {
+  const [, base64] = downloadUrl.split(",");
+  const bytes = base64ToBytes(base64);
+  const entries = new Map<string, string>();
+  let offset = 0;
+  while (readUint32(bytes, offset) === 0x04034b50) {
+    const compressedSize = readUint32(bytes, offset + 18);
+    const fileNameLength = readUint16(bytes, offset + 26);
+    const extraLength = readUint16(bytes, offset + 28);
+    const nameStart = offset + 30;
+    const contentStart = nameStart + fileNameLength + extraLength;
+    const name = bytesToUtf8(
+      bytes.slice(nameStart, nameStart + fileNameLength)
+    );
+    const content = bytesToUtf8(
+      bytes.slice(contentStart, contentStart + compressedSize)
+    );
+    entries.set(name, content);
+    offset = contentStart + compressedSize;
+  }
+  return entries;
+}
+
+function readUint16(bytes: Uint8Array, offset: number): number {
+  return new DataView(bytes.buffer, bytes.byteOffset + offset, 2).getUint16(
+    0,
+    true
+  );
+}
+
+function readUint32(bytes: Uint8Array, offset: number): number {
+  return new DataView(bytes.buffer, bytes.byteOffset + offset, 4).getUint32(
+    0,
+    true
+  );
 }
