@@ -14,6 +14,7 @@ import {
   saveStorageDataWorkspace,
   serializeStorageDataDraftFile,
   serializeStorageDataFile,
+  StorageDataSaveError,
   verifyStorageDataHash
 } from "./index";
 import type { StorageDataContent } from "./storage-data-types";
@@ -233,6 +234,51 @@ describe("storage-data folder access", () => {
     await expect(saveStorageDataWorkspace(workspace)).rejects.toThrow(
       EXTERNAL_CHANGE_MESSAGE
     );
+    const conflictPath = root.writeLog.find((path) =>
+      path.startsWith("conflicts/conflict-o1-c2-n2-")
+    );
+    expect(conflictPath).toBeTruthy();
+    expect(root.writeLog).not.toContain(
+      "revisions/storage-data-rev-000002.json"
+    );
+    expect(
+      root.writeLog.filter((path) => path === "current.json")
+    ).toHaveLength(1);
+    await expect(
+      parseStorageDataFileText(root.getFile(conflictPath!))
+    ).resolves.toMatchObject({
+      revision: 2,
+      data: {
+        spaces: [
+          {
+            spaceId: "alpha"
+          }
+        ]
+      }
+    });
+  });
+
+  it("exposes conflict file name on external-change save errors", async () => {
+    const root = createMockDirectoryHandle();
+    const workspace = await createStorageDataFolder(root);
+    await workspace.repository.saveSpace({ spaceId: "alpha" });
+    const external = await buildNextStorageDataFile(workspace.file, {
+      ...workspace.file.data,
+      spaces: [
+        { spaceId: "other", status: "active", createdAt: 1, updatedAt: 1 }
+      ]
+    });
+    root.setFile("current.json", serializeStorageDataFile(external));
+
+    try {
+      await saveStorageDataWorkspace(workspace);
+      throw new Error("expected save to fail");
+    } catch (error) {
+      expect(error).toBeInstanceOf(StorageDataSaveError);
+      expect((error as StorageDataSaveError).details.conflictFileName).toMatch(
+        /^conflict-o1-c2-n2-\d{8}T\d{6}Z\.json$/
+      );
+    }
   });
 });
 
@@ -244,6 +290,7 @@ type MockFileHandle = FileSystemFileHandle & {
 type MockDirectoryHandle = FileSystemDirectoryHandle & {
   writeLog: string[];
   setFile(path: string, content: string): void;
+  getFile(path: string): string;
 };
 
 function createMockDirectoryHandle(
@@ -255,6 +302,9 @@ function createMockDirectoryHandle(
     writeLog: state.writeLog,
     setFile(path: string, content: string) {
       state.files.set(path, content);
+    },
+    getFile(path: string) {
+      return state.files.get(path) ?? "";
     },
     async getDirectoryHandle(childName: string) {
       return createMockDirectoryHandle(pathJoin(name, childName), state);

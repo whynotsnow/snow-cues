@@ -50,6 +50,7 @@ type GuidanceInput = Pick<
   | "verificationPending"
 > & {
   storageDataConflictDetected?: boolean;
+  storageDataConflictFileName?: string;
   storageDataOpened?: boolean;
   storageDataDirty?: boolean;
   storageDataMode?: "direct-folder" | "download" | null;
@@ -101,7 +102,9 @@ function buildStorageDataConflictGuidance(
     id: "storage-data-conflict",
     priority: guidancePriority.spaceRestriction,
     title: "存储数据需要比较",
-    body: "保存时检测到存储数据已被其他设备更新。为避免会话与文件内容错位，请先离开当前空间，再到系统工具比较文件差异。",
+    body: input.storageDataConflictFileName
+      ? `保存时检测到存储数据已被其他设备更新。本次编辑结果已保存到 conflicts/${input.storageDataConflictFileName}，请先离开当前空间，再到系统工具比较文件差异。`
+      : "保存时检测到存储数据已被其他设备更新。为避免会话与文件内容错位，请先离开当前空间，再到系统工具比较文件差异。",
     status: "blocked",
     steps: [
       { label: "停止覆盖保存", status: "done" },
@@ -137,7 +140,9 @@ function buildOutsideSpaceGuidance(input: GuidanceInput): GuidanceCard[] {
         id: "storage-data-conflict",
         priority: guidancePriority.spaceRestriction,
         title: "比较冲突文件",
-        body: "系统检测到存储数据文件已被其他设备更新。先用系统工具比较 current.json、草稿或冲突文件，再决定保留哪一版内容。",
+        body: input.storageDataConflictFileName
+          ? `系统已把本次编辑结果保存到 conflicts/${input.storageDataConflictFileName}。先比较当前 current.json 与该冲突文件，再决定如何处理。`
+          : "系统检测到存储数据文件已被其他设备更新。先用系统工具比较 current.json 与冲突文件，再决定保留哪一版内容。",
         status: "active",
         steps: [
           { label: "停止覆盖保存", status: "done" },

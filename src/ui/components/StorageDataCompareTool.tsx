@@ -19,6 +19,7 @@ export function StorageDataCompareTool({
   conflictMode = false
 }: StorageDataCompareToolProps) {
   const {
+    storageDataConflictFileName,
     storageDataCompareSummary,
     storageDataCompareWarning,
     handleCompareStorageDataText
@@ -31,11 +32,17 @@ export function StorageDataCompareTool({
       <SectionHeader
         description={
           conflictMode
-            ? "检测到当前存储数据可能已被其他设备更新。选择当前 current.json 与本次草稿或冲突文件，先比较摘要差异再决定如何处理。"
+            ? "检测到当前存储数据可能已被其他设备更新。选择当前 current.json 与 conflicts/ 中的冲突文件，先比较摘要差异再决定如何处理。"
             : "比较工具只展示摘要差异，不会修改文件，也不会自动合并 Syncthing 冲突。"
         }
         title="比较两个存储数据文件"
       />
+      {conflictMode && storageDataConflictFileName ? (
+        <p className="login-note">
+          本次被拒绝覆盖的编辑结果已保存为 conflicts/
+          {storageDataConflictFileName}。
+        </p>
+      ) : null}
       <div className="field-grid">
         <TextField
           label="文件 A"

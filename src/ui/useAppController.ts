@@ -18,6 +18,7 @@ import {
 } from "../storage-data";
 import {
   EXTERNAL_CHANGE_MESSAGE,
+  StorageDataSaveError,
   buildNextStorageDataFile,
   createInitialStorageDataFile,
   createStorageDataFolder,
@@ -80,6 +81,8 @@ export function useAppController() {
     useState("");
   const [storageDataConflictDetected, setStorageDataConflictDetected] =
     useState(false);
+  const [storageDataConflictFileName, setStorageDataConflictFileName] =
+    useState("");
   const systemNotifications = useSystemNotifications();
   const { notifySystem } = systemNotifications;
 
@@ -124,6 +127,7 @@ export function useAppController() {
       setStorageDataCompareSummary(null);
       setStorageDataCompareWarning("");
       setStorageDataConflictDetected(false);
+      setStorageDataConflictFileName("");
     },
     []
   );
@@ -262,11 +266,18 @@ export function useAppController() {
           : "保存存储数据失败。";
       setError(message);
       if (message === EXTERNAL_CHANGE_MESSAGE) {
+        const conflictFileName =
+          storageError instanceof StorageDataSaveError
+            ? (storageError.details.conflictFileName ?? "")
+            : "";
         setStorageDataConflictDetected(true);
+        setStorageDataConflictFileName(conflictFileName);
         notifySystem({
           tone: "warning",
           title: "存储数据已变化",
-          body: "为避免覆盖其他设备的修改，本次保存已停止。请离开空间后在系统工具里比较文件差异。"
+          body: conflictFileName
+            ? `为避免覆盖其他设备的修改，本次保存已停止，并已写入冲突文件 ${conflictFileName}。`
+            : "为避免覆盖其他设备的修改，本次保存已停止。请离开空间后在系统工具里比较文件差异。"
         });
       }
     }
@@ -762,6 +773,7 @@ export function useAppController() {
     storageDataCompareSummary,
     storageDataCompareWarning,
     storageDataConflictDetected,
+    storageDataConflictFileName,
     handleCreateStorageData,
     handleOpenStorageDataText,
     handleOpenStorageDataFolder,

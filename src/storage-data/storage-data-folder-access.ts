@@ -64,7 +64,8 @@ export class StorageDataSaveError extends Error {
       | "empty-save"
       | "external-change"
       | "write-failed"
-      | "unsupported"
+      | "unsupported",
+    readonly details: { conflictFileName?: string } = {}
   ) {
     super(message);
   }
@@ -185,7 +186,7 @@ export async function saveStorageDataWorkspace(
         "unsupported"
       );
     }
-    await assertNoExternalChange(workspace);
+    await assertNoExternalChange(workspace, nextFile);
     const revisions = await workspace.directoryHandle.getDirectoryHandle(
       "revisions",
       { create: true }
@@ -239,7 +240,10 @@ export async function exportStorageDataDraft(
   return { fileName, content, draft };
 }
 
-async function assertNoExternalChange(workspace: StorageDataWorkspace) {
+async function assertNoExternalChange(
+  workspace: StorageDataWorkspace,
+  nextFile: StorageDataFile
+) {
   if (!workspace.directoryHandle) {
     return;
   }
@@ -252,7 +256,23 @@ async function assertNoExternalChange(workspace: StorageDataWorkspace) {
     current.revision !== workspace.openedRevision ||
     current.contentHash !== workspace.openedHash
   ) {
-    throw new StorageDataSaveError(EXTERNAL_CHANGE_MESSAGE, "external-change");
+    const conflicts = await workspace.directoryHandle.getDirectoryHandle(
+      "conflicts",
+      { create: true }
+    );
+    const conflictFileName = createConflictFileName({
+      openedRevision: workspace.openedRevision,
+      currentRevision: current.revision,
+      nextRevision: nextFile.revision,
+      createdAt: new Date().toISOString()
+    });
+    await writeFile(
+      await conflicts.getFileHandle(conflictFileName, { create: true }),
+      serializeStorageDataFile(nextFile)
+    );
+    throw new StorageDataSaveError(EXTERNAL_CHANGE_MESSAGE, "external-change", {
+      conflictFileName
+    });
   }
 }
 
@@ -296,4 +316,19 @@ export function createDraftFileName(isoString: string): string {
     .replace(/\.\d{3}Z$/, "Z")
     .replace(/[-:]/g, "")
     .replace("T", "T")}.json`;
+}
+
+export function createConflictFileName({
+  openedRevision,
+  currentRevision,
+  nextRevision,
+  createdAt
+}: {
+  openedRevision: number;
+  currentRevision: number;
+  nextRevision: number;
+  createdAt: string;
+}): string {
+  const stamp = createdAt.replace(/\.\d{3}Z$/, "Z").replace(/[-:]/g, "");
+  return `conflict-o${openedRevision}-c${currentRevision}-n${nextRevision}-${stamp}.json`;
 }
