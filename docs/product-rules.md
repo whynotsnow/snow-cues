@@ -7,14 +7,15 @@
 - 移动端不推荐普通用户自行安装 Termux、HTTP Server App 或配置局域网 HTTPS 证书来运行静态服务；这些方式只属于开发者或高级用户测试路径。
 - 普通局域网 HTTP（例如 `http://192.168.x.x`）、移动端 App 内置浏览器、文件管理器预览和直接打开 `file://` 打包 HTML 都不是可靠运行环境。它们可能导致 `crypto.randomUUID is not a function`、`crypto.subtle` 缺失、文件夹访问不可用或页面只显示标题。
 - 应用检测到当前环境缺少 WebCrypto 核心能力时，应展示明确阻断提示，说明需要使用 Cloudflare Pages HTTPS 正式地址或受信任的本机 `localhost` / `127.0.0.1` 环境，不要把底层异常直接展示给用户。
-- 应用检测到 File System Access API 不可用时，应提示当前浏览器不支持文件夹直接保存，并引导使用可用的导入/下载文件模式；不得把该限制解释为密码学失败。
+- 应用检测到 File System Access API 不可用时，应只展示当前可用的文件导入/下载操作；不得展示文件夹直接保存入口，也不得把该限制解释为密码学失败。
 
 ## 空间与 storageData
 
-- 未打开 `storageData` 时，不从 IndexedDB 或其他旧本地存储加载业务数据，不展示旧空间索引。空间工作台优先展示“新建存储数据文件夹 / 打开存储数据文件夹”。
-- 打开 `storageData` 后，空间工作台展示 `storageDataId`、revision、updatedAt、保存模式、dirty 状态、保存和 draft 导出。
+- 未打开 `storageData` 时，不从 IndexedDB 或其他旧本地存储加载业务数据，不展示旧空间索引。空间工作台展示“新建存储数据”，并根据运行环境展示“打开存储数据”或“导入 current.json”，不要并列展示不可用策略。
+- 打开 `storageData` 后，空间工作台展示 `storageDataId`、revision、updatedAt、dirty 状态、保存和 draft 导出；不要向用户展示“直接保存 / 下载新版”等内部保存模式。
 - 比较两个存储数据文件属于系统工具，不常驻在 storageData card 中；保存检测到外部变更或同步冲突时，必须拒绝覆盖 `current.json`，把本次待保存结果写入 `conflicts/`，并引导用户到系统工具页使用比较模块判断差异。比较工具只展示摘要差异，不自动合并或修改文件。
 - 所有业务操作只修改浏览器内存 repository 草稿。保存必须由用户显式触发；空保存必须拒绝；保存前必须展示摘要 diff 二次确认。
+- 保存入口统一为“保存存储数据”。确认后由运行环境和当前 workspace mode 决定写入文件夹或提供 `current.json` 下载，用户界面不要求用户理解或选择另一套策略。
 - 未进入空间或已离开空间时不加载、展示已存储密码列表。
 - 进入空间时 `spaceId` 会经过 `normalizeSpaceId()` 处理，即 trim + toLowerCase。
 - 进入不存在的空间 ID 或空间外空白创建时，先进入临时空间；只有初始化规则链、创建密码、创建密码组、clone/import 创建空间数据或创建迁移批次后，才会持久化本地数据。

@@ -53,7 +53,6 @@ type GuidanceInput = Pick<
   storageDataConflictFileName?: string;
   storageDataOpened?: boolean;
   storageDataDirty?: boolean;
-  storageDataMode?: "direct-folder" | "download" | null;
 };
 
 const guidancePriority = {
@@ -182,7 +181,7 @@ function buildOutsideSpaceGuidance(input: GuidanceInput): GuidanceCard[] {
         id: "storage-data-open",
         priority: guidancePriority.spaceRestriction,
         title: "打开存储数据",
-        body: "Snow Cues 2.1 需要先打开或新建存储数据文件夹。浏览器 IndexedDB 中的旧记录不会作为业务真源。",
+        body: "Snow Cues 2.1 需要先打开、导入或新建存储数据。浏览器 IndexedDB 中的旧记录不会作为业务真源。",
         status: "active",
         steps: [
           { label: "确认 Syncthing 已同步", status: "current" },
@@ -200,10 +199,7 @@ function buildOutsideSpaceGuidance(input: GuidanceInput): GuidanceCard[] {
         id: "storage-data-save",
         priority: guidancePriority.spaceVerification,
         title: "保存存储数据",
-        body:
-          input.storageDataMode === "download"
-            ? "当前使用下载新版模式。保存会生成新版 current.json，请手动放回同步文件夹并确认 Syncthing 状态。"
-            : "当前有未保存改动。保存前会展示摘要 diff，确认后先写 revision 再更新 current.json。",
+        body: "当前有未保存改动。保存前会展示摘要 diff，确认后按当前浏览器能力完成写入或提供 current.json 下载。",
         status: "active",
         steps: [
           { label: "查看保存摘要", status: "current" },

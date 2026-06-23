@@ -13,7 +13,7 @@ export const CORE_CRYPTO_UNAVAILABLE_MESSAGE =
   "当前浏览器环境不支持 Snow Cues 所需的安全加密能力。请使用 Cloudflare Pages HTTPS 正式地址、已安装的 PWA，或受信任的 localhost / 127.0.0.1 环境打开。";
 
 export const STORAGE_FOLDER_ACCESS_UNAVAILABLE_MESSAGE =
-  "当前浏览器不支持文件夹直接保存，请使用打开 current.json 和下载新版 current.json 的模式维护 storageData。";
+  "当前浏览器将通过导入和下载 current.json 维护 storageData。";
 
 export function detectBrowserCapabilities(): BrowserCapabilities {
   const cryptoApi = globalThis.crypto;

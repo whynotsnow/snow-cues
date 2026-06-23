@@ -31,7 +31,7 @@ export function renderApp() {
 }
 
 export async function ensureStorageDataOpened() {
-  const button = screen.queryByRole("button", { name: "新建存储数据文件夹" });
+  const button = screen.queryByRole("button", { name: "新建存储数据" });
   if (button) {
     fireEvent.click(button);
     await screen.findByText(/存储数据 ID/);

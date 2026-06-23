@@ -16,7 +16,7 @@
 - WebCrypto 核心能力缺失时，必须转化为明确中文环境错误；不要让 `Cannot read properties of undefined (reading 'digest')`、`crypto.subtle is undefined` 等底层异常直接暴露给用户。
 - `crypto.randomUUID` 缺失可以由 `src/lib/random-id.ts` 使用 `crypto.getRandomValues()` 生成 UUID v4 兼容；禁止使用 `Math.random()` 生成 `storageDataId`、条目 ID、迁移 ID 或其他业务 ID。
 - `crypto.subtle` 缺失不可用纯 JS SHA、PBKDF2、HMAC 或 AES-GCM 替代继续运行。后续应在应用启动、创建/打开 `storageData`、建立 session、密码生成、解密和比较工具入口前统一检测能力。
-- File System Access API 缺失属于存储交互能力限制，应在 UI 中引导下载/导入模式；不要和 WebCrypto 缺失混为同一个错误。
+- File System Access API 缺失属于存储交互能力限制，应在 UI 中只展示当前可用的导入/下载操作；不要并列展示文件夹直接保存和文件导入导出两套策略，也不要和 WebCrypto 缺失混为同一个错误。
 
 ## 格式化与 Lint
 

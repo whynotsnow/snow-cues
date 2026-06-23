@@ -100,9 +100,9 @@ npm run build
 - 正式文件格式为 `format: "snow-cues-storage-data"`、`schemaVersion: 1`；草稿文件格式为 `format: "snow-cues-storage-data-draft"`、`schemaVersion: 1`。
 - `current.json` 是当前正式入口，`revisions/storage-data-rev-xxxxxx.json` 保存历史快照，`drafts/` 用于用户手动导出的未保存草稿，`conflicts/` 用于保存应用检测到 `current.json` 已变化后拒绝覆盖的冲突候选文件。
 - `contentHash` 使用 canonical JSON + WebCrypto SHA-256，格式为 `sha256:<hex>`，计算时排除 `contentHash` 自身。
-- 业务操作只修改浏览器内存草稿。保存必须由用户显式触发，直接保存模式会先写入新的 revision 文件，再更新 `current.json`。
+- 业务操作只修改浏览器内存草稿。保存必须由用户显式触发；界面统一展示“保存存储数据”，内部根据当前浏览器能力写入文件夹或提供 `current.json` 下载。
 - 保存前会重读 `current.json`，用打开时的 revision/hash 检测外部变化；若发现变化会拒绝覆盖，保留当前内存草稿，并把本次待保存结果写入 `conflicts/` 供用户与当前 `current.json` 比较。
-- 下载新版模式不会直接写入文件系统，而是生成新版正式文件内容，由用户手动放回同步文件夹。
+- 浏览器不支持文件夹访问时，应用会提供新的 `current.json` 下载，由用户手动放回同步文件夹。
 - 保存 diff 和比较工具只展示集合数量级摘要，不展示密文字段、明文秘密或隐私元数据全文。
 
 ## UI 层结构

@@ -94,7 +94,6 @@ export function useAppController() {
   const storageDataDirty = storageDataWorkspace
     ? getStorageDataRepository().isDirty()
     : false;
-  const storageDataMode = storageDataWorkspace?.mode ?? null;
   const storageDataId = storageDataWorkspace?.file.storageDataId ?? "";
   const storageDataRevision = storageDataWorkspace?.file.revision ?? 0;
   const storageDataUpdatedAt = storageDataWorkspace?.file.updatedAt ?? "";
@@ -158,7 +157,7 @@ export function useAppController() {
         resetStorageDataRepository(workspace.file.data);
         workspace.repository = getStorageDataRepository();
         setStorageDataWorkspace(workspace);
-        setStatus("已新建存储数据文件夹。保存前请确认 Syncthing 已完成同步。");
+        setStatus("已新建存储数据。保存前请确认外部同步已完成。");
         return;
       }
       const emptyFile = await createInitialStorageDataFile();
@@ -173,9 +172,7 @@ export function useAppController() {
           : emptyFile;
       await applyStorageDataFile(file, "download");
       setStorageDataDownloadText(serializeStorageDataFile(file));
-      setStatus(
-        "当前浏览器使用下载新版模式。已生成初始 current.json，请放入你的存储数据文件夹。"
-      );
+      setStatus("已生成初始 current.json，请下载后放入你的 storageData。");
     } catch (storageError) {
       setError(
         storageError instanceof Error
@@ -200,7 +197,9 @@ export function useAppController() {
       try {
         const file = await parseStorageDataFileText(text);
         await applyStorageDataFile(file, "download");
-        setStatus("已打开存储数据文件。保存时会生成新版文件下载。");
+        setStatus(
+          "已导入 current.json。后续保存会提供新的 current.json 下载。"
+        );
       } catch (storageError) {
         setError(
           storageError instanceof Error
@@ -229,7 +228,7 @@ export function useAppController() {
         typeof window.showDirectoryPicker !== "function"
       ) {
         setError(
-          "当前浏览器不支持直接打开存储数据文件夹，请选择 current.json 使用下载新版模式。"
+          "当前浏览器不支持打开 storageData 文件夹，请导入 current.json。"
         );
         return;
       }
@@ -238,12 +237,12 @@ export function useAppController() {
       resetStorageDataRepository(workspace.file.data);
       workspace.repository = getStorageDataRepository();
       setStorageDataWorkspace(workspace);
-      setStatus("已打开存储数据文件夹。编辑前请确认 Syncthing 已完成同步。");
+      setStatus("已打开存储数据。编辑前请确认外部同步已完成。");
     } catch (storageError) {
       setError(
         storageError instanceof Error
           ? storageError.message
-          : "打开存储数据文件夹失败。"
+          : "打开存储数据失败。"
       );
     }
   }, [assertCanChangeLoadedStorageData, assertCoreCryptoAvailable]);
@@ -283,13 +282,9 @@ export function useAppController() {
       setStorageDataSaveSummary(null);
       if (result.mode === "download") {
         setStorageDataDownloadText(result.content);
-        setStatus(
-          "已生成新版存储数据文件。请确认 Syncthing 状态后手动替换 current.json。"
-        );
+        setStatus("已保存存储数据。请下载 current.json 并放回 storageData。");
       } else {
-        setStatus(
-          "已写入新版 revision 并更新 current.json。切换设备前请等待 Syncthing 完成同步。"
-        );
+        setStatus("已保存存储数据。切换设备前请等待外部同步完成。");
       }
     } catch (storageError) {
       const message =
@@ -808,7 +803,6 @@ export function useAppController() {
     error,
     storageDataOpened,
     storageDataDirty,
-    storageDataMode,
     storageDataId,
     storageDataRevision,
     storageDataUpdatedAt,

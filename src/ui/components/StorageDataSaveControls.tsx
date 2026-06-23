@@ -13,21 +13,12 @@ export function StorageDataSaveControls({
   const {
     storageDataDirty,
     storageDataDownloadText,
-    storageDataMode,
     storageDataSaveSummary,
     handleCancelStorageDataSave,
     handleConfirmStorageDataSave,
     handleExportStorageDataDraft,
     handlePrepareStorageDataSave
   } = controller;
-  const saveActionLabel =
-    storageDataMode === "direct-folder"
-      ? "保存到文件夹"
-      : "生成新版 current.json";
-  const confirmActionLabel =
-    storageDataMode === "direct-folder"
-      ? "确认保存到文件夹"
-      : "确认生成新版 current.json";
   const downloadUrl = storageDataDownloadText
     ? storageDataFileToDownloadUrl(storageDataDownloadText)
     : "";
@@ -40,7 +31,7 @@ export function StorageDataSaveControls({
           onClick={() => handlePrepareStorageDataSave()}
           variant="primary"
         >
-          {saveActionLabel}
+          保存存储数据
         </Button>
         <Button
           disabled={!storageDataDirty}
@@ -64,7 +55,7 @@ export function StorageDataSaveControls({
               onClick={() => void handleConfirmStorageDataSave()}
               variant="primary"
             >
-              {confirmActionLabel}
+              确认保存存储数据
             </Button>
             <Button onClick={() => handleCancelStorageDataSave()}>取消</Button>
           </ActionGroup>

@@ -55,11 +55,9 @@ describe("Snow Cues 应用冒烟流程", () => {
         screen.getAllByText(/请使用 Cloudflare Pages HTTPS 正式地址/)[0]
       ).toBeInTheDocument();
       expect(
-        screen.getByRole("button", { name: "新建存储数据文件夹" })
+        screen.getByRole("button", { name: "新建存储数据" })
       ).toBeDisabled();
-      expect(
-        screen.getByLabelText("打开 current.json（下载新版模式）")
-      ).toBeDisabled();
+      expect(screen.getByLabelText("导入 current.json")).toBeDisabled();
     } finally {
       Object.defineProperty(globalThis, "crypto", {
         value: originalCrypto,
@@ -68,20 +66,22 @@ describe("Snow Cues 应用冒烟流程", () => {
     }
   });
 
-  it("缺少文件夹访问能力时提示下载模式但不阻断新建存储数据", async () => {
+  it("缺少文件夹访问能力时提示文件导入导出但不阻断新建存储数据", async () => {
     renderApp();
 
-    expect(screen.getByText("文件夹直接保存不可用")).toBeInTheDocument();
+    expect(screen.getByText("当前使用文件导入导出")).toBeInTheDocument();
     expect(
-      screen.getByText(/请使用打开 current.json 和下载新版 current.json/)
+      screen.getByText(/将通过导入和下载 current.json/)
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "打开存储数据文件夹" })
-    ).toBeDisabled();
+      screen.queryByRole("button", { name: "打开存储数据" })
+    ).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: "新建存储数据文件夹" }));
+    fireEvent.click(screen.getByRole("button", { name: "新建存储数据" }));
     await screen.findByText(/存储数据 ID/);
-    expect(screen.getByText("下载新版")).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "下载 current.json" })
+    ).toHaveAttribute("download", "current.json");
   });
 
   it("可以完成空间主链路冒烟", async () => {
@@ -104,17 +104,13 @@ describe("Snow Cues 应用冒烟流程", () => {
       expect(screen.getByText("新密码已生成并加密保存。")).toBeInTheDocument()
     );
 
-    fireEvent.click(
-      screen.getByRole("button", { name: "生成新版 current.json" })
-    );
+    fireEvent.click(screen.getByRole("button", { name: "保存存储数据" }));
     await screen.findByRole("heading", { name: "保存前摘要" });
-    fireEvent.click(
-      screen.getByRole("button", { name: "确认生成新版 current.json" })
-    );
+    fireEvent.click(screen.getByRole("button", { name: "确认保存存储数据" }));
     await waitFor(() =>
       expect(
         screen.getByText(
-          "已生成新版存储数据文件。请确认 Syncthing 状态后手动替换 current.json。"
+          "已保存存储数据。请下载 current.json 并放回 storageData。"
         )
       ).toBeInTheDocument()
     );

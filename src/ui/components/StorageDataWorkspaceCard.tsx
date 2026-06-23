@@ -22,7 +22,6 @@ export function StorageDataWorkspaceCard({
     outsideSpace,
     storageDataOpened,
     storageDataDirty,
-    storageDataMode,
     storageDataId,
     storageDataRevision,
     storageDataUpdatedAt,
@@ -39,7 +38,7 @@ export function StorageDataWorkspaceCard({
     canChangeLoadedStorageData &&
     browserCapabilities.storageFolderAccessAvailable;
   const changeLockedHint = canChangeLoadedStorageData
-    ? "打开和保存前请先确认 Syncthing 已完成同步。"
+    ? "打开和保存前请先确认外部同步已完成。"
     : canUseCoreCrypto
       ? "已进入空间。为了避免会话与文件内容错位，切换或重新加载存储数据前需要先离开空间。"
       : "当前运行环境缺少核心加密能力，不能打开或创建存储数据。";
@@ -50,15 +49,6 @@ export function StorageDataWorkspaceCard({
       {
         label: "revision",
         value: storageDataOpened ? String(storageDataRevision) : "无"
-      },
-      {
-        label: "保存模式",
-        value:
-          storageDataMode === "direct-folder"
-            ? "直接保存"
-            : storageDataMode === "download"
-              ? "下载新版"
-              : "待选择"
       },
       {
         label: "改动",
@@ -112,14 +102,16 @@ export function StorageDataWorkspaceCard({
               disabled={!canChangeLoadedStorageData}
               onClick={() => void handleCreateStorageData()}
             >
-              新建存储数据文件夹
+              新建存储数据
             </Button>
-            <Button
-              disabled={!canUseFolderAccess}
-              onClick={() => void handleOpenStorageDataFolder()}
-            >
-              打开存储数据文件夹
-            </Button>
+            {browserCapabilities.storageFolderAccessAvailable ? (
+              <Button
+                disabled={!canUseFolderAccess}
+                onClick={() => void handleOpenStorageDataFolder()}
+              >
+                打开存储数据
+              </Button>
+            ) : null}
           </ActionGroup>
         }
         description={`Snow Cues 2.1 以你维护的 storageData 文件夹作为唯一业务数据源。${changeLockedHint}`}
@@ -141,30 +133,34 @@ export function StorageDataWorkspaceCard({
           <Notice
             notice={{
               scope: "action",
-              tone: "warning",
-              title: "文件夹直接保存不可用",
+              tone: "info",
+              title: "当前使用文件导入导出",
               body: browserCapabilities.storageFolderAccessUnavailableMessage
             }}
           />
         ) : null}
-        <TextField
-          disabled={!canChangeLoadedStorageData}
-          hint={
-            !canUseCoreCrypto
-              ? "当前环境不支持安全加密能力，无法读取或校验 current.json。"
-              : !canChangeLoadedStorageData
-                ? "请先离开空间，再更换或重新加载 current.json。"
-                : undefined
-          }
-          label="打开 current.json（下载新版模式）"
-          onChange={(event) => {
-            const file = event.target.files?.[0];
-            if (file) {
-              void file.text().then((text) => handleOpenStorageDataText(text));
+        {!browserCapabilities.storageFolderAccessAvailable ? (
+          <TextField
+            disabled={!canChangeLoadedStorageData}
+            hint={
+              !canUseCoreCrypto
+                ? "当前环境不支持安全加密能力，无法读取或校验 current.json。"
+                : !canChangeLoadedStorageData
+                  ? "请先离开空间，再更换或重新加载 current.json。"
+                  : undefined
             }
-          }}
-          type="file"
-        />
+            label="导入 current.json"
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              if (file) {
+                void file
+                  .text()
+                  .then((text) => handleOpenStorageDataText(text));
+              }
+            }}
+            type="file"
+          />
+        ) : null}
         {storageDataOpened ? (
           <>
             <DescriptionList
@@ -178,13 +174,6 @@ export function StorageDataWorkspaceCard({
                         hour12: false
                       })
                     : "未保存"
-                },
-                {
-                  label: "保存模式",
-                  value:
-                    storageDataMode === "direct-folder"
-                      ? "直接保存"
-                      : "下载新版"
                 },
                 {
                   label: "改动状态",
@@ -201,7 +190,7 @@ export function StorageDataWorkspaceCard({
             <StorageDataSaveControls controller={controller} />
             {storageDataDownloadText ? (
               <TextareaField
-                label="生成的新版 current.json"
+                label="保存后的 current.json 内容"
                 onChange={() => undefined}
                 value={storageDataDownloadText}
               />
