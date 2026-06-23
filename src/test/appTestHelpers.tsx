@@ -118,8 +118,9 @@ export async function confirmRuleProfileWithMaster(masterPassword = "master") {
   await screen.findByRole("heading", { name: "密码管理" });
 }
 
-export function fillFirstSpaceMasterPassword(masterPassword = "master") {
-  fireEvent.change(screen.getAllByLabelText("空间主密码")[0], {
+export async function fillFirstSpaceMasterPassword(masterPassword = "master") {
+  const inputs = await screen.findAllByLabelText("空间主密码");
+  fireEvent.change(inputs[0], {
     target: { value: masterPassword }
   });
 }

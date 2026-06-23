@@ -107,7 +107,7 @@ export function EntryVerificationPanel({
   );
 }
 
-export function formatVerificationEntryLabel(
+function formatVerificationEntryLabel(
   entry: Pick<VerificationEntryOption, "platform" | "description" | "updatedAt">
 ) {
   const name = entry.platform || entry.description || "未填写平台";

@@ -86,7 +86,6 @@ export function usePasswordEntryController({
   const {
     visibleEntryId,
     setVisibleEntryId,
-    visiblePassword,
     setVisiblePassword,
     setDecryptingEntryId,
     decryptSpaceMasterPasswords,

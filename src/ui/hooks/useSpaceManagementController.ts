@@ -240,19 +240,29 @@ export function useSpaceManagementController({
     setSourceMasterPassword("");
   }
 
-  async function withMigrationTargetSession<T>(
-    operation: (liveSession: TargetSession) => Promise<T>
-  ): Promise<T> {
-    if (basePolicyInput.sessionAlive) {
-      return withLiveSession(operation);
-    }
-    if (!migrationTargetMasterPassword.trim()) {
-      throw new Error("请输入目标空间主密码。");
-    }
-    const liveSession = await ensureLiveSession(migrationTargetMasterPassword);
-    setMigrationTargetMasterPassword("");
-    return operation(liveSession);
-  }
+  const withMigrationTargetSession = useCallback(
+    async <T>(
+      operation: (liveSession: TargetSession) => Promise<T>
+    ): Promise<T> => {
+      if (basePolicyInput.sessionAlive) {
+        return withLiveSession(operation);
+      }
+      if (!migrationTargetMasterPassword.trim()) {
+        throw new Error("请输入目标空间主密码。");
+      }
+      const liveSession = await ensureLiveSession(
+        migrationTargetMasterPassword
+      );
+      setMigrationTargetMasterPassword("");
+      return operation(liveSession);
+    },
+    [
+      basePolicyInput.sessionAlive,
+      ensureLiveSession,
+      migrationTargetMasterPassword,
+      withLiveSession
+    ]
+  );
 
   async function handleExportSpace(includeEntries: boolean) {
     setError("");

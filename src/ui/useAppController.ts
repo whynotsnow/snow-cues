@@ -569,13 +569,14 @@ export function useAppController() {
     setError,
     setStatus
   );
+  const refreshSpaceIndex = spaceIndex.refreshSpaceIndex;
 
   useEffect(() => {
     if (!storageDataWorkspace || !outsideSpace) {
       return;
     }
-    void spaceIndex.refreshSpaceIndex();
-  }, [outsideSpace, spaceIndex.refreshSpaceIndex, storageDataWorkspace]);
+    void refreshSpaceIndex();
+  }, [outsideSpace, refreshSpaceIndex, storageDataWorkspace]);
 
   const detachedPasswordController = useDetachedPasswordController({
     coreCryptoAvailable: browserCapabilities.coreCryptoAvailable,
@@ -621,8 +622,7 @@ export function useAppController() {
     ensureLiveSession,
     withLiveSession
   });
-  const { passwordGroups, setPasswordGroups, refreshPasswordGroups } =
-    groupController;
+  const { setPasswordGroups, refreshPasswordGroups } = groupController;
 
   useEffect(() => {
     if (outsideSpace) {
@@ -678,7 +678,7 @@ export function useAppController() {
     ruleProfileConfirmed,
     verificationPending,
     leaveSpace,
-    refreshSpaceIndex: spaceIndex.refreshSpaceIndex,
+    refreshSpaceIndex,
     resetRuleProfile,
     setActivePage,
     setEntries,
@@ -710,7 +710,7 @@ export function useAppController() {
     withLiveSession,
     enterSpace: handleEnterSpace,
     refreshEntries,
-    refreshSpaceIndex: spaceIndex.refreshSpaceIndex,
+    refreshSpaceIndex,
     notifySystem,
     setError,
     setStatus

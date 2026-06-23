@@ -85,25 +85,7 @@ declare global {
   }
 
   interface FileSystemDirectoryHandle {
-    getDirectoryHandle(
-      name: string,
-      options?: { create?: boolean }
-    ): Promise<FileSystemDirectoryHandle>;
-    getFileHandle(
-      name: string,
-      options?: { create?: boolean }
-    ): Promise<FileSystemFileHandle>;
-    entries?: () => AsyncIterableIterator<[string, unknown]>;
-  }
-
-  interface FileSystemFileHandle {
-    getFile(): Promise<File>;
-    createWritable(): Promise<FileSystemWritableFileStream>;
-  }
-
-  interface FileSystemWritableFileStream {
-    write(data: string): Promise<void>;
-    close(): Promise<void>;
+    entries(): AsyncIterableIterator<[string, unknown]>;
   }
 }
 

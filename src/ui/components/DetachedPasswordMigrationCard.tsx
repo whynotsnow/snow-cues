@@ -35,13 +35,14 @@ export function DetachedPasswordMigrationCard({
   } = controller;
   const form = useCreatePasswordForm();
   const { values, actions } = form;
+  const { setEntrySecret } = actions;
   const needsSpaceHomeSession = currentSpaceIsTemporary && !sessionAlive;
 
   useEffect(() => {
     if (pendingDetachedEntrySecret) {
-      actions.setEntrySecret(pendingDetachedEntrySecret);
+      setEntrySecret(pendingDetachedEntrySecret);
     }
-  }, [pendingDetachedEntrySecret]);
+  }, [pendingDetachedEntrySecret, setEntrySecret]);
 
   if (!pendingDetachedEntrySecret) {
     return null;
