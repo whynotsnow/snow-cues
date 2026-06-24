@@ -308,7 +308,13 @@ label {
 
 .content-column > .storage-data-card-compact {
   flex-shrink: 0;
-  margin: 0.75rem 1.5rem 0 1.5rem;
+  margin: 0.75rem auto 0 auto;
+  max-width: 1050px;
+  width: calc(100% - 3rem);
+}
+
+.content-column:has(.guidance-drawer.expanded) > .storage-data-card-compact {
+  max-width: calc(1050px + 1.25rem + 300px);
 }
 
 .main-column > .storage-data-card:first-of-type {
@@ -463,8 +469,12 @@ label {
 .content-area {
   display: flex;
   flex: 1;
-  gap: 1.25rem;
+  gap: 0;
   justify-content: safe center;
+}
+
+.content-area:has(.guidance-drawer.expanded) {
+  gap: 1.25rem;
 }
 
 .guidance-drawer {
@@ -691,8 +701,11 @@ h2 {
 .login-panel,
 .generator-panel,
 .section-card,
-.rule-init-panel,
 .entries-section {
+  margin-top: 0.75rem;
+}
+
+.rule-init-panel {
   margin-top: 0.75rem;
 }
 
@@ -700,6 +713,7 @@ h2 {
 .workspace-route > .section-card:first-child,
 .workspace-route > .rules-section:first-child,
 .workspace-route > .entries-section:first-child,
+.workspace-route > .page-section:first-child,
 .page-notice-area + .section-card,
 .page-notice-area + .rules-section,
 .page-notice-area + .entries-section {
@@ -709,7 +723,6 @@ h2 {
 .login-panel,
 .generator-panel,
 .section-card,
-.rule-init-panel,
 .rules-section,
 .entries-section {
   background: var(--card);
@@ -755,7 +768,6 @@ h2 {
 
 .generator-panel,
 .section-card,
-.rule-init-panel,
 .rules-section,
 .entries-section {
   padding: 1rem;
@@ -767,6 +779,11 @@ h2 {
 }
 
 .space-page {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.page-section {
   display: grid;
   gap: 0.75rem;
 }
@@ -929,7 +946,7 @@ h2 {
 }
 
 .guidance-card {
-  background: var(--card);
+  background: var(--muted);
   border: 1px solid var(--border);
   border-radius: var(--radius-2xl);
   display: grid;
@@ -938,7 +955,7 @@ h2 {
 }
 
 .guidance-card-primary {
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-md);
 }
 
 .guidance-card-secondary {
@@ -1662,8 +1679,11 @@ h2 {
     overflow: visible;
   }
 
-  .content-column > .storage-data-card-compact {
+  .content-column > .storage-data-card-compact,
+  .content-column:has(.guidance-drawer.expanded) > .storage-data-card-compact {
     margin: 0.5rem 0.5rem 0 0.5rem;
+    max-width: none;
+    width: auto;
   }
 
   .content-scroll {
@@ -1678,7 +1698,12 @@ h2 {
 
   .content-area {
     flex-direction: column;
+    gap: 1.25rem;
     justify-content: initial;
+  }
+
+  .content-area:has(.guidance-drawer.expanded) {
+    gap: 1.25rem;
   }
 
   .main-column {

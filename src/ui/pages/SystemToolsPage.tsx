@@ -8,7 +8,7 @@ type SystemToolsPageProps = {
 
 export function SystemToolsPage({ controller }: SystemToolsPageProps) {
   return (
-    <section className="rules-section" aria-label="系统工具页面">
+    <section className="page-section" aria-label="系统工具页面">
       <DetachedPasswordPage controller={controller} />
       <StorageDataCompareTool
         controller={controller}

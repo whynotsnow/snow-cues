@@ -52,7 +52,7 @@ export function SpaceIndexPanel({ controller }: SpaceIndexPanelProps) {
   }
 
   return (
-    <section className="rules-section" aria-label="空间外工作台">
+    <section className="page-section" aria-label="空间外工作台">
       <Card aria-label="空间外创建空间">
         <SectionHeader
           actions={
