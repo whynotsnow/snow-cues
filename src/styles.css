@@ -263,9 +263,7 @@ label {
 }
 
 .nav-rail {
-  background: hsl(38, 28%, 91%, 0.8);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: var(--card);
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
