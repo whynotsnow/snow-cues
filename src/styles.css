@@ -439,6 +439,7 @@ label {
 .main-column {
   flex: 1;
   min-width: 0;
+  max-width: 1050px;
 }
 
 .content-column {
@@ -463,6 +464,7 @@ label {
   display: flex;
   flex: 1;
   gap: 1.25rem;
+  justify-content: safe center;
 }
 
 .guidance-drawer {
@@ -1676,6 +1678,11 @@ h2 {
 
   .content-area {
     flex-direction: column;
+    justify-content: initial;
+  }
+
+  .main-column {
+    max-width: none;
   }
 
   .guidance-drawer {
