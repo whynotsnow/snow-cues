@@ -1,6 +1,7 @@
 import type { AppController } from "../useAppController";
 import { spaceStatusLabels } from "../useAppController";
 import type { AppPage } from "../appTypes";
+import { ThemeToggle } from "./ThemeToggle";
 
 type TopbarProps = {
   controller: AppController;
@@ -99,8 +100,13 @@ export function Topbar({ controller, navigateToPage }: TopbarProps) {
           <button onClick={() => leaveSpace()} type="button">
             离开空间
           </button>
+          <ThemeToggle />
         </div>
-      ) : null}
+      ) : (
+        <div className="sidebar-actions">
+          <ThemeToggle />
+        </div>
+      )}
     </section>
   );
 }
