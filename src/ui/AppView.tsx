@@ -5,9 +5,9 @@ import { SpaceIndexPanel } from "./components/SpaceIndexPanel";
 import { StorageDataWorkspaceCard } from "./components/StorageDataWorkspaceCard";
 import { SystemNoticeHost } from "./components/SystemNoticeHost";
 import { TestDataTools } from "./components/TestDataTools";
-import { Topbar } from "./components/Topbar";
+import { NavRail } from "./components/NavRail";
 import { WorkspaceView } from "./components/WorkspaceView";
-import { GuidancePanel } from "./components/GuidancePanel";
+import { GuidanceDrawer } from "./components/GuidanceDrawer";
 import { SystemToolsPage } from "./pages/SystemToolsPage";
 import type { AppPage } from "./appTypes";
 import { getUserGuidance, type GuidanceAction } from "./guidance";
@@ -105,38 +105,57 @@ export function AppView({ controller }: AppViewProps) {
     <main className="app-shell">
       <SystemNoticeHost controller={controller} />
       <div className="app-workbench">
-        <Topbar controller={controller} navigateToPage={navigateToPage} />
-        <section className="main-column" aria-label="主要内容">
-          <MessageRow controller={controller} />
-          {!controller.browserCapabilities.coreCryptoAvailable ? (
-            <Notice
-              notice={{
-                scope: "page",
-                tone: "error",
-                title: "当前环境不支持安全加密",
-                body: controller.browserCapabilities
-                  .coreCryptoUnavailableMessage
-              }}
-            />
-          ) : null}
-          {activePage === "tools" ? null : (
+        <NavRail controller={controller} navigateToPage={navigateToPage} />
+
+        <div className="content-column">
+          {/* Inside space: compact storage data bar across full width */}
+          {!outsideSpace && activePage !== "tools" ? (
             <StorageDataWorkspaceCard controller={controller} />
-          )}
-          {outsideSpace && activePage === "tools" ? (
-            <SystemToolsPage controller={controller} />
-          ) : outsideSpace ? (
-            <SpaceIndexPanel controller={controller} />
-          ) : (
-            <WorkspaceView
-              controller={controller}
-              navigateToPage={navigateToPage}
-            />
-          )}
-          {showDevTools ? <TestDataTools controller={controller} /> : null}
-        </section>
-        <aside className="guidance-column">
-          <GuidancePanel guidance={guidance} onAction={handleGuidanceAction} />
-        </aside>
+          ) : null}
+
+          <div className="content-scroll">
+            <div className="content-area">
+              <section className="main-column" aria-label="主要内容">
+                <MessageRow controller={controller} />
+                {!controller.browserCapabilities.coreCryptoAvailable ? (
+                  <Notice
+                    notice={{
+                      scope: "page",
+                      tone: "error",
+                      title: "当前环境不支持安全加密",
+                      body: controller.browserCapabilities
+                        .coreCryptoUnavailableMessage
+                    }}
+                  />
+                ) : null}
+
+                {/* Outside space: full storage data card inside content flow */}
+                {outsideSpace && activePage !== "tools" ? (
+                  <StorageDataWorkspaceCard controller={controller} />
+                ) : null}
+
+                {outsideSpace && activePage === "tools" ? (
+                  <SystemToolsPage controller={controller} />
+                ) : outsideSpace ? (
+                  <SpaceIndexPanel controller={controller} />
+                ) : (
+                  <WorkspaceView
+                    controller={controller}
+                    navigateToPage={navigateToPage}
+                  />
+                )}
+                {showDevTools ? (
+                  <TestDataTools controller={controller} />
+                ) : null}
+              </section>
+
+              <GuidanceDrawer
+                guidance={guidance}
+                onAction={handleGuidanceAction}
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </main>
   );
