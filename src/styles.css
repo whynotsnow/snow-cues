@@ -947,7 +947,6 @@ h2 {
 
 .guidance-card {
   background: var(--muted);
-  border: 1px solid var(--border);
   border-radius: var(--radius-2xl);
   display: grid;
   gap: 1rem;
@@ -959,13 +958,12 @@ h2 {
 }
 
 .guidance-card-secondary {
-  background: var(--muted);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-sm);
   gap: 0.8rem;
 }
 
 .guidance-card-blocked {
-  border-color: hsl(38, 92%, 45%, 0.25);
+  border: 1px solid hsl(38, 92%, 45%, 0.25);
 }
 
 .guidance-header {
