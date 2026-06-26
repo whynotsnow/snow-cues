@@ -103,3 +103,13 @@
 - `outputPolicy` 是解密后的输出适配策略，不参与核心密码生成。
 - `spaceProfiles` 按 `spaceId` 保存空间级 profile：`spaceId`、`ruleChain`、`importedRuleManifests`、`createdAt`、`updatedAt`。
 - `migrationBatches` 和 `migrationEntries` 保存迁移队列，与正式 `PasswordEntry` 分离。待迁移条目保存旧空间密文和非敏感元数据，不得直接出现在正式密码列表中。
+
+## PWA Service Worker 缓存边界
+
+Snow Cues 的 Service Worker 采用 Workbox `generateSW` 生成，仅缓存 `workbox.globPatterns` 中列出的静态应用外壳资源（JS、CSS、HTML、字体、图标）。以下数据**永远不会**进入 SW 的 Cache API：
+
+- 用户的 `storageData`（`current.json`、`revisions/`、`drafts/`、`conflicts/` 等文件）。`storageData` 始终由 File System Access API 按需读写，驻留在用户本机磁盘上。
+- `master_password`、`entrySecret`、派生的 `CryptoKey`、Session 中的 `cryptoKey` 和 `storageKey`。密钥只保存在浏览器内存（non-extractable `CryptoKey`），绝不会被 SW 缓存。
+- `encrypted_password`、`encrypted_memory_hint`、密码校验材料或任何可重建派生输入的元数据。
+
+SW 的 `prompt` 更新模式保证：新版 Service Worker 只在后台安装，不会自动 `skipWaiting`；只有用户点击“立即刷新”后才激活。进行中的解密会话绝不会因 SW 自动更新而中断。该设计确保了会话安全性与代码可更新性之间的平衡。

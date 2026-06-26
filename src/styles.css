@@ -713,6 +713,97 @@ h2 {
   white-space: nowrap;
 }
 
+/* ===== PWA 更新提示横幅 =====
+   独立于 SystemNoticeHost，挂在 App 顶层，跨越所有路由。 */
+
+.pwa-update-banner {
+  align-items: center;
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: space-between;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  padding: 0.85rem 1rem;
+}
+
+.pwa-update-banner-content {
+  display: flex;
+  flex: 1 1 16rem;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.pwa-update-banner-content strong {
+  display: block;
+  font-size: 0.92rem;
+}
+
+.pwa-update-banner-content span {
+  color: inherit;
+  display: block;
+  font-size: 0.88rem;
+  opacity: 0.85;
+}
+
+.pwa-update-banner-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.pwa-update-banner-button-primary,
+.pwa-update-banner-button-ghost {
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.9rem;
+  min-height: 2.2rem;
+  padding: 0.4rem 0.95rem;
+}
+
+.pwa-update-banner-button-primary {
+  background: var(--primary-fg);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.pwa-update-banner-button-primary:hover {
+  filter: brightness(0.95);
+}
+
+.pwa-update-banner-button-ghost {
+  background: transparent;
+  color: inherit;
+  opacity: 0.8;
+}
+
+.pwa-update-banner-button-ghost:hover {
+  opacity: 1;
+}
+
+/* 新版本可用：用主色 terracotta 突出，提示需要用户操作。 */
+.pwa-update-banner-refresh {
+  background: var(--primary);
+  border: 1px solid var(--primary-strong);
+  color: var(--primary-fg);
+}
+
+/* 已可离线：success 色调，一次性提示，无需操作。 */
+.pwa-update-banner-offline {
+  background: hsl(142, 71%, 38%, 0.1);
+  border: 1px solid hsl(142, 71%, 38%, 0.25);
+  color: hsl(142, 60%, 25%);
+}
+
+:root[data-theme="dark"] .pwa-update-banner-offline {
+  background: hsl(142, 60%, 50%, 0.12);
+  border-color: hsl(142, 60%, 50%, 0.3);
+  color: hsl(142, 50%, 70%);
+}
+
 .login-panel,
 .generator-panel,
 .section-card,

@@ -2,9 +2,48 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
     <meta name="description" content="Snow Cues v2.1 安全本地优先密码系统" />
     <title>Snow Cues v2.1 本地密码系统</title>
+
+    <!-- PWA / 可安装应用清单。manifest.webmanifest 由 vite-plugin-pwa 在构建时生成。 -->
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <meta
+      name="theme-color"
+      content="#d25636"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta
+      name="theme-color"
+      content="#3a2f24"
+      media="(prefers-color-scheme: dark)"
+    />
+
+    <!-- iOS Safari 安装到主屏后的外观。 -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Snow Cues" />
+
+    <!-- 图标。相对路径适配 Cloudflare Pages 非根路径部署（base: "./"）。 -->
+    <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="./icons/favicon-32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="./icons/favicon-16.png"
+    />
+    <link rel="icon" type="image/svg+xml" href="./icons/icon.svg" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

@@ -36,7 +36,9 @@ type GuidanceDrawerProps = {
 
 export function GuidanceDrawer({ guidance, onAction }: GuidanceDrawerProps) {
   const [collapsed, setCollapsed] = useState(getInitialCollapsed);
-  const [toggleTop, setToggleTop] = useState<number | null>(getInitialToggleTop);
+  const [toggleTop, setToggleTop] = useState<number | null>(
+    getInitialToggleTop
+  );
   const buttonRef = useRef<HTMLButtonElement>(null);
   const draggingRef = useRef(false);
   const hasMovedRef = useRef(false);
