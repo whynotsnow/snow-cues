@@ -21,7 +21,7 @@ export function Topbar({ controller, navigateToPage }: TopbarProps) {
   return (
     <section className="sidebar" aria-label="应用状态">
       <div className="sidebar-brand">
-        <p className="eyebrow">Snow Cues v2.1</p>
+        <p className="eyebrow">Snow Cues v2.3</p>
         <h1>安全本地密码系统</h1>
         <p className="subtitle">
           以用户维护的存储数据文件夹作为唯一业务数据源。

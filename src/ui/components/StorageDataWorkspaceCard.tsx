@@ -113,7 +113,7 @@ export function StorageDataWorkspaceCard({
             ) : null}
           </ActionGroup>
         }
-        description={`Snow Cues 2.1 以你维护的 storageData 文件夹作为唯一业务数据源。${changeLockedHint}`}
+        description={`Snow Cues 2.3 以你维护的 storageData 文件夹作为唯一业务数据源。${changeLockedHint}`}
         title="存储数据"
       />
       <div className="form-stack">

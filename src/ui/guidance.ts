@@ -181,7 +181,7 @@ function buildOutsideSpaceGuidance(input: GuidanceInput): GuidanceCard[] {
         id: "storage-data-open",
         priority: guidancePriority.spaceRestriction,
         title: "打开存储数据",
-        body: "Snow Cues 2.1 需要先打开、导入或新建存储数据。浏览器 IndexedDB 中的旧记录不会作为业务真源。",
+        body: "Snow Cues 2.3 需要先打开、导入或新建存储数据。浏览器 IndexedDB 中的旧记录不会作为业务真源。",
         status: "active",
         steps: [
           { label: "确认 Syncthing 已同步", status: "current" },

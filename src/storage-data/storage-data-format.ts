@@ -42,7 +42,7 @@ export async function parseStorageDataFileText(
     throw new StorageDataFormatError("草稿文件不能作为当前存储数据打开。");
   }
   if (parsed.format !== STORAGE_DATA_FORMAT) {
-    throw new StorageDataFormatError("不是 Snow Cues 2.1 存储数据文件。");
+    throw new StorageDataFormatError("不是 Snow Cues 2.3 存储数据文件。");
   }
   if (parsed.schemaVersion !== STORAGE_DATA_SCHEMA_VERSION) {
     throw new StorageDataFormatError("存储数据文件版本不受支持。");

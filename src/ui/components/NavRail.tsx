@@ -21,7 +21,7 @@ export function NavRail({ controller, navigateToPage }: NavRailProps) {
   return (
     <nav className="nav-rail" aria-label="应用状态">
       <div className="nav-rail-brand">
-        <p className="eyebrow">◈ Snow Cues v2.1</p>
+        <p className="eyebrow">◈ Snow Cues v2.3</p>
         <p className="nav-rail-subtitle">
           以用户维护的存储数据文件夹作为唯一业务数据源。
         </p>
