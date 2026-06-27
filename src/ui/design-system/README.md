@@ -19,35 +19,22 @@ Snow Cues v2.3 当前是纯前端、本地优先应用，UI 由 React 组件和 
 
 ## 设计 token 方向
 
-当前已在 `src/styles.css` 中落地完整的 warm-earth-tone 设计 token 体系（基于 Anthropic 品牌灵感），并通过 legacy alias 保持现有 `var(--color-*)` 引用兼容。
+> **权威以 `design/Design.md` 为准。** 本节只描述 token 体系的组织方式，不重复罗列具体取值；颜色、圆角、阴影、间距、字体、过渡的权威定义见 Design.md 对应章节。
 
-核心 token 语义：
+设计系统采用 v2.2 确立的 Swiss Modernism × Minimalism（冰川蓝 / Glacier Blue）方向。token 统一在 `src/styles.css` 的 `:root` 与 `:root[data-theme="dark"]` 中以 CSS 自定义属性管理，覆盖以下类别：
 
-| Token              | 亮色                 | 暗色                 | 角色              |
-| ------------------ | -------------------- | -------------------- | ----------------- |
-| `--bg`             | `hsl(38, 28%, 91%)`  | `hsl(40, 15%, 12%)`  | 页面背景          |
-| `--fg`             | `hsl(30, 15%, 15%)`  | `hsl(35, 20%, 88%)`  | 主文字            |
-| `--card`           | `hsl(35, 22%, 85%)`  | `hsl(38, 12%, 18%)`  | 卡片/表面         |
-| `--muted`          | `hsl(35, 20%, 87%)`  | `hsl(38, 10%, 22%)`  | 次级表面          |
-| `--muted-fg`       | `hsl(30, 12%, 38%)`  | `hsl(35, 15%, 55%)`  | 次要文字          |
-| `--border`         | `hsl(35, 18%, 80%)`  | `hsl(38, 10%, 25%)`  | 边框/分割线       |
-| `--primary`        | `hsl(15, 65%, 52%)`  | `hsl(15, 65%, 58%)`  | 主色调（赤陶橙）  |
-| `--primary-strong` | `hsl(15, 70%, 42%)`  | `hsl(15, 65%, 50%)`  | 主色 hover/active |
-| `--success`        | `hsl(142, 71%, 38%)` | `hsl(142, 60%, 50%)` | 成功语义          |
-| `--warning`        | `hsl(38, 92%, 45%)`  | `hsl(38, 90%, 58%)`  | 警告语义          |
-| `--info`           | `hsl(220, 70%, 50%)` | `hsl(220, 75%, 65%)` | 信息语义          |
-
-已落地的 token 类别：
-
-- 颜色：页面背景、卡片面、弱背景、边框、正文、弱正文、主色、语义色（success / warning / info），全量亮色 + 暗色覆盖。
-- 圆角：`--radius: 0.75rem` 为基准，`--radius-sm` 到 `--radius-3xl`（2rem）共 5 级。
-- 阴影：`--shadow-sm` / `--shadow-md` / `--shadow-lg` / `--glow-primary` 四级。
-- 缓动：`--ease: cubic-bezier(0, 0, 0.2, 1)`（Material Design decelerate）。
+- 颜色：页面背景、卡片面、次级表面、边框、主文字、次要文字、主色（含 hover / muted）、焦点环、语义色（success / warning / error / info）。
+- 圆角：受 Swiss 几何哲学约束的克制圆角尺度（默认 `0.5rem`，上限 `0.75rem`）。
+- 阴影：分层极简阴影 + 焦点光晕。
+- 缓动与时长：标准缓动与 fast / normal / slow 三档时长。
+- 间距：系统化 spacing scale。
 - 字体：`--font-sans`（Inter + 系统回退 + 中文回退）、`--font-mono`（Fira Code + 回退）。
 
 暗色模式通过 `<html data-theme="dark">` 切换，由 `src/ui/components/ThemeToggle.tsx` 控制，偏好持久化到 `localStorage` key `sc-theme`。
 
-新增样式时，必须使用语义 token（如 `var(--border)`、`var(--muted-fg)`），禁止新增长期硬编码 hex 颜色。
+新增样式时，必须使用语义 token（如 `var(--border)`、`var(--muted-fg)`），禁止新增长期硬编码 hex 颜色或散写 `rgba(...)` 语义色。
+
+> **实施状态备忘**：v2.2 Glacier Blue token 在 `src/styles.css` 的落地工作由 v2.3 阶段 1 完成。在此之前若发现代码中仍有 warm-earth-tone（陶土橙）取值，属于待迁移的过渡状态，请以 `design/Design.md` 与 `docs/v2.3-plan.md` 为准，不要把过渡取值当作目标。
 
 ## 组件分层规则
 
@@ -76,7 +63,7 @@ Snow Cues v2.3 当前是纯前端、本地优先应用，UI 由 React 组件和 
 - 基础层落地：已建立 design-system、README、barrel export 和最小渲染测试。
 - 中间层迁移：规则管理、新建密码、密码组、输出策略字段、空间索引、游离密码、空间概览和测试工具已迁入基础组件。
 - 复杂业务卡片迁移：`EntryCard`、迁移情况卡片和迁移条目卡片已替换基础展示件，业务 handler、门禁表达式和安全流程保持在原业务层。
-- Token 体系落地：全局颜色、圆角、阴影、缓动、字体已通过 CSS 自定义属性统一管理，支持亮/暗双主题，所有硬编码 hex 颜色已替换为语义 token 引用。
+- Token 体系落地：全局颜色、圆角、阴影、缓动、字体已通过 CSS 自定义属性统一管理，支持亮/暗双主题。**当前取值仍为过渡的 warm-earth-tone（陶土橙），向 v2.2 Glacier Blue 的收敛由 v2.3 阶段 1 完成**；详见 `design/Design.md` 与 `docs/v2.3-plan.md`。
 
 后续路线：
 
