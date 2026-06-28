@@ -85,7 +85,7 @@ Service Worker 由 Workbox 生成，采用 `generateSW` 策略，只在 `workbox
 ### 应用清单与图标
 
 - `manifest.webmanifest` 由 vite-plugin-pwa 在构建时自动生成，包含 `name`、`theme_color`、`scope`、`display: "standalone"` 及多尺寸图标。
-- 当前图标为占位素材：terracotta 主色底 + 白色 “SC” 字母。SVG 源文件位于 `public/icons/icon.svg`，由 `scripts/generate-icons.mjs`（依赖 `sharp`）生成各尺寸 PNG：192×192、512×512、maskable 自适应版、apple-touch-icon 180×180 及 favicon。运行 `npm run generate-icons` 可重新生成。
+- 当前图标为占位素材：Glacier Blue 主色底 + 白色 “SC” 字母。SVG 源文件位于 `public/icons/icon.svg`，由 `scripts/generate-icons.mjs`（依赖 `sharp`）生成各尺寸 PNG：192×192、512×512、maskable 自适应版、apple-touch-icon 180×180 及 favicon。运行 `npm run generate-icons` 可重新生成。
 
 ### 测试隔离
 

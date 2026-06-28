@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <!-- Snow Cues 占位图标：terracotta orange 底 + 白色 "SC" 字母。后续可替换为正式设计。 -->
-  <rect width="512" height="512" rx="96" ry="96" fill="#d25636" />
+  <!-- Snow Cues 占位图标：Glacier Blue 底 + 白色 "SC" 字母。后续可替换为正式设计。 -->
+  <rect width="512" height="512" rx="64" ry="64" fill="#3E7CB1" />
   <text
     x="50%"
     y="50%"

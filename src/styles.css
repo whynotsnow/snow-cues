@@ -1,42 +1,41 @@
-/* ===== Warm Earth-Tone Design Tokens ===== */
+/* ===== Glacier Blue Design Tokens (v2.2) ===== */
 
 :root {
   color-scheme: light;
 
   /* Backgrounds */
-  --bg: hsl(38, 28%, 91%);
-  --fg: hsl(30, 15%, 15%);
+  --bg: #F7F8FA;
+  --fg: #1A1D23;
 
   /* Cards & surfaces */
-  --card: hsl(35, 22%, 85%);
-  --card-fg: hsl(30, 15%, 15%);
+  --card: #FFFFFF;
+  --card-fg: #1A1D23;
 
   /* Muted surfaces */
-  --muted: hsl(35, 20%, 87%);
-  --muted-fg: hsl(30, 12%, 38%);
+  --muted: #EEF1F5;
+  --muted-fg: #5B6370;
 
   /* Popover / elevated */
-  --popover: hsl(38, 28%, 91%);
+  --popover: #FFFFFF;
 
   /* Borders */
-  --border: hsl(35, 18%, 80%);
-  --input: hsl(35, 18%, 80%);
+  --border: #DDE1E6;
+  --input: #DDE1E6;
 
-  /* Primary — Terracotta Orange */
-  --primary: hsl(15, 65%, 52%);
-  --primary-fg: hsl(40, 30%, 96%);
-  --primary-strong: hsl(15, 70%, 42%);
-
-  /* Accent */
-  --accent-warm: hsl(15, 55%, 48%);
+  /* Primary — Glacier Blue */
+  --primary: #3E7CB1;
+  --primary-fg: #FFFFFF;
+  --primary-strong: #2F6492;
+  --primary-muted: rgba(62, 124, 177, 0.08);
 
   /* Focus ring */
-  --ring: hsl(15, 65%, 52%);
+  --ring: #3E7CB1;
 
   /* Semantic */
-  --success: hsl(142, 71%, 38%);
-  --warning: hsl(38, 92%, 45%);
-  --info: hsl(220, 70%, 50%);
+  --success: #2D8A5E;
+  --warning: #C2842D;
+  --error: #C74B4B;
+  --info: #4B7FC7;
 
   /* Typography */
   --font-sans:
@@ -45,27 +44,27 @@
   --font-mono: "Fira Code", "JetBrains Mono", "SF Mono", monospace;
   font-family: var(--font-sans);
 
-  /* Radius */
-  --radius: 0.75rem;
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-xl: 1rem;
-  --radius-2xl: 1.5rem;
-  --radius-3xl: 2rem;
+  /* Radius — Swiss Modernism restrained geometry */
+  --radius-sm: 0.375rem;
+  --radius: 0.5rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.625rem;
+  --radius-xl: 0.75rem;
+  --radius-pill: 999px;
 
   /* Easing */
   --ease: cubic-bezier(0, 0, 0.2, 1);
 
-  /* Shadows */
-  --shadow-sm:
-    0px 1px 1px hsla(0, 0%, 0%, 0.06), 0px 2px 1px hsla(0, 0%, 0%, 0.06);
-  --shadow-md:
-    0px 8px 4px hsla(0, 0%, 0%, 0.03), 0px 5px 2px hsla(0, 0%, 0%, 0.03),
-    0px 3px 2px hsla(0, 0%, 0%, 0.06), 0px 1px 1px hsla(0, 0%, 0%, 0.06);
-  --shadow-lg:
-    0px 25px 7px rgba(0, 0, 0, 0.01), 0px 16px 6px hsla(0, 0%, 0%, 0.03),
-    0px 9px 5px hsla(223, 13%, 10%, 0.08), 0px 4px 4px hsla(0, 0%, 0%, 0.16);
-  --glow-primary: 0 10px 40px -10px hsl(15, 65%, 52%, 0.4);
+  /* Duration */
+  --duration-fast: 150ms;
+  --duration-normal: 200ms;
+  --duration-slow: 300ms;
+
+  /* Shadows — 3-layer minimal */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.1);
+  --glow-primary: 0 0 0 3px rgba(62, 124, 177, 0.2);
 }
 
 /* ===== Dark Mode ===== */
@@ -73,37 +72,45 @@
 :root[data-theme="dark"] {
   color-scheme: dark;
 
-  --bg: hsl(40, 15%, 12%);
-  --fg: hsl(35, 20%, 88%);
+  /* Backgrounds — Deep Arctic */
+  --bg: #0F1724;
+  --fg: #E8ECF2;
 
-  --card: hsl(38, 12%, 18%);
-  --card-fg: hsl(35, 20%, 88%);
+  /* Cards & surfaces */
+  --card: #1A2332;
+  --card-fg: #E8ECF2;
 
-  --muted: hsl(38, 10%, 22%);
-  --muted-fg: hsl(35, 15%, 55%);
+  /* Muted surfaces */
+  --muted: #243044;
+  --muted-fg: #8B95A5;
 
-  --popover: hsl(40, 12%, 14%);
+  /* Popover / elevated */
+  --popover: #1A2332;
 
-  --border: hsl(38, 10%, 25%);
-  --input: hsl(38, 10%, 25%);
+  /* Borders */
+  --border: #2D3A4E;
+  --input: #2D3A4E;
 
-  --primary: hsl(15, 65%, 58%);
-  --primary-fg: hsl(0, 0%, 100%);
-  --primary-strong: hsl(15, 65%, 50%);
+  /* Primary — Ice Blue */
+  --primary: #5B9BD5;
+  --primary-fg: #FFFFFF;
+  --primary-strong: #4A8BC7;
+  --primary-muted: rgba(91, 155, 213, 0.12);
 
-  --accent-warm: hsl(15, 55%, 52%);
-  --ring: hsl(15, 65%, 58%);
+  /* Focus ring */
+  --ring: #5B9BD5;
 
-  --success: hsl(142, 60%, 50%);
-  --warning: hsl(38, 90%, 58%);
-  --info: hsl(220, 75%, 65%);
+  /* Semantic */
+  --success: #40A86E;
+  --warning: #D9A441;
+  --error: #D96363;
+  --info: #6B9FD9;
 
-  --shadow-sm: 0px 1px 1px hsla(0, 0%, 0%, 0.2);
-  --shadow-md:
-    0px 8px 4px hsla(0, 0%, 0%, 0.08), 0px 5px 2px hsla(0, 0%, 0%, 0.08);
-  --shadow-lg:
-    0px 25px 7px hsla(0, 0%, 0%, 0.05), 0px 16px 6px hsla(0, 0%, 0%, 0.1);
-  --glow-primary: 0 10px 40px -10px hsl(15, 65%, 58%, 0.3);
+  /* Shadows — slightly higher opacity for dark backgrounds */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.12);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.14);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.18);
+  --glow-primary: 0 0 0 3px rgba(91, 155, 213, 0.25);
 }
 
 /* ===== Base Reset ===== */
@@ -325,7 +332,7 @@ label {
   background: var(--card);
   box-shadow: var(--shadow-md);
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius);
   padding: 0.55rem 0.85rem;
 }
 
@@ -349,8 +356,8 @@ label {
 }
 
 .storage-data-lock-badge {
-  background: hsl(15, 65%, 52%, 0.08);
-  border: 1px solid hsl(15, 65%, 52%, 0.15);
+  background: var(--primary-muted);
+  border: 1px solid var(--primary-muted);
   border-radius: 999px;
   color: var(--primary);
   font-size: 0.76rem;
@@ -493,7 +500,7 @@ label {
 .guidance-drawer.expanded {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius);
   box-shadow: var(--shadow-lg);
   overflow: hidden;
   position: sticky;
@@ -642,7 +649,7 @@ h2 {
 
 .notice {
   align-items: center;
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius);
   display: flex;
   flex-wrap: wrap;
   gap: 0.28rem;
@@ -718,7 +725,7 @@ h2 {
 
 .pwa-update-banner {
   align-items: center;
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius);
   box-shadow: var(--shadow-md);
   display: flex;
   flex-wrap: wrap;
@@ -784,7 +791,7 @@ h2 {
   opacity: 1;
 }
 
-/* 新版本可用：用主色 terracotta 突出，提示需要用户操作。 */
+/* 新版本可用：用主色冰川蓝突出，提示需要用户操作。 */
 .pwa-update-banner-refresh {
   background: var(--primary);
   border: 1px solid var(--primary-strong);
@@ -833,7 +840,7 @@ h2 {
 .entries-section {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius);
   box-shadow: var(--shadow-lg);
 }
 
@@ -859,7 +866,7 @@ h2 {
 .login-note {
   background: var(--muted);
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius);
   color: var(--muted-fg);
   line-height: 1.5;
   padding: 0.75rem;
@@ -931,7 +938,7 @@ h2 {
 .password-group-card {
   background: var(--muted);
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius);
   display: grid;
   gap: 0.9rem;
   padding: 0.9rem;
@@ -955,7 +962,7 @@ h2 {
 .output-adapter-panel {
   background: var(--muted);
   border: 1px dashed var(--border);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius);
   padding: 0.9rem;
 }
 
@@ -988,7 +995,7 @@ h2 {
   align-items: center;
   background: var(--muted);
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius);
   display: grid;
   gap: 0.35rem;
   padding: 0.35rem;
@@ -1033,7 +1040,7 @@ h2 {
 
 .nav-item.active::before {
   background: var(--primary);
-  box-shadow: 0 0 0 3px hsl(15, 65%, 52%, 0.15);
+  box-shadow: 0 0 0 3px var(--primary-muted);
 }
 
 .nav-rail-divider {
@@ -1053,7 +1060,7 @@ h2 {
 
 .guidance-card {
   background: var(--muted);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius);
   display: grid;
   gap: 1rem;
   padding: 1rem;
@@ -1128,7 +1135,7 @@ h2 {
 
 .guidance-step-current .guidance-step-marker {
   background: var(--primary);
-  box-shadow: 0 0 0 4px hsl(15, 65%, 52%, 0.15);
+  box-shadow: 0 0 0 4px var(--primary-muted);
 }
 
 .guidance-step-blocked {
@@ -1142,7 +1149,7 @@ h2 {
 .guidance-blocked {
   background: hsl(38, 92%, 45%, 0.08);
   border: 1px solid hsl(38, 92%, 45%, 0.25);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius);
   color: hsl(38, 50%, 25%);
   line-height: 1.5;
   padding: 0.75rem;
@@ -1190,7 +1197,7 @@ h2 {
   margin-top: 0.75rem;
   background: var(--muted);
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius);
   display: grid;
   gap: 0.35rem;
   padding: 0.85rem;
@@ -1199,7 +1206,7 @@ h2 {
 .inline-guide {
   background: hsl(38, 92%, 45%, 0.08);
   border: 1px solid hsl(38, 92%, 45%, 0.25);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius);
   color: hsl(38, 50%, 25%);
   display: grid;
   gap: 0.3rem;
@@ -1223,7 +1230,7 @@ h2 {
   align-items: flex-start;
   background: var(--muted);
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius);
   display: grid;
   gap: 0.65rem;
   grid-template-columns: auto 1fr;
@@ -1249,7 +1256,7 @@ h2 {
 .flow-preview {
   background: var(--muted);
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius);
   color: var(--muted-fg);
   display: grid;
   gap: 0.42rem;
@@ -1279,7 +1286,7 @@ h2 {
 .global-rule-select {
   background: var(--muted);
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius);
   margin-top: 0.75rem;
   max-width: 420px;
   padding: 0.85rem;
@@ -1288,7 +1295,7 @@ h2 {
 .rule-card {
   background: var(--muted);
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius);
   display: grid;
   gap: 0.55rem;
   padding: 0.85rem;
@@ -1302,7 +1309,7 @@ h2 {
 }
 
 .rule-card-header span {
-  background: hsl(15, 65%, 52%, 0.08);
+  background: var(--primary-muted);
   border-radius: 999px;
   color: var(--primary);
   font-size: 0.72rem;
@@ -1341,7 +1348,7 @@ h2 {
 .test-tools {
   background: var(--muted);
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius);
   display: grid;
   gap: 0.75rem;
   margin-top: 0.75rem;
@@ -1389,7 +1396,7 @@ h2 {
 .detached-result {
   background: var(--muted);
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius);
   display: grid;
   gap: 0.65rem;
   margin-top: 0.75rem;
@@ -1423,7 +1430,7 @@ h2 {
 .space-index-card {
   background: var(--muted);
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius);
   display: grid;
   gap: 0.75rem;
   padding: 0.85rem;
@@ -1438,7 +1445,7 @@ h2 {
 .sample-rule-card {
   background: var(--muted);
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius);
   display: grid;
   gap: 0.65rem;
   padding: 0.85rem;
@@ -1460,7 +1467,7 @@ h2 {
 }
 
 .primary-button {
-  background: linear-gradient(135deg, var(--primary), var(--accent-warm));
+  background: var(--primary);
   border-color: transparent;
   color: var(--primary-fg);
   box-shadow: var(--glow-primary);
@@ -1489,7 +1496,7 @@ h2 {
 .ds-card-subtle {
   background: var(--muted);
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius);
   display: grid;
   gap: 0.75rem;
   padding: 0.85rem;
@@ -1505,7 +1512,7 @@ h2 {
 .entry-card {
   background: var(--muted);
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius);
   display: grid;
   gap: 0.75rem;
   position: relative;
@@ -1539,7 +1546,7 @@ h2 {
 .verification-badge {
   background: hsl(220, 70%, 50%, 0.06);
   border: 1px solid hsl(220, 70%, 50%, 0.2);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius);
   color: hsl(220, 40%, 30%);
   display: grid;
   gap: 0.25rem;
@@ -1708,7 +1715,7 @@ h2 {
 .empty-state {
   background: var(--muted);
   border: 1px dashed var(--border);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius);
   color: var(--muted-fg);
   margin: 0;
   padding: 1rem;
@@ -1828,7 +1835,7 @@ h2 {
     position: static;
     width: 100%;
     flex-direction: row;
-    border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+    border-radius: var(--radius) var(--radius) 0 0;
     border-bottom: 1px solid var(--border);
     box-shadow: none;
     right: auto;
@@ -1852,7 +1859,7 @@ h2 {
   .guidance-drawer-toggle {
     background: var(--muted);
     border-bottom: 1px solid var(--border);
-    border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+    border-radius: var(--radius) var(--radius) 0 0;
     box-shadow: none;
     left: auto;
     position: static;

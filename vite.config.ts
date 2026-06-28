@@ -2,9 +2,9 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 
-// Snow Cues 主色 terracotta orange 的近似十六进制 (hsl(15,65%,52%))。
-const THEME_COLOR = "#d25636";
-const BACKGROUND_COLOR = "#f3ece1";
+// Snow Cues 主色 Glacier Blue (v2.2 Swiss Modernism)。
+const THEME_COLOR = "#3E7CB1";
+const BACKGROUND_COLOR = "#F7F8FA";
 
 export default defineConfig({
   base: "./",

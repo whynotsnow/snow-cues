@@ -1,5 +1,5 @@
 // 生成 Snow Cues PWA 占位图标。
-// 普通图标：terracotta 底圆角矩形 + 白色 SC 字母。
+// 普通图标：Glacier Blue 底圆角矩形 + 白色 SC 字母。
 // maskable 图标：底色填满整个画布（无圆角），SC 字母缩小到安全区内，
 //                以适配 Android 自适应图标的裁剪。
 //
@@ -15,9 +15,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ICONS_DIR = resolve(__dirname, "../public/icons");
 
 // 原始 SVG viewBox 为 512x512，SC 字母字号 260。
+// 注意：本脚本内联 SVG，不读取 public/icons/icon.svg。两者需手动保持一致。
 const BASE_SVG = `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <rect width="512" height="512" rx="96" ry="96" fill="#d25636" />
+  <rect width="512" height="512" rx="64" ry="64" fill="#3E7CB1" />
   <text
     x="50%" y="50%"
     text-anchor="middle"
@@ -32,7 +33,7 @@ const BASE_SVG = `
 // Android maskable 安全区约为画布中心 66% 半径，字号 180 保证不被裁掉。
 const MASKABLE_SVG = `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <rect width="512" height="512" fill="#d25636" />
+  <rect width="512" height="512" fill="#3E7CB1" />
   <text
     x="50%" y="50%"
     text-anchor="middle"
