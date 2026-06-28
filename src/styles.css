@@ -145,6 +145,12 @@
   box-sizing: border-box;
 }
 
+.sc-icon {
+  display: inline-block;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
 html {
   background: var(--bg);
   color: var(--fg);
@@ -308,6 +314,12 @@ label {
   display: grid;
   gap: 0.55rem;
   padding-bottom: 0.9rem;
+}
+
+.nav-rail-brand-mark {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.25rem;
 }
 
 .nav-rail-subtitle {
@@ -602,7 +614,7 @@ label {
 }
 
 .guidance-drawer-toggle-icon {
-  font-size: 0.65rem;
+  display: inline-flex;
   line-height: 1;
   user-select: none;
 }
@@ -615,7 +627,7 @@ label {
 }
 
 .guidance-drawer.expanded .guidance-drawer-toggle-icon {
-  font-size: 0.7rem;
+  align-items: center;
 }
 
 .guidance-drawer-body {
@@ -1764,7 +1776,6 @@ h2 {
   background: var(--card);
   color: var(--fg);
   cursor: pointer;
-  font-size: 18px;
   transition:
     background 0.2s var(--ease),
     transform 0.15s var(--ease);
@@ -1871,7 +1882,7 @@ h2 {
   }
 
   .guidance-drawer-toggle-fixed .guidance-drawer-toggle-icon {
-    font-size: 0.7rem;
+    align-items: center;
   }
 
   .guidance-drawer-toggle {

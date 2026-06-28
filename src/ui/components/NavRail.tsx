@@ -1,6 +1,7 @@
 import type { AppController } from "../useAppController";
 import { spaceStatusLabels } from "../useAppController";
 import type { AppPage } from "../appTypes";
+import { SpaceIcon } from "../icons";
 import { ThemeToggle } from "./ThemeToggle";
 
 type NavRailProps = {
@@ -21,7 +22,10 @@ export function NavRail({ controller, navigateToPage }: NavRailProps) {
   return (
     <nav className="nav-rail" aria-label="应用状态">
       <div className="nav-rail-brand">
-        <p className="eyebrow">◈ Snow Cues v2.3</p>
+        <p className="eyebrow nav-rail-brand-mark">
+          <SpaceIcon size={16} />
+          <span>Snow Cues v2.3</span>
+        </p>
         <p className="nav-rail-subtitle">
           以用户维护的存储数据文件夹作为唯一业务数据源。
         </p>

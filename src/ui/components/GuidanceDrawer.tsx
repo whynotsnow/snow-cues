@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { GuidanceAction, UserGuidance } from "../guidance";
+import { ChevronLeftIcon, ChevronRightIcon } from "../icons";
 import { GuidancePanel } from "./GuidancePanel";
 
 const STORAGE_KEY_COLLAPSED = "sc-guidance-collapsed";
@@ -153,7 +154,7 @@ export function GuidanceDrawer({ guidance, onAction }: GuidanceDrawerProps) {
           {collapsed ? "操作指引" : "收起指引"}
         </span>
         <span className="guidance-drawer-toggle-icon">
-          {collapsed ? "◀" : "▶"}
+          {collapsed ? <ChevronLeftIcon size={16} /> : <ChevronRightIcon size={16} />}
         </span>
       </button>
       {!collapsed && (

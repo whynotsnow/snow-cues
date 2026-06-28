@@ -420,7 +420,32 @@ Each tone has its own background/border/text derived from the matching semantic 
 | --------- | --------------------------------- |
 | Notice    | `src/ui/design-system/Notice.tsx` |
 
-### 9.5 Navigation / 导航
+### 9.5 Icon System / 图标系统
+
+Snow Cues uses a small local SVG React icon set in `src/ui/icons/`. Do not add a third-party UI or icon library for isolated icon needs.
+
+```css
+.sc-icon {
+  display: inline-block;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+```
+
+**Rules**:
+
+- SVG icons use `fill="none"` and `stroke="currentColor"` unless a specific mark requires otherwise.
+- Supported sizes are `16`, `18`, and `20`; default is `18`.
+- Icons are decorative by default with `aria-hidden="true"` and `focusable="false"`.
+- Icon-only buttons must keep an explicit `aria-label`; icon+text patterns must keep visible text.
+- Icons must not carry security-critical meaning by themselves.
+- Do not use emoji or Unicode symbols as UI icons.
+
+| Component | File             |
+| --------- | ---------------- |
+| Icons     | `src/ui/icons/` |
+
+### 9.6 Navigation / 导航
 
 **Nav Item** (left sidebar):
 
@@ -461,7 +486,7 @@ Each tone has its own background/border/text derived from the matching semantic 
 }
 ```
 
-### 9.6 Badges & Chips / 徽章与标签
+### 9.7 Badges & Chips / 徽章与标签
 
 ```css
 .badge {

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { MoonIcon, SunIcon } from "../icons";
 
 const STORAGE_KEY = "sc-theme";
 type Theme = "light" | "dark";
@@ -49,7 +50,7 @@ export function ThemeToggle() {
       type="button"
       aria-label={theme === "dark" ? "切换到亮色主题" : "切换到暗色主题"}
     >
-      {theme === "dark" ? "☀️" : "🌙"}
+      {theme === "dark" ? <SunIcon /> : <MoonIcon />}
     </button>
   );
 }
