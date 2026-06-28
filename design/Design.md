@@ -1,819 +1,125 @@
-# Snow Cues v2.2 Design System / 设计系统
-
-> **Design Authority** — AI agents and contributors MUST read this file before modifying any UI code.
-> **设计权威** — AI agent 和贡献者在修改任何 UI 代码前必须读取此文件。
->
-> Style: **Swiss Modernism 2.0 × Minimalism**  
-> Color mood: **Glacier Blue / 冰川蓝**  
-> Generated for: Snow Cues v2.2 — local-first password derivation & encryption system
->
-> Replaces the previous warm-earth-tone (Anthropic-inspired) design system from v2.1.
-
----
-
-## 1. Design Principles / 设计原则
-
-| #   | Principle / 原则                               | Rationale / 理由                                                             |
-| --- | ---------------------------------------------- | ---------------------------------------------------------------------------- |
-| 1   | **Trust through precision / 精准确立信任**     | Security tools must look exact and intentional. Never ornamental.            |
-| 2   | **Clarity over warmth / 清晰优于温暖**         | A password vault is not a lifestyle brand. Cool, neutral, readable.          |
-| 3   | **Information hierarchy / 信息层级**           | Swiss style prioritizes content structure. Every surface has a purpose.      |
-| 4   | **Less chrome, more content / 少装饰，多内容** | Eliminate visual noise. Shadows and borders serve structure, not decoration. |
-| 5   | **Cool confidence / 冷静自信**                 | The "Snow" brand evokes clarity, ice, mountains — crisp and unshakeable.     |
-| 6   | **Consistent rhythm / 一致的节奏**             | Systematic spacing, consistent rounding, predictable interactions.           |
-| 7   | **Accessible contrast / 无障碍对比度**         | All text meets WCAG AA (4.5:1 minimum). Focus states are visible.            |
-| 8   | **Security-critical copy / 安全关键文案保护**  | Minimalism must not remove required explanations for sensitive workflows.    |
-
-Security-critical copy must remain visible at first mention or before the relevant action. This applies to `storageData`, `master_password`, `entrySecret`, `encrypted_memory_hint`, space verification, rule chains, output adaptation, migration mode, deprecated spaces, and archived spaces.
-
----
-
-## 2. Style Reference / 风格参考
-
-| Aspect / 维度         | Choice / 选择                                              | Why / 理由                                             |
-| --------------------- | ---------------------------------------------------------- | ------------------------------------------------------ |
-| **Primary style**     | Swiss Modernism 2.0                                        | Clean geometry, corporate trust, editorial precision   |
-| **Secondary style**   | Minimalism & Swiss Style                                   | Tool interfaces need clear hierarchy, zero distraction |
-| **Design philosophy** | "Form follows function"                                    | No decorative elements without structural purpose      |
-| **Mood**              | Professional, calm, precise                                | Matches security/privacy product expectations          |
-| **Best for**          | Enterprise apps, security tools, dashboards, documentation |                                                        |
-
-### Key Style Characteristics / 关键风格特征
-
-- **Rectilinear precision**: Rounded corners are subtle (0.375–0.5rem), never pillowy
-- **Generous whitespace**: Content breathes; sections are clearly separated
-- **Single accent**: One primary blue, no competing accent colors
-- **Subtle elevation**: Shadows are minimal, used only to distinguish surface layers
-- **Crisp borders**: `1px solid` borders define edges; dashed borders signal secondary/optional areas
-- **Fast transitions**: 150–200ms; security tools must feel responsive, not sluggish
-
----
-
-## 3. Color System / 色彩系统
-
-### 3.1 Light Mode / 亮色模式
-
-| Token              | Value                   | Role / 角色                                |
-| ------------------ | ----------------------- | ------------------------------------------ |
-| `--bg`             | `#F7F8FA`               | Page background / 页面背景                 |
-| `--fg`             | `#1A1D23`               | Primary text / 主文字                      |
-| `--card`           | `#FFFFFF`               | Card / surface background / 卡片背景       |
-| `--card-fg`        | `#1A1D23`               | Card text / 卡片文字                       |
-| `--muted`          | `#EEF1F5`               | Secondary surface / 次级表面               |
-| `--muted-fg`       | `#5B6370`               | Secondary text / 次要文字                  |
-| `--popover`        | `#FFFFFF`               | Popover / elevated surface / 弹出层        |
-| `--border`         | `#DDE1E6`               | Borders & dividers / 边框与分割线          |
-| `--input`          | `#DDE1E6`               | Input border / 输入框边框                  |
-| `--primary`        | `#3E7CB1`               | Primary accent — Glacier Blue / 冰川蓝主色 |
-| `--primary-fg`     | `#FFFFFF`               | Text on primary / 主色上文字               |
-| `--primary-strong` | `#2F6492`               | Primary hover/active / 主色悬停/激活       |
-| `--primary-muted`  | `rgba(62,124,177,0.08)` | Subtle primary background / 主色浅底       |
-| `--ring`           | `#3E7CB1`               | Focus ring / 焦点环                        |
-
-**Semantic / 语义色**:
-
-| Token       | Value     | Role           |
-| ----------- | --------- | -------------- |
-| `--success` | `#2D8A5E` | Success / 成功 |
-| `--warning` | `#C2842D` | Warning / 警告 |
-| `--error`   | `#C74B4B` | Error / 错误   |
-| `--info`    | `#4B7FC7` | Info / 信息    |
-
-**Semantic surfaces / 语义表面色**:
-
-| Semantic | Muted background | Border | Text |
-| --- | --- | --- | --- |
-| success | `--success-muted: rgba(45,138,94,0.08)` | `--success-border: rgba(45,138,94,0.18)` | `--success-fg: #1E5E40` |
-| warning | `--warning-muted: rgba(194,132,45,0.07)` | `--warning-border: rgba(194,132,45,0.22)` | `--warning-fg: #6B4A1E` |
-| error | `--error-muted: rgba(199,75,75,0.06)` | `--error-border: rgba(199,75,75,0.2)` | `--error-fg: #6B2E2E` |
-| info | `--info-muted: rgba(75,127,199,0.06)` | `--info-border: rgba(75,127,199,0.18)` | `--info-fg: #2D4A78` |
-
-### 3.2 Dark Mode / 暗色模式
-
-| Token              | Value                   | Role / 角色                              |
-| ------------------ | ----------------------- | ---------------------------------------- |
-| `--bg`             | `#0F1724`               | Page background — Deep Arctic / 深极夜蓝 |
-| `--fg`             | `#E8ECF2`               | Primary text / 主文字                    |
-| `--card`           | `#1A2332`               | Card / surface / 卡片背景                |
-| `--card-fg`        | `#E8ECF2`               | Card text                                |
-| `--muted`          | `#243044`               | Secondary surface / 次级表面             |
-| `--muted-fg`       | `#8B95A5`               | Secondary text / 次要文字                |
-| `--popover`        | `#1A2332`               | Popover / 弹出层                         |
-| `--border`         | `#2D3A4E`               | Borders & dividers / 边框                |
-| `--input`          | `#2D3A4E`               | Input border / 输入框边框                |
-| `--primary`        | `#5B9BD5`               | Primary accent — Ice Blue / 冰蓝主色     |
-| `--primary-fg`     | `#FFFFFF`               | Text on primary                          |
-| `--primary-strong` | `#4A8BC7`               | Primary hover/active                     |
-| `--primary-muted`  | `rgba(91,155,213,0.12)` | Subtle primary background                |
-| `--ring`           | `#5B9BD5`               | Focus ring                               |
-
-**Semantic / 语义色 (dark)**:
-
-| Token       | Value     | Role    |
-| ----------- | --------- | ------- |
-| `--success` | `#40A86E` | Success |
-| `--warning` | `#D9A441` | Warning |
-| `--error`   | `#D96363` | Error   |
-| `--info`    | `#6B9FD9` | Info    |
-
-**Semantic surfaces / 语义表面色 (dark)**:
-
-| Semantic | Muted background | Border | Text |
-| --- | --- | --- | --- |
-| success | `--success-muted: rgba(64,168,110,0.12)` | `--success-border: rgba(64,168,110,0.3)` | `--success-fg: #8FD7AA` |
-| warning | `--warning-muted: rgba(217,164,65,0.12)` | `--warning-border: rgba(217,164,65,0.3)` | `--warning-fg: #F0C978` |
-| error | `--error-muted: rgba(217,99,99,0.12)` | `--error-border: rgba(217,99,99,0.3)` | `--error-fg: #F2A0A0` |
-| info | `--info-muted: rgba(107,159,217,0.12)` | `--info-border: rgba(107,159,217,0.28)` | `--info-fg: #A8CFF5` |
-
-### 3.3 Notice Backgrounds / 通知背景
-
-Notice backgrounds use the semantic surface tokens:
-
-| Class             | Background             | Border             | Text           |
-| ----------------- | ---------------------- | ------------------ | -------------- |
-| `.notice-info`    | `var(--info-muted)`    | `var(--info-border)`    | `var(--info-fg)`    |
-| `.notice-success` | `var(--success-muted)` | `var(--success-border)` | `var(--success-fg)` |
-| `.notice-warning` | `var(--warning-muted)` | `var(--warning-border)` | `var(--warning-fg)` |
-| `.notice-error`   | `var(--error-muted)`   | `var(--error-border)`   | `var(--error-fg)`   |
-
-Dark mode notice colors come from the same token names under `:root[data-theme="dark"]`.
-
-### 3.4 Color Usage Rules / 用色规则
-
-- **NEVER** hardcode hex colors in new CSS — always use `var(--token)` references.
-- **Semantic tokens** (`--success`, `--warning`, `--error`, `--info`) are ONLY for their semantic purpose.
-- **Primary** is used for: primary buttons, focus rings, active nav indicators, eyebrows, badges.
-- **Muted surfaces** (`--muted`) are used for: secondary cards, nested panels, code blocks, read-only info grids.
-- **Border** is also used for horizontal dividers (`border-top: 1px solid var(--border)`).
-- **Info** tone is for neutral informational notices; do NOT use it as a secondary accent color.
-
----
-
-## 4. Typography / 字体排版
+# Snow Cues UI Design System
 
-### 4.1 Font Families / 字体族
+## 文档定位
 
-| Token         | Stack                                                                                                        | Usage                                      |
-| ------------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------ |
-| `--font-sans` | `"Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif` | UI text, headings, labels, body / 界面文字 |
-| `--font-mono` | `"Fira Code", "JetBrains Mono", "SF Mono", monospace`                                                        | Passwords, codes, hashes, IDs / 密码与代码 |
+本文档是 Snow Cues 当前项目级 UI 与交互设计规范。它只描述当前应遵守的设计方向、页面结构、视觉 token、组件使用原则和安全文案边界，不记录 v2.2 / v2.3 的迁移过程。
 
-**Google Fonts import** (in `index.html`):
-
-```html
-<link
-  href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;500;600;700&display=swap"
-  rel="stylesheet"
-/>
-```
+相关权威边界：
 
-### 4.2 Font Weights / 字重
+- 项目级 UI 设计规范：`design/Design.md`。
+- CSS token、布局 class 和实际样式实现：`src/styles.css`。
+- 内部基础组件库维护规则：`src/ui/design-system/README.md`。
+- 用户可见行为、空间流程和 UI 状态规则：`docs/product-rules.md`。
+- 密码、加密、session、隐私字段和安全红线：`docs/security-boundaries.md`。
 
-| Weight            | Usage                                    |
-| ----------------- | ---------------------------------------- |
-| `400` (regular)   | Body text, descriptions, code blocks     |
-| `500` (medium)    | Secondary emphasis                       |
-| `600` (semibold)  | Labels, button text, field hints         |
-| `700` (bold)      | Headings, strong emphasis, active states |
-| `800` (extrabold) | Badges, eyebrows, small caps accents     |
+当本文档与实现不一致时，先检查是否为实现漂移；若确认需要调整设计规范，应同时更新本文档和相关实现或说明。
 
-### 4.3 Type Scale / 字号层级
+## 设计定位
 
-| Role                 | Size      | Weight | Line-height |
-| -------------------- | --------- | ------ | ----------- |
-| Page title (h1)      | `1.35rem` | `700`  | `1.15`      |
-| Section heading (h2) | `1.05rem` | `700`  | `1.25`      |
-| Body / description   | `1rem`    | `400`  | `1.5`       |
-| Label                | `0.84rem` | `600`  | `1.4`       |
-| Field hint / note    | `0.82rem` | `400`  | `1.45`      |
-| Badge                | `0.72rem` | `800`  | `1`         |
-| Caption / eyebrow    | `0.78rem` | `800`  | `1`         |
-| Code / password      | `0.85rem` | `400`  | inherit     |
+Snow Cues 是本地优先的密码派生与加密存储工具，UI 应服务于重复、安全、清晰的操作流程，而不是营销展示。整体方向为 Swiss Modernism x Minimalism，配合 Glacier Blue 冰川蓝视觉系统。
 
----
-
-## 5. Spacing / 间距
-
-Systematic spacing scale. All gaps and paddings use values from this scale:
-
-| Token     | Value     | Usage                                     |
-| --------- | --------- | ----------------------------------------- |
-| `space-1` | `0.25rem` | Icon-to-text gap, tight inline            |
-| `space-2` | `0.5rem`  | Button group gap, label-input gap         |
-| `space-3` | `0.75rem` | Card content gap, section grid gap        |
-| `space-4` | `1rem`    | Section padding, card padding (default)   |
-| `space-5` | `1.25rem` | Large section padding, page-level gap     |
-| `space-6` | `1.5rem`  | Content scroll padding, major section gap |
-
-**Note**: CSS custom properties for spacing are optional. Use consistent values from this scale. Existing code uses raw values like `0.75rem` directly; continue this pattern for now.
-
-### Content Layout Spacing
-
-| Area                         | Value                 |
-| ---------------------------- | --------------------- |
-| Content scroll padding       | `1.5rem` (`space-6`)  |
-| Section gap (workspace grid) | `0.75rem` (`space-3`) |
-| Card internal padding        | `1rem` (`space-4`)    |
-| Form field gap               | `0.75rem` (`space-3`) |
-| Button group gap             | `0.5rem` (`space-2`)  |
-
----
-
-## 6. Border Radius / 圆角
-
-Swiss Modernism uses restrained, rectilinear geometry. Maximum radius is 0.75rem.
-
-| Token           | Value      | Usage                                         |
-| --------------- | ---------- | --------------------------------------------- |
-| `--radius-sm`   | `0.375rem` | Buttons, inputs, small controls               |
-| `--radius`      | `0.5rem`   | Default — cards, panels, form controls        |
-| `--radius-md`   | `0.5rem`   | Same as `--radius` (kept for backward compat) |
-| `--radius-lg`   | `0.625rem` | Larger cards, modals                          |
-| `--radius-xl`   | `0.75rem`  | Maximum — special prominent cards only        |
-| `--radius-pill` | `999px`    | Badges, chips, theme toggle                   |
-
-**Rule**: Do NOT use `border-radius` values larger than `--radius-xl` (0.75rem). The previous `--radius-2xl` (1.5rem) and `--radius-3xl` (2rem) are **removed**.
-
----
-
-## 7. Shadows / 阴影
-
-Minimal. Only three elevation levels + a focus/glow ring. No decorative drop shadows.
-
-| Token            | Value                            | Usage                                     |
-| ---------------- | -------------------------------- | ----------------------------------------- |
-| `--shadow-sm`    | `0 1px 2px rgba(0,0,0,0.06)`     | Subtle surface distinction / 细微表面区分 |
-| `--shadow-md`    | `0 2px 8px rgba(0,0,0,0.08)`     | Elevated cards, popovers / 卡片/弹出层    |
-| `--shadow-lg`    | `0 4px 16px rgba(0,0,0,0.1)`     | High elevation, modals / 高层级/模态框    |
-| `--glow-primary` | `0 0 0 3px rgba(62,124,177,0.2)` | Focus ring glow / 焦点环光晕              |
-
-Dark mode shadows use slightly higher opacity but same structure.
-
----
-
-## 8. Transitions & Easing / 过渡与缓动
-
-| Token               | Value                        | Usage                                    |
-| ------------------- | ---------------------------- | ---------------------------------------- |
-| `--ease`            | `cubic-bezier(0, 0, 0.2, 1)` | Standard decelerate (Material Design)    |
-| `--duration-fast`   | `150ms`                      | Button hover, focus, active states       |
-| `--duration-normal` | `200ms`                      | Panel open/close, card hover             |
-| `--duration-slow`   | `300ms`                      | Drawer expand/collapse, page transitions |
-
-**Transition usage rules**:
-
-- **Hover states**: 150ms on `background`, `border-color`, `box-shadow`, `color`
-- **Active states**: `transform: scale(0.97)` instant (no transition needed)
-- **Drawer/overlay**: 300ms with `--ease`
-- **Always respect** `prefers-reduced-motion: reduce` — disable all transitions
-- **Never animate** `width`/`height` on non-composited properties; prefer `transform`
-
----
-
-## 9. Component Specifications / 组件规范
-
-### 9.1 Button / 按钮
-
-| Variant   | Background       | Border          | Text                | Hover                                         |
-| --------- | ---------------- | --------------- | ------------------- | --------------------------------------------- |
-| Primary   | `var(--primary)` | transparent     | `var(--primary-fg)` | `var(--primary-strong)` bg                    |
-| Secondary | `var(--card)`    | `var(--border)` | `var(--fg)`         | `var(--primary-strong)` border, `--shadow-sm` |
-| Ghost     | transparent      | transparent     | `var(--fg)`         | `var(--muted)` bg, `var(--border)` border     |
-
-**Base styles**:
-
-```css
-button {
-  min-height: 2.5rem;
-  padding: 0.5rem 0.875rem;
-  border-radius: var(--radius-sm); /* 0.375rem */
-  font-weight: 600;
-  transition:
-    background 150ms var(--ease),
-    border-color 150ms var(--ease),
-    box-shadow 150ms var(--ease);
-  cursor: pointer;
-}
-button:disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-button:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
-}
-```
-
-**Primary button**:
-
-```css
-.primary-button {
-  background: var(--primary);
-  border-color: transparent;
-  color: var(--primary-fg);
-  box-shadow: 0 1px 3px rgba(62, 124, 177, 0.25);
-}
-.primary-button:hover:not(:disabled) {
-  background: var(--primary-strong);
-}
-```
-
-**Sizes**:
-
-- `md` (default): `min-height: 2.5rem`, `padding: 0.5rem 0.875rem`
-- `sm`: `min-height: 2.1rem`, `padding: 0.375rem 0.65rem`, `font-size: 0.88rem`
-
-| Component | File                              |
-| --------- | --------------------------------- |
-| Button    | `src/ui/design-system/Button.tsx` |
-
-### 9.2 Card / 卡片
-
-| Tone              | Background     | Border          | Radius     | Shadow        | Padding   |
-| ----------------- | -------------- | --------------- | ---------- | ------------- | --------- |
-| Section (default) | `var(--card)`  | `var(--border)` | `--radius` | `--shadow-md` | `1rem`    |
-| Subtle            | `var(--muted)` | `var(--border)` | `--radius` | none          | `0.85rem` |
-
-```css
-.section-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius); /* 0.5rem */
-  box-shadow: var(--shadow-md);
-  padding: 1rem;
-}
-
-.ds-card-subtle {
-  background: var(--muted);
-  border: 1px solid var(--border);
-  border-radius: var(--radius); /* 0.5rem */
-  padding: 0.85rem;
-}
-```
-
-**Dashed variant** (for secondary/optional areas):
-
-```css
-border: 1px dashed var(--border);
-```
-
-| Component | File                            |
-| --------- | ------------------------------- |
-| Card      | `src/ui/design-system/Card.tsx` |
-
-### 9.3 Input / 输入框
-
-```css
-input,
-select,
-textarea {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm); /* 0.375rem */
-  color: var(--fg);
-  min-height: 2.5rem;
-  padding: 0.5rem 0.7rem;
-  width: 100%;
-  font: inherit;
-}
-input:focus,
-select:focus,
-textarea:focus {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
-}
-```
-
-**Field label pattern**:
-
-```css
-.ds-field {
-  display: grid;
-  gap: 0.5rem;
-}
-.ds-field > label {
-  color: var(--muted-fg);
-  font-size: 0.84rem;
-  font-weight: 600;
-}
-```
-
-| Components                                                        | File                             |
-| ----------------------------------------------------------------- | -------------------------------- |
-| TextField, NumberField, SelectField, TextareaField, CheckboxField | `src/ui/design-system/Field.tsx` |
-
-### 9.4 Semantic Notices / 语义通知
-
-```css
-.notice {
-  align-items: center;
-  border-radius: var(--radius);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  justify-content: space-between;
-  line-height: 1.5;
-  padding: 0.85rem 1rem;
-}
-```
-
-Each tone has its own background/border/text derived from the matching semantic token. See §3.3 for exact values.
-
-| Component | File                              |
-| --------- | --------------------------------- |
-| Notice    | `src/ui/design-system/Notice.tsx` |
-
-### 9.5 Icon System / 图标系统
-
-Snow Cues uses a small local SVG React icon set in `src/ui/icons/`. Do not add a third-party UI or icon library for isolated icon needs.
-
-```css
-.sc-icon {
-  display: inline-block;
-  flex-shrink: 0;
-  vertical-align: middle;
-}
-```
-
-**Rules**:
-
-- SVG icons use `fill="none"` and `stroke="currentColor"` unless a specific mark requires otherwise.
-- Supported sizes are `16`, `18`, and `20`; default is `18`.
-- Icons are decorative by default with `aria-hidden="true"` and `focusable="false"`.
-- Icon-only buttons must keep an explicit `aria-label`; icon+text patterns must keep visible text.
-- Icons must not carry security-critical meaning by themselves.
-- Do not use emoji or Unicode symbols as UI icons.
-
-| Component | File             |
-| --------- | ---------------- |
-| Icons     | `src/ui/icons/` |
-
-### 9.6 Navigation / 导航
-
-**Nav Item** (left sidebar):
-
-```css
-.nav-item {
-  border-radius: var(--radius-sm); /* 0.375rem */
-}
-.nav-item.active {
-  background: var(--card);
-  border-color: var(--border);
-  box-shadow: var(--shadow-sm);
-}
-.nav-item.active::before {
-  background: var(--primary);
-  box-shadow: 0 0 0 3px var(--primary-muted);
-  /* 6px × 6px dot indicator */
-}
-```
-
-**Tabs**:
-
-```css
-.tabs {
-  background: var(--muted);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 0.35rem;
-  gap: 0.35rem;
-}
-.tabs button {
-  border-radius: var(--radius-sm);
-  transition: background 150ms var(--ease);
-}
-.tabs .tab-active {
-  background: var(--card);
-  border-color: var(--border);
-  box-shadow: var(--shadow-sm);
-}
-```
-
-### 9.7 Badges & Chips / 徽章与标签
-
-```css
-.badge {
-  border-radius: var(--radius-pill); /* 999px */
-  font-size: 0.72rem;
-  font-weight: 800;
-  padding: 0.24rem 0.5rem;
-  white-space: nowrap;
-}
-```
-
-| Class            | Background             | Border                  | Text Color       |
-| ---------------- | ---------------------- | ----------------------- | ---------------- |
-| Badge (primary)  | `var(--primary-muted)` | `rgba(62,124,177,0.15)` | `var(--primary)` |
-| Badge (dirty)    | `rgba(194,132,45,0.1)` | `rgba(194,132,45,0.22)` | `#6B4A1E`        |
-| Badge (clean)    | `rgba(45,138,94,0.08)` | `rgba(45,138,94,0.18)`  | `#1E5E40`        |
-| Deprecated badge | `rgba(194,132,45,0.1)` | `rgba(194,132,45,0.22)` | `#6B4A1E`        |
-
-### 9.7 Code & Password Display / 代码与密码展示
-
-```css
-.password-display {
-  background: var(--muted);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  color: var(--fg);
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  min-height: 2.5rem;
-  overflow-wrap: anywhere;
-  padding: 0.65rem;
-}
-
-.inline-code {
-  background: var(--muted);
-  border-radius: var(--radius-sm);
-  font-family: var(--font-mono);
-  font-size: 0.82rem;
-  padding: 0.15rem 0.4rem;
-}
-```
-
-### 9.8 Other Design-System Components / 其他基础组件
-
-| Component       | File                                       | Notes                                        |
-| --------------- | ------------------------------------------ | -------------------------------------------- |
-| SectionHeader   | `src/ui/design-system/SectionHeader.tsx`   | Title + description + trailing actions       |
-| ActionGroup     | `src/ui/design-system/ActionGroup.tsx`     | Button groups: default, entry, tool, compact |
-| DescriptionList | `src/ui/design-system/DescriptionList.tsx` | Read-only key-value grid                     |
-| EmptyState      | `src/ui/design-system/EmptyState.tsx`      | Dashed border placeholder                    |
-| Steps           | `src/ui/design-system/Steps.tsx`           | Done/current/blocked step indicators         |
-
----
-
-## 10. Layout System / 布局系统
-
-### 10.1 App Shell
-
-```
-┌────────────────────────────────────────────────────┐
-│ System Notice Host (top banner, full width)        │
-├──────────┬─────────────────────────────────────────┤
-│          │ Storage Data Card (compact, sticky)      │
-│ Nav Rail │ ─────────────────────────────────────── │
-│  220px   │          │                    ┌───────┐│
-│          │  Content │  Main Column       │Guidance││
-│  Brand   │  Scroll  │  max-width:1050px  │Drawer  ││
-│  Nav     │          │                    │ 300px  ││
-│  Status  │          │                    │        ││
-│  Actions │          │                    └───────┘│
-└──────────┴──────────┴─────────────────────────────┘
-```
-
-**Structure**:
-
-- `.app-shell`: `height: 100vh`, `flex-direction: column`, `overflow: hidden`
-- `.app-workbench`: `display: grid`, `grid-template-columns: 220px minmax(0, 1fr)`
-- `.content-column`: `display: flex`, `flex-direction: column`, `overflow: hidden`
-- `.content-scroll`: `flex: 1`, `overflow-y: auto`, `padding: 1.5rem`
-- `.content-area`: `display: flex`, `justify-content: safe center`
-- `.main-column`: `flex: 1`, `max-width: 1050px`, `min-width: 0`
-
-**Nav Rail**:
-
-```css
-.nav-rail {
-  background: var(--card);
-  border-right: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  padding: 1.25rem 1rem;
-  overflow-y: auto;
-}
-```
-
-**Guidance Drawer**:
-
-```css
-.guidance-drawer.expanded {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-lg);
-  width: 300px;
-}
-```
-
-### 10.2 Responsive Breakpoint / 响应式断点
-
-**Single breakpoint: `max-width: 960px`**
-
-At mobile:
-
-- Nav rail becomes full-width, horizontal layout
-- Content column loses overflow constraints
-- All multi-column grids collapse to single column
-- Guidance drawer becomes static full-width
-- Storage data compact card goes full-width
-
-### 10.3 Max Width Constraints
-
-| Element                                 | Max Width              |
-| --------------------------------------- | ---------------------- |
-| Main column                             | `1050px`               |
-| Form fields (`.form-stack label`)       | `560px`                |
-| Form textareas (`.form-stack textarea`) | `760px`                |
-| Verification selector                   | `560px`                |
-| Decrypt secret field                    | `calc(50% - 0.375rem)` |
-
-### 10.4 Page-Level Layout / 页面级布局规范
-
-`WorkspaceView` owns page-level orchestration: render `.page-notice-area` first when a notice exists, then render the active hash page body. Page components should focus on composing sections and cards, not reimplementing app shell layout.
-
-**Hash page skeletons / 页面骨架**:
-
-| Page | Structure |
-| ---- | --------- |
-| Space home / 空间主页 | Space overview, verification or session setup, migration summary, space operations |
-| Rules / 规则管理 | Rule-chain initialization, built-in rule cards, imported rule area, dev sample area |
-| Password groups / 密码组 | Password group panel and output adapter workflow |
-| Passwords / 密码管理 | Create-entry entrypoint, detached migration card, optional create form, entry list |
-| System tools / 系统工具 | Detached password tool, storageData compare tool |
-
-**Page notice placement / 页面通知位置**:
-
-- `.page-notice-area` appears above the page body and is labelled as page notices.
-- When a notice precedes `.section-card`, `.rules-section`, or `.entries-section`, spacing follows the existing sibling margin rules in `src/styles.css`.
-- Page notices are contextual; do not replace required form hints, safety explanations, or validation messages inside the page body.
-
-**SectionHeader usage / 区块标题用法**:
-
-- Major page sections should use one `SectionHeader` for title, description, and trailing actions.
-- Do not duplicate large page titles inside every nested card; nested cards should use tighter headings or `SectionHeader` only when they introduce a distinct workflow.
-- Primary actions belong in the `actions` slot when they control the whole section; row-level actions stay near the row/card they affect.
-
-**Content and form widths / 内容与表单宽度**:
-
-- Keep the main work surface inside `.main-column` (`max-width: 1050px`).
-- Standard form labels/fields max out at `560px`; large text inputs max out at `760px`.
-- Global rule selection uses a narrower `420px` control width to avoid overextended option labels.
-- Decrypt secret fields may use two-column width (`calc(50% - 0.375rem)`) on desktop and must collapse to a single column at the mobile breakpoint.
-
-**Responsive behavior / 响应式行为**:
-
-- The primary breakpoint is `max-width: 960px`.
-- App shell changes from the desktop workbench layout to a single-column flow.
-- Nav rail, topbar controls, storageData compact card, and guidance drawer become static full-width surfaces.
-- Multi-column grids, form grids, and paired secret fields collapse to one column.
-
-**Empty states and guidance / 空状态与指引**:
-
-- Use `.empty-state` or `EmptyState` inside the relevant list/card container when there is no data.
-- Empty states should describe the empty condition and point to the next local action, without floating outside the workflow they belong to.
-- Guidance and `Steps` are auxiliary navigation. They may summarize the next action, but they must not replace the page body's own safety copy or required form explanation.
-
----
-
-## 11. Dark Mode / 暗色模式
-
-### 11.1 Mechanism
-
-```html
-<html data-theme="dark"></html>
-```
-
-- Toggle: `src/ui/components/ThemeToggle.tsx`
-- Persistence: `localStorage` key `sc-theme`
-- Default: respects `prefers-color-scheme: dark`, falls back to `"light"`
-- CSS: `:root[data-theme="dark"]` overrides all color tokens
-
-### 11.2 Dark Mode Color Scheme
-
-```css
-:root[data-theme="dark"] {
-  color-scheme: dark;
-  /* All color tokens overridden — see §3.2 */
-}
-```
-
-### 11.3 PWA Theme Colors
-
-```html
-<!-- index.html -->
-<meta
-  name="theme-color"
-  content="#3E7CB1"
-  media="(prefers-color-scheme: light)"
-/>
-<meta
-  name="theme-color"
-  content="#0F1724"
-  media="(prefers-color-scheme: dark)"
-/>
-```
-
-### 11.4 Dark Mode Specific Rules
-
-- **Background**: Deep arctic blue (`#0F1724`), NOT pure black (`#000`)
-- **Surface distinction**: Use `--card` and `--muted` with 1px borders; shadows are less visible in dark mode
-- **Primary**: Lightened to `#5B9BD5` for visibility
-- **Text contrast**: All text must maintain 4.5:1 minimum against its background
-- **Code blocks**: `--muted` background with `--border` border
-- **Notice backgrounds**: Slightly higher opacity than light mode (dark backgrounds absorb less)
-
----
-
-## 12. Anti-Patterns / 反模式
-
-| #   | Anti-Pattern                                          | Reason / 原因                                                            |
-| --- | ----------------------------------------------------- | ------------------------------------------------------------------------ |
-| 1   | **AI purple/pink gradients**                          | Destroys trust for a security product; looks like a toy, not a vault     |
-| 2   | **Bright neon colors**                                | Disrupts the calm, professional mood; harms readability                  |
-| 3   | **Glassmorphism / heavy transparency**                | Security tools should feel solid and opaque, not see-through             |
-| 4   | **Excessive border-radius (> 0.75rem)**               | Pillowy shapes contradict Swiss precision and security tool expectations |
-| 5   | **Decorative box-shadows**                            | Shadows should serve surface hierarchy, not ornament                     |
-| 6   | **Emojis as icons**                                   | Use SVG icons (Lucide or Heroicons); emojis look unprofessional          |
-| 7   | **Animations > 300ms**                                | Security tools need responsive, instant-feeling interactions             |
-| 8   | **Pure black (#000) in dark mode**                    | Use `#0F1724` — deep blue-black is easier on eyes                        |
-| 9   | **Hardcoded hex colors**                              | Always reference `var(--token)` from this design system                  |
-| 10  | **Low contrast text**                                 | Minimum 4.5:1 for body text; 3:1 for large text (≥18px bold)             |
-| 11  | **Missing focus states**                              | Every interactive element must have visible `:focus-visible` styling     |
-| 12  | **Animating layout properties**                       | Never animate `width`, `height`, `top`, `left`; use `transform`          |
-| 13  | **New CSS without light+dark coverage**               | Every new color usage must have a dark mode override                     |
-| 14  | **Significant visual divergence from this Design.md** | This file is the single source of truth; deviations must be approved     |
-| 15  | **Removing security-critical copy for minimalism**    | Security workflows need explicit Chinese explanations and next steps     |
-
----
-
-## 13. Pre-Implementation Checklist / 实施前检查清单
-
-Before marking any UI change as complete:
-
-- [ ] No hardcoded hex colors — all colors use `var(--token)`
-- [ ] Light mode and dark mode both tested
-- [ ] Text contrast ≥ 4.5:1 (use browser DevTools accessibility panel)
-- [ ] Focus states visible for keyboard navigation
-- [ ] `cursor: pointer` on all clickable elements (buttons, links, interactive cards)
-- [ ] Hover states with smooth transitions (150–200ms)
-- [ ] `prefers-reduced-motion: reduce` respected
-- [ ] Responsive: tested at 375px, 768px, 1024px, 1440px
-- [ ] No border-radius values exceed `--radius-xl` (0.75rem)
-- [ ] No emojis used as icons
-- [ ] `npm run typecheck` passes
-- [ ] `npm run test` passes
-- [ ] No changes to security boundaries or data flow
-
----
-
-## 14. Migration Notes / 迁移注意事项
-
-### 14.1 From v2.1 (Warm Earth-Tone) to v2.2 (Glacier Blue)
-
-| Change        | Old                            | New                    |
-| ------------- | ------------------------------ | ---------------------- |
-| Primary color | `hsl(15, 65%, 52%)` terracotta | `#3E7CB1` glacier blue |
-| Background    | `hsl(38, 28%, 91%)` warm cream | `#F7F8FA` ice white    |
-| Card          | `hsl(35, 22%, 85%)` beige      | `#FFFFFF` pure white   |
-| Dark bg       | `hsl(40, 15%, 12%)` olive      | `#0F1724` arctic night |
-| Max radius    | `2rem`                         | `0.75rem`              |
-| Card radius   | `1.5rem`                       | `0.5rem`               |
-| Button radius | `0.75rem`                      | `0.375rem`             |
-| Shadows       | 4-layer soft shadows           | 3-layer minimal        |
-| PWA theme     | `#d25636` / `#3a2f24`          | `#3E7CB1` / `#0F1724`  |
-
-### 14.2 Files to Update
-
-| File                    | Changes                                              |
-| ----------------------- | ---------------------------------------------------- |
-| `src/styles.css`        | Full token replacement + style updates               |
-| `index.html`            | PWA theme-color meta tags                            |
-| `vite.config.ts`        | PWA manifest colors                                  |
-| `public/icons/icon.svg` | Recolor from terracotta to glacier blue              |
-| `src/ui/design-system/` | No API changes needed; components consume CSS tokens |
-
-### 14.3 Implementation Order
-
-1. Update CSS custom properties in `:root` and `:root[data-theme="dark"]`
-2. Replace all `var(--radius-2xl)` → `var(--radius)` and `var(--radius-3xl)` → `var(--radius-xl)`
-3. Update shadow tokens
-4. Update PWA theme colors in `index.html` and `vite.config.ts`
-5. Regenerate icons (`npm run generate-icons`)
-6. Run `npm run validate`
-7. Visual review by human
-
-### 14.4 Implementation Status / 实施状态
-
-> ⚠️ **截至 v2.3 规划时，v2.1 → v2.2 的迁移尚未落地到代码。**
->
-> `src/styles.css` 中的 CSS token 取值仍为 v2.1 warm-earth-tone（陶土橙）体系；`index.html` 和 `vite.config.ts` 的 PWA theme-color 仍为陶土橙/暖橄榄棕；`--radius-2xl` / `--radius-3xl` 仍在代码中定义且被大量引用；`--error` token 缺失；`--primary-muted` 缺失。
->
-> `src/ui/design-system/README.md` 中已包含本实施状态备忘，指向本文件（Design.md）与 `docs/v2.3-plan.md` 为权威。后续 Agent 读到此备忘时应以 Design.md 为目标状态，不要把过渡取值当作设计意图。
->
-> v2.3 阶段 1 负责完成 §14.3 的全部步骤，将本文件定义的 token 值真正写入代码。
-
----
-
-## 15. Version History / 版本历史
-
-| Version | Date       | Changes                                                                                                   |
-| ------- | ---------- | --------------------------------------------------------------------------------------------------------- |
-| 2.2.0   | 2026-06-26 | Complete redesign: Swiss Modernism 2.0 × Minimalism, Glacier Blue palette, reduced radii, minimal shadows |
-| 2.1.0   | (prior)    | Warm earth-tone design system (Anthropic-inspired)                                                        |
-
----
-
-_End of Design System — all UI changes must conform to this document._
+设计关键词：
+
+- 清晰：结构、状态、前置条件和后果必须可扫描。
+- 克制：减少装饰和视觉噪声，避免炫技式背景、渐变和大面积氛围图。
+- 稳定：表单、卡片、列表和操作区应保持尺寸与位置稳定，避免状态变化造成布局跳动。
+- 安全：安全关键文案不能因视觉极简被删除或弱化。
+
+## 应用布局
+
+应用使用后台式工作台布局：
+
+- 左侧 `NavRail`：品牌、主导航、空间范围或当前空间状态。
+- 右侧 `content-column`：顶部 storageData 栏、可滚动主内容区和 hash 路由页面。
+- 主内容区内置可收缩悬浮 `GuidanceDrawer`，用于全局用户操作指引。
+
+空间外主导航包含“空间工作台”和“系统工具”。进入空间后主导航顺序为“空间主页 / 规则管理 / 输出适配 / 密码管理”。不要把内部 `UiState`、调试状态机标签或实现细节直接展示给用户。
+
+移动端布局应转为上下堆叠，导航和按钮组允许换行，表单和列表转为单列。悬浮指引抽屉必须避免遮挡主体操作；必要时以静态全宽区域展示。
+
+## 视觉 Token
+
+颜色、圆角、阴影、字体、过渡和主题切换的实现权威在 `src/styles.css`。新增样式优先使用现有语义 token，不要在业务组件里长期硬编码颜色。
+
+核心方向：
+
+- 背景：低饱和浅灰蓝，暗色模式使用 Deep Arctic 深色背景。
+- 主色：Glacier Blue，承担主按钮、焦点、版本更新提示和关键行动强调。
+- 语义色：success、warning、error、info 必须通过语义 token 使用，不以单次场景新增临时颜色。
+- 字体：`--font-sans` 用于界面正文，`--font-mono` 用于代码、ID、hash、文件名等技术文本。
+- 圆角：默认克制，优先使用 `0.5rem` 附近尺度；不要创建大圆角卡片或胶囊化正文容器。
+- 阴影：仅用于层级和聚焦，不用于装饰性浮夸效果。
+
+暗色模式通过 `<html data-theme="dark">` 切换，由 `ThemeToggle` 控制，偏好保存在 `localStorage` key `sc-theme`。暗色模式不是独立风格，应保持同一信息层级和组件结构。
+
+## 组件原则
+
+项目没有第三方 UI 组件库。基础展示组件位于 `src/ui/design-system/`，业务展示组件位于 `src/ui/components/`，页面入口位于 `src/ui/pages/`。
+
+使用原则：
+
+- 优先复用 `Button`、`Card`、`SectionHeader`、`Field`、`ActionGroup`、`Notice`、`EmptyState`、`DescriptionList`、`Steps`。
+- 基础组件只处理展示、语义、可访问性和轻量状态，不引入业务 controller、WebCrypto、storageData、规则注册表或空间 policy。
+- 业务组件负责组合基础组件并传入 handler，不把密码生成、解密、迁移或空间校验逻辑下沉到基础层。
+- 新增 UI 模式前先判断是否能由现有基础组件组合；只有明确重复出现且有稳定语义时才新增基础组件或 variant。
+- 图标使用 `src/ui/icons/` 的本地 SVG React 组件，使用 `currentColor`，不得承载安全关键含义；安全相关动作必须有明确文字标签。
+
+## 页面模式
+
+页面主体应优先使用明确区块，而不是营销式 hero 或装饰性大卡片。常见页面模式：
+
+- 空间主页：空间概览、关系、校验、空间主密码设置、迁移情况、当前空间操作。
+- 规则管理：规则链状态、声明式导入规则、初始化前置说明。
+- 输出适配：密码组和输出策略，强调适配只发生在核心密码解密后。
+- 密码管理：条目列表、新建、解密、编辑、废弃和记忆提示。
+- 系统工具：游离密码临时预览和 storageData 比较工具。
+
+页面级通知只说明当前页面或空间状态、风险、限制和门禁原因。普通操作指导优先进入全局 Guidance，但安全关键说明必须保留在页面主体首次出现或关键操作前。
+
+## Guidance 与通知
+
+通知分层：
+
+- 系统级通知：跨页面、操作结果或浏览器能力相关；不得包含隐私字段。
+- 页面级通知：当前页面状态、限制和门禁原因。
+- 区域级反馈：某个卡片或表单的成功、失败、等待状态。
+- 浮动操作反馈：短生命周期的复制、保存、跳转反馈。
+
+全局 Guidance 由 `src/ui/guidance.ts` 根据 controller 状态计算，`GuidanceDrawer` 和 `GuidancePanel` 只负责展示。卡片状态应明确属于“下一步 / 可用操作 / 相关流程 / 受阻流程”。Guidance 不保存已读状态，不保存敏感信息。
+
+## 安全文案保护
+
+不得为了视觉极简删除或弱化安全关键说明。以下概念首次出现或关键操作前必须保留必要中文说明：
+
+- `storageData`
+- `master_password`
+- `entrySecret`
+- `encrypted_memory_hint`
+- 空间校验
+- 规则链
+- 输出适配
+- 迁移模式
+- 历史空间
+- 归档空间
+
+安全文案应清楚说明前置条件、数据是否持久化、操作后果和失败处理。不要把底层异常直接展示给用户；WebCrypto、File System Access API 或安全上下文缺失时，应给出明确中文阻断提示。
+
+## 响应式与可访问性
+
+- 最小宽度按 320px 设备考虑，所有文本必须在父容器内换行或收缩，不得溢出按钮、卡片或表格。
+- 表单控件应有可见 label 或等价的无障碍名称。
+- 按钮文案应描述结果，不使用只有图标且无标题的安全关键动作。
+- loading、disabled、success、error 状态必须可由文本理解，不只依赖颜色。
+- 焦点态使用 `--ring` 或现有焦点样式，不能移除键盘可见焦点。
+
+## 反模式
+
+禁止或避免：
+
+- 为了兼容普通局域网 HTTP、App 内置浏览器或 `file://` 环境而降低 WebCrypto 安全边界。
+- 在 UI 中实现目录监听、自动同步、自动合并、后端同步、账号系统或云端服务。
+- 将 `entrySecret`、规则输入、明文提示、密码校验材料或可重建派生输入的元数据写入存储、URL 或浏览器持久状态。
+- 使用大面积装饰渐变、背景光斑、营销 hero、嵌套卡片或无信息密度的视觉占位。
+- 以图标、颜色或布局暗示安全含义但缺少文字说明。
+- 在业务组件中散写长期颜色、阴影和布局常量，绕过 `src/styles.css` token。
+- 为单个一次性页面效果新增全局 token 或基础组件 variant。

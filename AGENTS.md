@@ -4,7 +4,7 @@
 
 Snow Cues 是一个纯前端、本地优先的密码派生与加密存储系统。正式推荐通过 Cloudflare Pages 分发静态构建产物，以 HTTPS 安全上下文解决移动端 WebCrypto 可用性问题。Cloudflare Pages 只用于分发前端代码，不承载用户业务数据、账号系统或后端同步。
 
-v2.3 版本以用户显式维护的 `storageData` 文件夹作为唯一业务数据源。UI 设计系统采用 v2.2 引入的 Swiss Modernism × Minimalism 冰川蓝（详见 `design/Design.md`）。Syncthing、Git 同步和冲突自动合并不属于应用逻辑。不要在应用内实现本地目录监听、自动同步、自动合并、后端同步、账号系统或云端服务。
+v2.3 版本以用户显式维护的 `storageData` 文件夹作为唯一业务数据源。UI 采用 Swiss Modernism × Minimalism 冰川蓝方向，项目级设计规范以 `design/Design.md` 为准，样式实现以 `src/styles.css` 的 design tokens 为准，内部基础组件维护以 `src/ui/design-system/README.md` 为准。Syncthing、Git 同步和冲突自动合并不属于应用逻辑。不要在应用内实现本地目录监听、自动同步、自动合并、后端同步、账号系统或云端服务。
 
 本地开发可使用 `localhost` / `127.0.0.1`。不要把普通局域网 HTTP（例如 `http://192.168.x.x`）、移动端 App 内置浏览器或直接打开打包 HTML 文件视为可靠运行环境；这些环境可能不提供 `crypto.subtle`、File System Access API 或完整模块加载能力。
 
@@ -17,7 +17,7 @@ v2.3 版本以用户显式维护的 `storageData` 文件夹作为唯一业务数
 - 涉及编码风格、React/TypeScript 拆分、测试归属、重构边界时，读取 `docs/coding-rules.md`。
 - 涉及密码、加密、session、`storageData`、IndexedDB、隐私字段或安全红线时，读取 `docs/security-boundaries.md`。
 - 需要给 Codex 派发后续任务时，可参考 `docs/ai-task-template.md`。
-- 涉及 UI 样式、颜色、字体、间距、圆角、阴影、组件外观或主题变更时，读取 `design/Design.md`（v2.2 Swiss Modernism / Glacier Blue 设计系统，是当前唯一设计权威）。需要了解设计决策背景、为什么从暖大地色切换到冰川蓝、以及新旧对比时，读取 `design/design-review.md`。
+- 涉及 UI 设计、页面布局、组件外观、颜色、字体、间距、圆角、阴影、主题或安全文案呈现时，读取 `design/Design.md`。涉及具体 token 或样式实现时，再读取 `src/styles.css`。涉及内部基础组件复用、扩展或迁移时，再读取 `src/ui/design-system/README.md`。
 - 大范围任务、需求不清或跨越多个领域时，组合读取相关 docs。
 
 ## 技术栈与命令
@@ -29,7 +29,7 @@ v2.3 版本以用户显式维护的 `storageData` 文件夹作为唯一业务数
 - `npm run typecheck`：执行 `tsc -b --pretty false`。
 - `npm run test`：执行 `vitest run`。
 - `npm run build`：先执行 `tsc -b`，再执行 `vite build`。
-- `npm run validate`：依次执行 typecheck、test 和 build。
+- `npm run validate`：依次执行 typecheck、lint、format:check、test 和 build。
 
 修改文件后不需要启动本地预览项目或浏览器预览验证；用户会亲自做这一步。可以运行类型检查、测试和构建，但不要为了视觉检查启动 `npm run dev` 或 `npm run preview`。
 
@@ -56,8 +56,9 @@ v2.3 版本以用户显式维护的 `storageData` 文件夹作为唯一业务数
 - `src/space/`：空间 policy、诊断、克隆、导入导出和迁移编排。
 - `src/ui/`：React UI 层，页面、组件和业务 controller hooks。
 - `src/ui/icons/`：本地 SVG React 图标系统，纯展示组件，使用 `currentColor`，不得承载安全关键含义。
-- `design/Design.md`：v2.2 设计系统权威文档（Swiss Modernism × Minimalism，Glacier Blue 冰川蓝）。所有 UI 样式变更都必须遵循此文档。
-- `design/design-review.md`：v2.1→v2.2 设计评审文档。包含完整调研数据、问题诊断、设计思想与新旧对比，阐明"为什么"切换。
+- `design/Design.md`：项目级 UI 设计规范，记录布局、视觉 token 使用原则、组件原则、页面模式、Guidance/通知、安全文案保护和反模式。
+- `src/styles.css`：当前 Glacier Blue 设计 token、双主题、布局和组件 class 的实现权威。
+- `src/ui/design-system/README.md`：内部基础组件、设计系统维护边界和迁移状态说明。
 - `src/App.tsx`：薄入口，只装配 `useAppController` 与 `AppView`。
 - `src/ui/hooks/usePwaUpdate.ts`：Service Worker prompt 注册逻辑，测试环境安全降级。
 - `src/ui/components/PwaUpdateBanner.tsx`：PWA 版本更新横幅组件，独立于系统通知通道。

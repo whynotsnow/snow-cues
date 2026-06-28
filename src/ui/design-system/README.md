@@ -1,8 +1,10 @@
-# UI Design System 摸底与维护说明
+# UI Design System 组件库维护说明
 
 ## 当前 UI 现状
 
-Snow Cues v2.3 当前是纯前端、本地优先应用，UI 由 React 组件和 `src/styles.css` 手写样式组成，没有第三方 UI 组件库。应用外壳是三栏工作台：左侧导航与 storageData / 空间状态，中间 hash 路由页面，右侧全局用户操作指引。
+Snow Cues v2.3 当前是纯前端、本地优先应用，UI 由 React 组件和 `src/styles.css` 手写样式组成，没有第三方 UI 组件库。项目级 UI 规范见 `design/Design.md`；本文只记录 `src/ui/design-system/` 内部基础组件库的边界、组件清单和维护方式。
+
+当前应用外壳是左侧垂直导航轨道 + 右侧内容区的工作台：左侧 `NavRail` 承载品牌、页面导航和空间状态；右侧 `content-column` 承载顶部 storageData 栏、hash 路由页面和可收缩悬浮操作指引抽屉。
 
 现有 UI 组件主要分布在 `src/ui/components/`、`src/ui/pages/` 和 `src/ui/notifications/`。当前主要表单、卡片、按钮组和只读信息展示已开始通过 `src/ui/design-system/` 组合；少量业务专用结构仍保留原 class，以便后续在不改业务流程的前提下继续收敛。
 
@@ -12,14 +14,14 @@ Snow Cues v2.3 当前是纯前端、本地优先应用，UI 由 React 组件和 
 - 表单：文本输入、密码输入、数字输入、下拉框、多行文本、复选框，以及 label + hint 模式。
 - 卡片：`section-card`、`rule-card`、`entry-card`、`password-group-card`、`space-index-card`、`guidance-card` 等多套近似结构。
 - 通知：系统通知、页面通知、区域反馈和浮动操作反馈，底层已由 `Notice` 承载。
-- 布局：三栏工作台、页面主区域、按钮组、双列表单网格。
+- 布局：导航轨道、内容区、顶部 storageData 栏、悬浮操作指引抽屉、页面主区域、按钮组、双列表单网格。
 - 只读信息：`entry-readonly-grid` 被条目、空间索引等场景复用。
 - 空状态：`.empty-state` 用于列表为空。
 - 步骤指引：右侧 Guidance 使用步骤列表展示下一步、已完成和受阻状态。
 
 ## 设计 token 方向
 
-> **权威以 `design/Design.md` 为准。** 本节只描述 token 体系的组织方式，不重复罗列具体取值；颜色、圆角、阴影、间距、字体、过渡的权威定义见 Design.md 对应章节。
+> **项目级规范以 `design/Design.md` 为准，当前实现权威以 `src/styles.css` 为准。** 本节只描述基础组件库使用 token 的方式与维护边界；颜色、圆角、阴影、字体、过渡和布局 class 的具体取值都在 `src/styles.css` 中维护。
 
 设计系统采用 v2.2 确立的 Swiss Modernism × Minimalism（冰川蓝 / Glacier Blue）方向。token 统一在 `src/styles.css` 的 `:root` 与 `:root[data-theme="dark"]` 中以 CSS 自定义属性管理，覆盖以下类别：
 
@@ -32,9 +34,7 @@ Snow Cues v2.3 当前是纯前端、本地优先应用，UI 由 React 组件和 
 
 暗色模式通过 `<html data-theme="dark">` 切换，由 `src/ui/components/ThemeToggle.tsx` 控制，偏好持久化到 `localStorage` key `sc-theme`。
 
-新增样式时，必须使用语义 token（如 `var(--border)`、`var(--muted-fg)`），禁止新增长期硬编码 hex 颜色或散写 `rgba(...)` 语义色。
-
-> **实施状态备忘**：v2.2 Glacier Blue token 在 `src/styles.css` 的落地工作由 v2.3 阶段 1 完成。在此之前若发现代码中仍有 warm-earth-tone（陶土橙）取值，属于待迁移的过渡状态，请以 `design/Design.md` 与 `docs/v2.3-plan.md` 为准，不要把过渡取值当作目标。
+新增样式时，必须使用语义 token（如 `var(--border)`、`var(--muted-fg)`），禁止新增长期硬编码 hex 颜色或散写 `rgba(...)` 语义色。新增 token 前先确认它是否能服务多个组件或明确语义，不为单个一次性装饰新增全局 token。
 
 ## 组件分层规则
 
@@ -63,7 +63,7 @@ Snow Cues v2.3 当前是纯前端、本地优先应用，UI 由 React 组件和 
 - 基础层落地：已建立 design-system、README、barrel export 和最小渲染测试。
 - 中间层迁移：规则管理、新建密码、密码组、输出策略字段、空间索引、游离密码、空间概览和测试工具已迁入基础组件。
 - 复杂业务卡片迁移：`EntryCard`、迁移情况卡片和迁移条目卡片已替换基础展示件，业务 handler、门禁表达式和安全流程保持在原业务层。
-- Token 体系落地：全局颜色、圆角、阴影、缓动、字体已通过 CSS 自定义属性统一管理，支持亮/暗双主题。**当前取值仍为过渡的 warm-earth-tone（陶土橙），向 v2.2 Glacier Blue 的收敛由 v2.3 阶段 1 完成**；详见 `design/Design.md` 与 `docs/v2.3-plan.md`。
+- Token 体系落地：全局颜色、圆角、阴影、缓动、字体已通过 CSS 自定义属性统一管理，支持亮/暗双主题；当前取值已收敛为 Glacier Blue 方向，具体实现见 `src/styles.css`。
 
 后续路线：
 

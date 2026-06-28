@@ -8,7 +8,7 @@
 - 跨页面共享状态放在 `useAppController` 或其组合的 controller hook 中。表单输入、临时展开状态、条目可见状态应优先下放到局部 hook。
 - 组件文件不要重新引入 WebCrypto、IndexedDB 或规则注册表等底层模块；需要业务能力时通过 hook 暴露的 handler 传入。
 - 新增条目操作时，先扩展 `src/ui/entryCapabilities.ts` 和测试，再接入组件。
-- 新增全局用户操作指引时，优先在 `src/ui/guidance.ts` 新增独立 builder，明确 card 是“下一步 / 可用操作 / 相关流程 / 受阻流程”，不要把业务判断塞进 `GuidancePanel`。
+- 新增全局用户操作指引时，优先在 `src/ui/guidance.ts` 新增独立 builder，明确 card 是“下一步 / 可用操作 / 相关流程 / 受阻流程”，不要把业务判断塞进 `GuidanceDrawer` 或 `GuidancePanel`。
 - UI 文案删减不得以视觉极简为理由删除安全关键说明。涉及 `storageData`、`master_password`、`entrySecret`、`encrypted_memory_hint`、空间校验、规则链、输出适配、迁移模式、历史空间或归档空间时，如需压缩文案，必须保留同等语义的信息、风险说明、操作前置条件和下一步指引。
 
 ## 浏览器能力与移动端兼容
@@ -37,7 +37,7 @@
 ## 测试归属
 
 - `src/App.test.tsx` 只保留端到端冒烟主链路，例如进入存储空间、设置空间主密码、初始化规则链、新建保存、解密和基本存储边界检查。不要继续把新的 UI 流程用例堆回这个文件。
-- `src/ui/__tests__/notifications.test.tsx` 覆盖系统通知、页面通知、浮动操作反馈和右侧全局用户操作指引去重。
+- `src/ui/__tests__/notifications.test.tsx` 覆盖系统通知、页面通知、浮动操作反馈和全局用户操作指引去重。
 - `src/ui/__tests__/space-access.test.tsx` 覆盖进入/离开空间、临时空间、设置空间主密码、已有密码空间校验、空间状态门禁和校验条目切换。
 - `src/ui/__tests__/password-entries.test.tsx` 覆盖密码条目新建、解密、记忆提示、编辑、废弃和只读门禁等条目级流程。
 - `src/ui/__tests__/password-groups.test.tsx` 覆盖密码组管理和解密后的输出适配流程。
