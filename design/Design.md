@@ -76,6 +76,15 @@
 | `--error`   | `#C74B4B` | Error / 错误   |
 | `--info`    | `#4B7FC7` | Info / 信息    |
 
+**Semantic surfaces / 语义表面色**:
+
+| Semantic | Muted background | Border | Text |
+| --- | --- | --- | --- |
+| success | `--success-muted: rgba(45,138,94,0.08)` | `--success-border: rgba(45,138,94,0.18)` | `--success-fg: #1E5E40` |
+| warning | `--warning-muted: rgba(194,132,45,0.07)` | `--warning-border: rgba(194,132,45,0.22)` | `--warning-fg: #6B4A1E` |
+| error | `--error-muted: rgba(199,75,75,0.06)` | `--error-border: rgba(199,75,75,0.2)` | `--error-fg: #6B2E2E` |
+| info | `--info-muted: rgba(75,127,199,0.06)` | `--info-border: rgba(75,127,199,0.18)` | `--info-fg: #2D4A78` |
+
 ### 3.2 Dark Mode / 暗色模式
 
 | Token              | Value                   | Role / 角色                              |
@@ -104,18 +113,27 @@
 | `--error`   | `#D96363` | Error   |
 | `--info`    | `#6B9FD9` | Info    |
 
+**Semantic surfaces / 语义表面色 (dark)**:
+
+| Semantic | Muted background | Border | Text |
+| --- | --- | --- | --- |
+| success | `--success-muted: rgba(64,168,110,0.12)` | `--success-border: rgba(64,168,110,0.3)` | `--success-fg: #8FD7AA` |
+| warning | `--warning-muted: rgba(217,164,65,0.12)` | `--warning-border: rgba(217,164,65,0.3)` | `--warning-fg: #F0C978` |
+| error | `--error-muted: rgba(217,99,99,0.12)` | `--error-border: rgba(217,99,99,0.3)` | `--error-fg: #F2A0A0` |
+| info | `--info-muted: rgba(107,159,217,0.12)` | `--info-border: rgba(107,159,217,0.28)` | `--info-fg: #A8CFF5` |
+
 ### 3.3 Notice Backgrounds / 通知背景
 
-Notice backgrounds use the semantic color at ~8% opacity with matching borders at ~20% opacity:
+Notice backgrounds use the semantic surface tokens:
 
-| Class             | Background              | Border                  | Text      |
-| ----------------- | ----------------------- | ----------------------- | --------- |
-| `.notice-info`    | `rgba(75,127,199,0.06)` | `rgba(75,127,199,0.18)` | `#2D4A78` |
-| `.notice-success` | `rgba(45,138,94,0.07)`  | `rgba(45,138,94,0.18)`  | `#1E5E40` |
-| `.notice-warning` | `rgba(194,132,45,0.07)` | `rgba(194,132,45,0.22)` | `#6B4A1E` |
-| `.notice-error`   | `rgba(199,75,75,0.06)`  | `rgba(199,75,75,0.2)`   | `#6B2E2E` |
+| Class             | Background             | Border             | Text           |
+| ----------------- | ---------------------- | ------------------ | -------------- |
+| `.notice-info`    | `var(--info-muted)`    | `var(--info-border)`    | `var(--info-fg)`    |
+| `.notice-success` | `var(--success-muted)` | `var(--success-border)` | `var(--success-fg)` |
+| `.notice-warning` | `var(--warning-muted)` | `var(--warning-border)` | `var(--warning-fg)` |
+| `.notice-error`   | `var(--error-muted)`   | `var(--error-border)`   | `var(--error-fg)`   |
 
-Dark mode notice colors use slightly higher opacity backgrounds and lighter text.
+Dark mode notice colors come from the same token names under `:root[data-theme="dark"]`.
 
 ### 3.4 Color Usage Rules / 用色规则
 
