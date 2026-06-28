@@ -1,6 +1,6 @@
-# Snow Cues v2.1
+# Snow Cues v2.3
 
-Snow Cues v2.1 是一个纯浏览器运行的安全本地优先密码系统。系统基于 `master_password` 与单条密码的 `entrySecret`（关键密钥，旧名 `runtime_salt`）派生密码，只在用户维护的 `storageData` 文件夹中加密保存派生后的输出，不保存关键密钥或可重建关键密钥的材料。
+Snow Cues v2.3 是一个纯浏览器运行的安全本地优先密码系统。系统基于 `master_password` 与单条密码的 `entrySecret`（关键密钥，旧名 `runtime_salt`）派生密码，只在用户维护的 `storageData` 文件夹中加密保存派生后的输出，不保存关键密钥或可重建关键密钥的材料。
 
 ## 技术栈
 
