@@ -617,6 +617,52 @@ At mobile:
 | Verification selector                   | `560px`                |
 | Decrypt secret field                    | `calc(50% - 0.375rem)` |
 
+### 10.4 Page-Level Layout / 页面级布局规范
+
+`WorkspaceView` owns page-level orchestration: render `.page-notice-area` first when a notice exists, then render the active hash page body. Page components should focus on composing sections and cards, not reimplementing app shell layout.
+
+**Hash page skeletons / 页面骨架**:
+
+| Page | Structure |
+| ---- | --------- |
+| Space home / 空间主页 | Space overview, verification or session setup, migration summary, space operations |
+| Rules / 规则管理 | Rule-chain initialization, built-in rule cards, imported rule area, dev sample area |
+| Password groups / 密码组 | Password group panel and output adapter workflow |
+| Passwords / 密码管理 | Create-entry entrypoint, detached migration card, optional create form, entry list |
+| System tools / 系统工具 | Detached password tool, storageData compare tool |
+
+**Page notice placement / 页面通知位置**:
+
+- `.page-notice-area` appears above the page body and is labelled as page notices.
+- When a notice precedes `.section-card`, `.rules-section`, or `.entries-section`, spacing follows the existing sibling margin rules in `src/styles.css`.
+- Page notices are contextual; do not replace required form hints, safety explanations, or validation messages inside the page body.
+
+**SectionHeader usage / 区块标题用法**:
+
+- Major page sections should use one `SectionHeader` for title, description, and trailing actions.
+- Do not duplicate large page titles inside every nested card; nested cards should use tighter headings or `SectionHeader` only when they introduce a distinct workflow.
+- Primary actions belong in the `actions` slot when they control the whole section; row-level actions stay near the row/card they affect.
+
+**Content and form widths / 内容与表单宽度**:
+
+- Keep the main work surface inside `.main-column` (`max-width: 1050px`).
+- Standard form labels/fields max out at `560px`; large text inputs max out at `760px`.
+- Global rule selection uses a narrower `420px` control width to avoid overextended option labels.
+- Decrypt secret fields may use two-column width (`calc(50% - 0.375rem)`) on desktop and must collapse to a single column at the mobile breakpoint.
+
+**Responsive behavior / 响应式行为**:
+
+- The primary breakpoint is `max-width: 960px`.
+- App shell changes from the desktop workbench layout to a single-column flow.
+- Nav rail, topbar controls, storageData compact card, and guidance drawer become static full-width surfaces.
+- Multi-column grids, form grids, and paired secret fields collapse to one column.
+
+**Empty states and guidance / 空状态与指引**:
+
+- Use `.empty-state` or `EmptyState` inside the relevant list/card container when there is no data.
+- Empty states should describe the empty condition and point to the next local action, without floating outside the workflow they belong to.
+- Guidance and `Steps` are auxiliary navigation. They may summarize the next action, but they must not replace the page body's own safety copy or required form explanation.
+
 ---
 
 ## 11. Dark Mode / 暗色模式
