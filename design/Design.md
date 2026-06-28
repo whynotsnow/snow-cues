@@ -22,6 +22,9 @@
 | 5   | **Cool confidence / 冷静自信**                 | The "Snow" brand evokes clarity, ice, mountains — crisp and unshakeable.     |
 | 6   | **Consistent rhythm / 一致的节奏**             | Systematic spacing, consistent rounding, predictable interactions.           |
 | 7   | **Accessible contrast / 无障碍对比度**         | All text meets WCAG AA (4.5:1 minimum). Focus states are visible.            |
+| 8   | **Security-critical copy / 安全关键文案保护**  | Minimalism must not remove required explanations for sensitive workflows.    |
+
+Security-critical copy must remain visible at first mention or before the relevant action. This applies to `storageData`, `master_password`, `entrySecret`, `encrypted_memory_hint`, space verification, rule chains, output adaptation, migration mode, deprecated spaces, and archived spaces.
 
 ---
 
@@ -732,6 +735,7 @@ At mobile:
 | 12  | **Animating layout properties**                       | Never animate `width`, `height`, `top`, `left`; use `transform`          |
 | 13  | **New CSS without light+dark coverage**               | Every new color usage must have a dark mode override                     |
 | 14  | **Significant visual divergence from this Design.md** | This file is the single source of truth; deviations must be approved     |
+| 15  | **Removing security-critical copy for minimalism**    | Security workflows need explicit Chinese explanations and next steps     |
 
 ---
 

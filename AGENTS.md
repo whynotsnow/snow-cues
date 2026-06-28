@@ -55,6 +55,7 @@ v2.3 版本以用户显式维护的 `storageData` 文件夹作为唯一业务数
 - `src/storage-data/`：2.1 `storageData` 文件格式、schema、hash、diff、repository、存储类型、字段白名单和文件夹访问。
 - `src/space/`：空间 policy、诊断、克隆、导入导出和迁移编排。
 - `src/ui/`：React UI 层，页面、组件和业务 controller hooks。
+- `src/ui/icons/`：本地 SVG React 图标系统，纯展示组件，使用 `currentColor`，不得承载安全关键含义。
 - `design/Design.md`：v2.2 设计系统权威文档（Swiss Modernism × Minimalism，Glacier Blue 冰川蓝）。所有 UI 样式变更都必须遵循此文档。
 - `design/design-review.md`：v2.1→v2.2 设计评审文档。包含完整调研数据、问题诊断、设计思想与新旧对比，阐明"为什么"切换。
 - `src/App.tsx`：薄入口，只装配 `useAppController` 与 `AppView`。
@@ -72,6 +73,7 @@ v2.3 版本以用户显式维护的 `storageData` 文件夹作为唯一业务数
 - 不用纯 JavaScript 密码学库替代核心 WebCrypto 链路，不为了兼容非安全上下文而降低 PBKDF2、HMAC、AES-GCM、SHA-256 或 non-extractable `CryptoKey` 安全边界。
 - 遇到 `crypto.subtle`、安全上下文或文件夹访问能力缺失时，应在 UI 中给出明确中文阻断提示，引导使用 Cloudflare Pages HTTPS 正式地址或受信任的本机 `localhost` 环境。
 - 不把派生输入或单条密码可重建派生输入的元数据写入 `storageData`、IndexedDB、localStorage、sessionStorage、URL 或其他文件。
+- 不为了视觉极简删除安全关键文案；`storageData`、`master_password`、`entrySecret`、`encrypted_memory_hint`、空间校验、规则链、输出适配、迁移模式、历史空间和归档空间必须在首次出现或关键操作前保留必要中文说明。
 - 不把 `dist/` 作为源码提交，除非用户明确要求提交构建产物。
 
 ## Git 提交规则

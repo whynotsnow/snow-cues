@@ -9,6 +9,7 @@
 - 组件文件不要重新引入 WebCrypto、IndexedDB 或规则注册表等底层模块；需要业务能力时通过 hook 暴露的 handler 传入。
 - 新增条目操作时，先扩展 `src/ui/entryCapabilities.ts` 和测试，再接入组件。
 - 新增全局用户操作指引时，优先在 `src/ui/guidance.ts` 新增独立 builder，明确 card 是“下一步 / 可用操作 / 相关流程 / 受阻流程”，不要把业务判断塞进 `GuidancePanel`。
+- UI 文案删减不得以视觉极简为理由删除安全关键说明。涉及 `storageData`、`master_password`、`entrySecret`、`encrypted_memory_hint`、空间校验、规则链、输出适配、迁移模式、历史空间或归档空间时，如需压缩文案，必须保留同等语义的信息、风险说明、操作前置条件和下一步指引。
 
 ## 浏览器能力与移动端兼容
 
