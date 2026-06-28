@@ -9,7 +9,10 @@ import {
 } from "../design-system";
 import { Notice } from "../notifications/Notice";
 import type { AppController } from "../useAppController";
-import { StorageDataSaveControls } from "./StorageDataSaveControls";
+import {
+  StorageDataSaveControls,
+  StorageDataSaveFeedback
+} from "./StorageDataSaveControls";
 
 type StorageDataWorkspaceCardProps = {
   controller: AppController;
@@ -41,18 +44,30 @@ export function StorageDataWorkspaceCard({
     : canUseCoreCrypto
       ? "已进入空间。为了避免会话与文件内容错位，切换或重新加载存储数据前需要先离开空间。"
       : "当前运行环境缺少核心加密能力，不能打开或创建存储数据。";
+  const savedAtText = formatStorageDataSavedAt(storageDataUpdatedAt);
+  const dirtyStatusText = storageDataDirty ? "有未保存改动" : "已同步";
 
   if (!outsideSpace) {
     const compactItems = [
-      { label: "数据集", value: formatCompactStorageDataId(storageDataId) },
+      {
+        label: "数据集",
+        value: (
+          <span title={storageDataId || "未打开"}>
+            {formatCompactStorageDataId(storageDataId)}
+          </span>
+        )
+      },
       {
         label: "revision",
         value: storageDataOpened ? String(storageDataRevision) : "无"
       },
       {
-        label: "改动",
-        value: storageDataDirty ? "未保存" : "已同步",
-        tone: storageDataDirty ? "dirty" : "clean"
+        label: "最近保存",
+        value: savedAtText
+      },
+      {
+        label: "加载状态",
+        value: "空间内已锁定"
       }
     ];
 
@@ -61,33 +76,40 @@ export function StorageDataWorkspaceCard({
         className="storage-data-card storage-data-card-compact"
         aria-label="当前存储数据文件"
       >
-        <div className="storage-data-compact-header">
+        <div className="storage-data-card-header">
           <div>
             <h2>存储数据</h2>
             <p>空间内已锁定当前加载文件；如需切换，请先离开空间。</p>
           </div>
-          <span className="storage-data-lock-badge">空间内锁定</span>
+          <div className="storage-data-status-group">
+            <span
+              className="storage-data-status-badge storage-data-status-locked"
+              aria-label="加载状态：空间内锁定"
+            >
+              空间内锁定
+            </span>
+            <span
+              className={
+                storageDataDirty
+                  ? "storage-data-status-badge storage-data-status-dirty"
+                  : "storage-data-status-badge storage-data-status-clean"
+              }
+              aria-label={`改动状态：${dirtyStatusText}`}
+            >
+              {dirtyStatusText}
+            </span>
+          </div>
         </div>
-        <div className="storage-data-compact-body">
-          <dl className="storage-data-compact-list">
-            {compactItems.map((item) => (
-              <div
-                className={
-                  item.tone
-                    ? `storage-data-compact-item storage-data-compact-item-${item.tone}`
-                    : "storage-data-compact-item"
-                }
-                key={item.label}
-              >
-                <dt>{item.label}</dt>
-                <dd>{item.value}</dd>
-              </div>
-            ))}
-          </dl>
+        <div className="storage-data-layout">
+          <DescriptionList
+            className="storage-data-meta-grid storage-data-meta-grid-compact"
+            items={compactItems}
+          />
           {storageDataOpened ? (
             <StorageDataSaveControls controller={controller} />
           ) : null}
         </div>
+        <StorageDataSaveFeedback controller={controller} />
       </Card>
     );
   }
@@ -96,22 +118,36 @@ export function StorageDataWorkspaceCard({
     <Card className="storage-data-card" aria-label="当前存储数据文件">
       <SectionHeader
         actions={
-          <ActionGroup variant="tool">
-            <Button
-              disabled={!canChangeLoadedStorageData}
-              onClick={() => void handleCreateStorageData()}
-            >
-              新建存储数据
-            </Button>
-            {browserCapabilities.storageFolderAccessAvailable ? (
-              <Button
-                disabled={!canUseFolderAccess}
-                onClick={() => void handleOpenStorageDataFolder()}
+          <div className="storage-data-header-tools">
+            {storageDataOpened ? (
+              <span
+                className={
+                  storageDataDirty
+                    ? "storage-data-status-badge storage-data-status-dirty"
+                    : "storage-data-status-badge storage-data-status-clean"
+                }
+                aria-label={`改动状态：${dirtyStatusText}`}
               >
-                打开存储数据
-              </Button>
+                {dirtyStatusText}
+              </span>
             ) : null}
-          </ActionGroup>
+            <ActionGroup variant="tool">
+              <Button
+                disabled={!canChangeLoadedStorageData}
+                onClick={() => void handleCreateStorageData()}
+              >
+                新建存储数据
+              </Button>
+              {browserCapabilities.storageFolderAccessAvailable ? (
+                <Button
+                  disabled={!canUseFolderAccess}
+                  onClick={() => void handleOpenStorageDataFolder()}
+                >
+                  打开存储数据
+                </Button>
+              ) : null}
+            </ActionGroup>
+          </div>
         }
         description={`Snow Cues 2.3 以你维护的 storageData 文件夹作为唯一业务数据源。${changeLockedHint}`}
         title="存储数据"
@@ -162,37 +198,45 @@ export function StorageDataWorkspaceCard({
         ) : null}
         {storageDataOpened ? (
           <>
-            <DescriptionList
-              items={[
-                { label: "存储数据 ID", value: storageDataId },
-                { label: "当前 revision", value: String(storageDataRevision) },
-                {
-                  label: "最近保存",
-                  value: storageDataUpdatedAt
-                    ? new Date(storageDataUpdatedAt).toLocaleString("zh-CN", {
-                        hour12: false
-                      })
-                    : "未保存"
-                },
-                {
-                  label: "改动状态",
-                  value: storageDataDirty ? "有未保存改动" : "已同步到当前草稿"
-                },
-                {
-                  label: "加载状态",
-                  value: canChangeLoadedStorageData
-                    ? "可更换文件"
-                    : "空间内已锁定"
-                }
-              ]}
-            />
-            <StorageDataSaveControls controller={controller} />
-            {storageDataDraftText ? (
-              <TextareaField
-                label="未保存草稿文件内容"
-                onChange={() => undefined}
-                value={storageDataDraftText}
+            <div className="storage-data-card-header storage-data-card-header-opened">
+              <div>
+                <h3>当前文件</h3>
+                <p>保存前请确认外部同步已完成；空保存会被拒绝。</p>
+              </div>
+            </div>
+            <div className="storage-data-layout">
+              <DescriptionList
+                className="storage-data-meta-grid"
+                items={[
+                  { label: "存储数据 ID", value: storageDataId },
+                  {
+                    label: "revision",
+                    value: String(storageDataRevision)
+                  },
+                  {
+                    label: "最近保存",
+                    value: savedAtText
+                  },
+                  {
+                    label: "加载状态",
+                    value: canChangeLoadedStorageData
+                      ? "可更换文件"
+                      : "空间内已锁定"
+                  }
+                ]}
               />
+              <StorageDataSaveControls controller={controller} />
+            </div>
+            <StorageDataSaveFeedback controller={controller} />
+            {storageDataDraftText ? (
+              <div className="storage-data-feedback">
+                <TextareaField
+                  className="storage-data-draft-field"
+                  label="未保存草稿文件内容"
+                  onChange={() => undefined}
+                  value={storageDataDraftText}
+                />
+              </div>
             ) : null}
           </>
         ) : (
@@ -214,4 +258,12 @@ function formatCompactStorageDataId(storageDataId: string): string {
     return storageDataId;
   }
   return `${storageDataId.slice(0, 14)}...${storageDataId.slice(-6)}`;
+}
+
+function formatStorageDataSavedAt(updatedAt: string | null): string {
+  return updatedAt
+    ? new Date(updatedAt).toLocaleString("zh-CN", {
+        hour12: false
+      })
+    : "未保存";
 }

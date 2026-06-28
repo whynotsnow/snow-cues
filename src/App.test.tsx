@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from "@testing-library/react";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 import { getSpace, listPasswordEntriesBySpace } from "./storage-data";
 import {
@@ -55,6 +55,21 @@ describe("Snow Cues 应用冒烟流程", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "新建存储数据" }));
     await screen.findByText(/存储数据 ID/);
+    const storageDataCard = screen.getByLabelText("当前存储数据文件");
+    expect(
+      within(storageDataCard).getByLabelText("改动状态：已同步")
+    ).toBeInTheDocument();
+    expect(within(storageDataCard).getByText("revision")).toBeInTheDocument();
+    expect(within(storageDataCard).getByText("最近保存")).toBeInTheDocument();
+    expect(within(storageDataCard).getByText("加载状态")).toBeInTheDocument();
+    expect(
+      within(storageDataCard).getByRole("button", { name: "保存存储数据" })
+    ).toBeDisabled();
+    expect(
+      within(storageDataCard).getByRole("button", {
+        name: "导出未保存草稿"
+      })
+    ).toBeDisabled();
     expect(
       screen.getByRole("link", { name: "下载保存包 .zip" })
     ).toHaveAttribute("download", expect.stringMatching(/\.zip$/));
@@ -79,9 +94,26 @@ describe("Snow Cues 应用冒烟流程", () => {
     await waitFor(() =>
       expect(screen.getByText("新密码已生成并加密保存。")).toBeInTheDocument()
     );
+    const storageDataCard = screen.getByLabelText("当前存储数据文件");
+    expect(
+      within(storageDataCard).getByLabelText("改动状态：有未保存改动")
+    ).toBeInTheDocument();
+    expect(
+      within(storageDataCard).getByRole("button", { name: "保存存储数据" })
+    ).toBeEnabled();
+    expect(
+      within(storageDataCard).getByRole("button", {
+        name: "导出未保存草稿"
+      })
+    ).toBeEnabled();
 
     fireEvent.click(screen.getByRole("button", { name: "保存存储数据" }));
     await screen.findByRole("heading", { name: "保存前摘要" });
+    expect(
+      within(screen.getByLabelText("存储数据保存反馈")).getByText(
+        /摘要不会展示密文/
+      )
+    ).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "确认保存存储数据" }));
     await waitFor(() =>
       expect(
@@ -91,7 +123,9 @@ describe("Snow Cues 应用冒烟流程", () => {
       ).toBeInTheDocument()
     );
     expect(
-      screen.getByRole("link", { name: "下载保存包 .zip" })
+      within(screen.getByLabelText("存储数据保存反馈")).getByRole("link", {
+        name: "下载保存包 .zip"
+      })
     ).toHaveAttribute("download", expect.stringMatching(/\.zip$/));
 
     fireEvent.click(screen.getByRole("button", { name: "解密" }));

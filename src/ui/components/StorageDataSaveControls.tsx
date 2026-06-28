@@ -1,4 +1,4 @@
-import { ActionGroup, Button, Card, SectionHeader } from "../design-system";
+import { ActionGroup, Button } from "../design-system";
 import { formatStorageDataSummary } from "../storageDataSummary";
 import type { AppController } from "../useAppController";
 
@@ -11,16 +11,15 @@ export function StorageDataSaveControls({
 }: StorageDataSaveControlsProps) {
   const {
     storageDataDirty,
-    storageDataDownloadPackage,
-    storageDataSaveSummary,
-    handleCancelStorageDataSave,
-    handleConfirmStorageDataSave,
     handleExportStorageDataDraft,
     handlePrepareStorageDataSave
   } = controller;
 
   return (
-    <div className="storage-save-controls" aria-label="存储数据保存操作">
+    <div
+      className="storage-save-controls storage-data-actions"
+      aria-label="存储数据保存操作"
+    >
       <ActionGroup variant="tool">
         <Button
           disabled={!storageDataDirty}
@@ -36,13 +35,32 @@ export function StorageDataSaveControls({
           导出未保存草稿
         </Button>
       </ActionGroup>
+    </div>
+  );
+}
 
+export function StorageDataSaveFeedback({
+  controller
+}: StorageDataSaveControlsProps) {
+  const {
+    storageDataDownloadPackage,
+    storageDataSaveSummary,
+    handleCancelStorageDataSave,
+    handleConfirmStorageDataSave
+  } = controller;
+
+  if (!storageDataSaveSummary && !storageDataDownloadPackage) {
+    return null;
+  }
+
+  return (
+    <div className="storage-data-feedback" aria-label="存储数据保存反馈">
       {storageDataSaveSummary ? (
-        <Card tone="subtle" aria-label="保存摘要">
-          <SectionHeader
-            description="摘要不会展示密文、关键密钥、平台或备注全文。"
-            title="保存前摘要"
-          />
+        <section className="storage-data-feedback-panel" aria-label="保存摘要">
+          <div>
+            <h3>保存前摘要</h3>
+            <p>摘要不会展示密文、关键密钥、平台或备注全文。</p>
+          </div>
           <p className="login-note">
             {formatStorageDataSummary(storageDataSaveSummary)}
           </p>
@@ -55,19 +73,18 @@ export function StorageDataSaveControls({
             </Button>
             <Button onClick={() => handleCancelStorageDataSave()}>取消</Button>
           </ActionGroup>
-        </Card>
+        </section>
       ) : null}
-
       {storageDataDownloadPackage ? (
-        <Card tone="subtle" aria-label="下载保存包">
-          <SectionHeader
-            description={
-              storageDataDownloadPackage.desktopScriptsIncluded
+        <section className="storage-data-feedback-panel" aria-label="下载保存包">
+          <div>
+            <h3>保存包已生成</h3>
+            <p>
+              {storageDataDownloadPackage.desktopScriptsIncluded
                 ? "桌面保存包包含固定脚本模板。先编辑 storageData-path.txt，再运行对应系统脚本。"
-                : "移动端保存包不包含脚本。请按 README 手动放置 current 和 revision 文件。"
-            }
-            title="保存包已生成"
-          />
+                : "移动端保存包不包含脚本。请按 README 手动放置 current 和 revision 文件。"}
+            </p>
+          </div>
           <a
             className="download-link primary-button"
             download={storageDataDownloadPackage.fileName}
@@ -75,7 +92,7 @@ export function StorageDataSaveControls({
           >
             下载保存包 .zip
           </a>
-        </Card>
+        </section>
       ) : null}
     </div>
   );

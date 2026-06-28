@@ -116,6 +116,14 @@ describe("空间外索引与创建入口", () => {
 
     await screen.findByText("空间：locked-space");
     expect(screen.getByText(/空间内已锁定当前加载文件/)).toBeInTheDocument();
+    const storageDataCard = screen.getByLabelText("当前存储数据文件");
+    expect(
+      within(storageDataCard).getByLabelText("加载状态：空间内锁定")
+    ).toBeInTheDocument();
+    expect(within(storageDataCard).getByText("数据集")).toBeInTheDocument();
+    expect(within(storageDataCard).getByText("revision")).toBeInTheDocument();
+    expect(within(storageDataCard).getByText("最近保存")).toBeInTheDocument();
+    expect(within(storageDataCard).getByText("加载状态")).toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: "新建存储数据" })
     ).not.toBeInTheDocument();
