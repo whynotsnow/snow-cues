@@ -1,9 +1,15 @@
 import { bytesToBase64, utf8ToBytes } from "../lib/bytes";
+import {
+  hmacSha256,
+  ImportedRuleAlgorithmRegistry,
+  isImportedRuleAlgorithmId,
+  supportedImportedRuleAlgorithms,
+  type CryptoRule,
+  type ImportedRuleAlgorithmId,
+  type ImportedRuleParams
+} from "./imported-rule-algorithms";
 
-export type CryptoRule = (
-  masterKey: CryptoKey,
-  salt: string
-) => Promise<string>;
+export type { CryptoRule, ImportedRuleAlgorithmId };
 
 export type RuleDefinition = {
   id: string;
@@ -20,19 +26,11 @@ export type ActiveRuleId = RuleId | string;
 export type ImportedRuleManifest = {
   id: string;
   name: string;
-  algorithm: "hmac-sha256" | "pbkdf2-sha256";
+  algorithm: ImportedRuleAlgorithmId;
   namespace?: string;
   iterations?: number;
+  params?: ImportedRuleParams;
 };
-
-async function hmacSha256(masterKey: CryptoKey, salt: string): Promise<string> {
-  const signature = await crypto.subtle.sign(
-    "HMAC",
-    masterKey,
-    utf8ToBytes(salt)
-  );
-  return bytesToBase64(new Uint8Array(signature));
-}
 
 async function pbkdf2Rule(masterKey: CryptoKey, salt: string): Promise<string> {
   const hmacMaterial = await hmacSha256(
@@ -122,73 +120,65 @@ export function parseImportedRuleManifest(input: string): ImportedRuleManifest {
   const id = normalizeImportedId(parsed.id);
   const name = normalizeImportedName(parsed.name);
   const algorithm = parsed.algorithm;
-  if (algorithm !== "hmac-sha256" && algorithm !== "pbkdf2-sha256") {
-    throw new Error("导入规则只允许 hmac-sha256 或 pbkdf2-sha256。");
+  if (!isImportedRuleAlgorithmId(algorithm)) {
+    throw new Error(
+      `导入规则只允许已注册算法：${supportedImportedRuleAlgorithms().join("、")}。`
+    );
   }
 
   const namespace =
     typeof parsed.namespace === "string" && parsed.namespace.trim()
       ? parsed.namespace.trim()
       : id;
-  const iterations =
+  const algorithmDefinition = ImportedRuleAlgorithmRegistry[algorithm];
+  const legacyIterations =
     typeof parsed.iterations === "number" && Number.isInteger(parsed.iterations)
-      ? Math.min(Math.max(parsed.iterations, 100_000), 600_000)
-      : 210_000;
+      ? parsed.iterations
+      : undefined;
+  const params: ImportedRuleParams = algorithmDefinition.normalizeParams({
+    namespace,
+    legacyIterations,
+    params: normalizeParamsInput(parsed.params)
+  });
+  const iterations =
+    typeof params.iterations === "number" ? params.iterations : undefined;
 
   return {
     id,
     name,
     algorithm,
     namespace,
-    iterations
+    iterations,
+    params
   };
 }
 
 export function createImportedRule(
   manifest: ImportedRuleManifest
 ): RuleDefinition {
-  if (manifest.algorithm === "hmac-sha256") {
-    return {
-      id: manifest.id,
-      label: manifest.name,
-      available: true,
-      origin: "导入规则",
-      description: `声明式 HMAC-SHA256 规则，namespace=${manifest.namespace}。`,
-      execute: (masterKey, salt) =>
-        hmacSha256(masterKey, `${manifest.namespace}:${salt}`)
-    };
+  if (!isImportedRuleAlgorithmId(manifest.algorithm)) {
+    throw new Error(`导入规则算法未注册：${manifest.algorithm}`);
   }
+  const namespace = manifest.namespace ?? manifest.id;
+  const algorithmDefinition = ImportedRuleAlgorithmRegistry[manifest.algorithm];
+  const params: ImportedRuleParams = algorithmDefinition.normalizeParams({
+    namespace,
+    legacyIterations: manifest.iterations,
+    params: manifest.params
+  });
+  const normalizedManifest = {
+    ...manifest,
+    namespace,
+    params
+  };
 
   return {
     id: manifest.id,
     label: manifest.name,
     available: true,
     origin: "导入规则",
-    description: `声明式 PBKDF2-SHA256 规则，iterations=${manifest.iterations}，namespace=${manifest.namespace}。`,
-    execute: async (masterKey, salt) => {
-      const hmacMaterial = await hmacSha256(
-        masterKey,
-        `${manifest.namespace}:material:${salt}`
-      );
-      const keyMaterial = await crypto.subtle.importKey(
-        "raw",
-        utf8ToBytes(hmacMaterial),
-        "PBKDF2",
-        false,
-        ["deriveBits"]
-      );
-      const bits = await crypto.subtle.deriveBits(
-        {
-          name: "PBKDF2",
-          hash: "SHA-256",
-          salt: utf8ToBytes(`${manifest.namespace}:salt:${salt}`),
-          iterations: manifest.iterations
-        },
-        keyMaterial,
-        256
-      );
-      return bytesToBase64(new Uint8Array(bits));
-    }
+    description: algorithmDefinition.description(normalizedManifest),
+    execute: algorithmDefinition.createExecute(normalizedManifest)
   };
 }
 
@@ -215,4 +205,16 @@ function normalizeImportedName(value: unknown): string {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function normalizeParamsInput(
+  value: unknown
+): Record<string, unknown> | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+  if (!isRecord(value)) {
+    throw new Error("导入规则 params 必须是对象。");
+  }
+  return value;
 }

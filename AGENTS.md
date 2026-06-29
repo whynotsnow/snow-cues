@@ -70,7 +70,7 @@ v2.3 版本以用户显式维护的 `storageData` 文件夹作为唯一业务数
 - 不添加 UI 组件库。
 - 不添加远程规则市场。
 - 不执行用户上传的 JavaScript 规则。
-- 导入规则只能使用声明式 JSON 映射到允许的内置算法模板，不能导入、拼接、解释或执行代码。
+- 导入规则只能使用声明式 JSON 映射到源码/构建期已注册的算法模板；`params` 只能包含模板白名单允许的公开非秘密参数，不能导入、拼接、解释或执行代码。
 - 不用纯 JavaScript 密码学库替代核心 WebCrypto 链路，不为了兼容非安全上下文而降低 PBKDF2、HMAC、AES-GCM、SHA-256 或 non-extractable `CryptoKey` 安全边界。
 - 遇到 `crypto.subtle`、安全上下文或文件夹访问能力缺失时，应在 UI 中给出明确中文阻断提示，引导使用 Cloudflare Pages HTTPS 正式地址或受信任的本机 `localhost` 环境。
 - 不把派生输入或单条密码可重建派生输入的元数据写入 `storageData`、IndexedDB、localStorage、sessionStorage、URL 或其他文件。

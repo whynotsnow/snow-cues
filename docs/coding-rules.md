@@ -32,7 +32,7 @@
 - 新增或调整 `PasswordEntry`、`PasswordGroup`、`spaceProfiles`、`migrationBatches` 或 `migrationEntries` 字段前，必须同时检查 `docs/security-boundaries.md`。
 - 修改 storage schema、字段清理、canonical JSON、contentHash 或 diff 行为时，必须同步更新存储测试。
 - 修改密码生成、加密、session、记忆提示或游离密码时，必须优先运行对应模块聚焦测试。
-- 规则导入仍然只能是声明式 JSON 映射到允许的内置算法模板，不能导入、拼接、解释或执行代码。
+- 规则导入仍然只能是声明式 JSON 映射到 `src/rule-registry/imported-rule-algorithms.ts` 中源码/构建期已注册的算法模板，不能导入、拼接、解释或执行代码。新增算法配置时必须在对应算法模板内实现 `params` 白名单校验、归一化和安全限幅；自部署扩展算法应修改算法注册表并自行构建，不得让 URL、`storageData` 或远程配置成为算法代码入口。
 
 ## 测试归属
 

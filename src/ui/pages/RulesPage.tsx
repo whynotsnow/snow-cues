@@ -19,14 +19,21 @@ const DEV_SAMPLE_RULE_MANIFESTS = [
     id: "imported-office",
     name: "办公规则",
     algorithm: "hmac-sha256",
-    namespace: "office"
+    namespace: "office",
+    params: {
+      saltPrefix: "office-v1"
+    }
   },
   {
     id: "imported-finance",
     name: "财务规则",
     algorithm: "pbkdf2-sha256",
     namespace: "finance",
-    iterations: 260_000
+    params: {
+      iterations: 260_000,
+      materialLabel: "material",
+      saltLabel: "salt"
+    }
   }
 ] as const;
 
@@ -193,7 +200,7 @@ export function RulesPage({ controller }: RulesPageProps) {
       <form className="rule-import" onSubmit={handleImportRule}>
         <TextareaField
           disabled={ruleProfileConfirmed || !draftRuleProfileAllowed}
-          hint="支持单个声明式规则 JSON 对象，或由多个规则对象组成的 JSON 数组。规则 ID 需使用 imported- 前缀。"
+          hint="支持单个声明式规则 JSON 对象，或由多个规则对象组成的 JSON 数组。规则 ID 需使用 imported- 前缀；params 只接受对应算法模板允许的公开参数。"
           label="导入声明式规则或规则数组"
           onChange={(event) => setRuleImportText(event.target.value)}
           placeholder="粘贴声明式规则 JSON"
