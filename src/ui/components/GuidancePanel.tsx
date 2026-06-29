@@ -64,21 +64,58 @@ function GuidanceCardView({
       ) : null}
       <div className="guidance-actions">
         {card.primaryAction ? (
-          <button
-            className={isPrimary ? "primary-button" : undefined}
-            onClick={() => onAction(card.primaryAction!)}
-            type="button"
-          >
-            {card.primaryAction.label}
-          </button>
+          <GuidanceActionControl
+            action={card.primaryAction}
+            isPrimary={isPrimary}
+            onAction={onAction}
+          />
         ) : null}
         {card.secondaryAction ? (
-          <button onClick={() => onAction(card.secondaryAction!)} type="button">
-            {card.secondaryAction.label}
-          </button>
+          <GuidanceActionControl
+            action={card.secondaryAction}
+            isPrimary={false}
+            onAction={onAction}
+          />
         ) : null}
       </div>
     </article>
+  );
+}
+
+type GuidanceActionControlProps = {
+  action: GuidanceAction;
+  isPrimary: boolean;
+  onAction: (action: GuidanceAction) => void;
+};
+
+function GuidanceActionControl({
+  action,
+  isPrimary,
+  onAction
+}: GuidanceActionControlProps) {
+  const className = isPrimary ? "primary-button" : undefined;
+
+  if (action.type === "external-link") {
+    return (
+      <a
+        className={className ? `button-link ${className}` : "button-link"}
+        href={action.href}
+        rel="noreferrer"
+        target="_blank"
+      >
+        {action.label}
+      </a>
+    );
+  }
+
+  return (
+    <button
+      className={className}
+      onClick={() => onAction(action)}
+      type="button"
+    >
+      {action.label}
+    </button>
   );
 }
 

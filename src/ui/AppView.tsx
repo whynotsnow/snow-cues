@@ -20,7 +20,7 @@ type AppViewProps = {
 export function AppView({ controller }: AppViewProps) {
   const { activePage, currentSpaceId, outsideSpace, setActivePage } =
     controller;
-  const guidance = getUserGuidance(controller);
+  const guidance = getUserGuidance(controller, { includeDocumentation: true });
   const showDevTools = import.meta.env.DEV;
   const initialHashApplied = useRef(false);
   const scrollResetKey = `${outsideSpace ? "outside" : currentSpaceId}:${activePage}`;
@@ -95,6 +95,10 @@ export function AppView({ controller }: AppViewProps) {
     if (action.type === "open-create-space") {
       navigateToPage("space");
       controller.setOutsideShowCreateSpaceOptions(true);
+      return;
+    }
+    if (action.type === "external-link") {
+      window.open(action.href, "_blank", "noreferrer");
       return;
     }
     navigateToPage("passwords");

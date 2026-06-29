@@ -1,4 +1,5 @@
 import type { AppPage } from "./appTypes";
+import { DOCS_SITE_URL } from "./externalLinks";
 import type { AppController } from "./useAppController";
 
 export type GuidanceStepStatus = "done" | "current" | "blocked" | "pending";
@@ -11,7 +12,8 @@ export type GuidanceStep = {
 export type GuidanceAction =
   | { type: "navigate"; label: string; targetPage: AppPage }
   | { type: "open-create-space"; label: string }
-  | { type: "open-create-password"; label: string };
+  | { type: "open-create-password"; label: string }
+  | { type: "external-link"; label: string; href: string };
 
 export type GuidanceCardStatus = "active" | "ready" | "blocked";
 
@@ -62,7 +64,8 @@ const guidancePriority = {
   ruleSetup: 80,
   migration: 70,
   detachedImport: 60,
-  regularWork: 40
+  regularWork: 40,
+  documentation: 10
 };
 
 const setupSteps: GuidanceStep[] = [
@@ -72,7 +75,14 @@ const setupSteps: GuidanceStep[] = [
   { label: "创建第一条密码", status: "pending" }
 ];
 
-export function getUserGuidance(input: GuidanceInput): UserGuidance {
+type UserGuidanceOptions = {
+  includeDocumentation?: boolean;
+};
+
+export function getUserGuidance(
+  input: GuidanceInput,
+  options: UserGuidanceOptions = {}
+): UserGuidance {
   const cards = input.outsideSpace
     ? buildOutsideSpaceGuidance(input)
     : [
@@ -85,9 +95,28 @@ export function getUserGuidance(input: GuidanceInput): UserGuidance {
         buildMigrationGuidance(input),
         buildReadySpaceGuidance(input)
       ].filter((card): card is GuidanceCard => Boolean(card));
+  const visibleCards = options.includeDocumentation
+    ? [...cards, buildDocumentationGuidance()]
+    : cards;
 
   return {
-    cards: cards.sort((a, b) => b.priority - a.priority)
+    cards: visibleCards.sort((a, b) => b.priority - a.priority)
+  };
+}
+
+function buildDocumentationGuidance(): GuidanceCard {
+  return {
+    id: "documentation",
+    priority: guidancePriority.documentation,
+    title: "查看产品资料与文档",
+    body: "产品介绍站整理了 Snow Cues 的定位、推荐运行环境、storageData 使用方式和常见流程说明。需要完整背景或操作解释时，可以从这里离开应用查看资料。",
+    status: "active",
+    steps: [],
+    primaryAction: {
+      type: "external-link",
+      label: "打开资料站",
+      href: DOCS_SITE_URL
+    }
   };
 }
 

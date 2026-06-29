@@ -1,6 +1,7 @@
 import type { AppController } from "../useAppController";
 import { spaceStatusLabels } from "../useAppController";
 import type { AppPage } from "../appTypes";
+import { DOCS_SITE_URL } from "../externalLinks";
 import { SpaceIcon } from "../icons";
 import { ThemeToggle } from "./ThemeToggle";
 
@@ -102,6 +103,23 @@ export function NavRail({ controller, navigateToPage }: NavRailProps) {
           </div>
         )}
       </div>
+
+      <section className="nav-rail-docs" aria-label="产品资料">
+        <div>
+          <p className="nav-rail-docs-title">资料与文档</p>
+          <p className="nav-rail-docs-body">
+            查看产品介绍、推荐运行环境和 storageData 使用说明。
+          </p>
+        </div>
+        <a
+          className="nav-rail-docs-link"
+          href={DOCS_SITE_URL}
+          rel="noreferrer"
+          target="_blank"
+        >
+          打开资料站
+        </a>
+      </section>
 
       <div className="nav-rail-actions">
         {!outsideSpace ? (
