@@ -9,6 +9,7 @@ import {
   Button,
   Card,
   CheckboxField,
+  CopyableSecret,
   NumberField,
   SectionHeader,
   SelectField,
@@ -43,9 +44,7 @@ export function DetachedPasswordPage({
     detachedPasswordVisible,
     setDetachedPasswordVisible,
     detachedGenerating,
-    detachedCopyStatus,
     handleGenerateDetachedPassword,
-    handleCopyDetachedPassword,
     handleClearDetachedPassword,
     handleStartDetachedPasswordMigration
   } = controller;
@@ -160,37 +159,33 @@ export function DetachedPasswordPage({
         </ActionGroup>
       </form>
       {detachedPasswordPreview ? (
-        <div className="detached-result">
-          <span>
-            {detachedApplyOutputPolicy ? "策略处理预览" : "核心密码预览"}
-          </span>
-          <code>
-            {detachedPasswordVisible
+        <CopyableSecret
+          actions={
+            <ActionGroup variant="entry">
+              <Button
+                onClick={() =>
+                  setDetachedPasswordVisible(!detachedPasswordVisible)
+                }
+              >
+                {detachedPasswordVisible ? "隐藏" : "显示"}
+              </Button>
+              <Button
+                onClick={handleStartDetachedPasswordMigration}
+                variant="primary"
+              >
+                迁移到空间
+              </Button>
+            </ActionGroup>
+          }
+          className="detached-result"
+          copyValue={detachedPasswordPreview}
+          label={detachedApplyOutputPolicy ? "策略处理预览" : "核心密码预览"}
+          value={
+            detachedPasswordVisible
               ? detachedPasswordPreview
-              : "••••••••••••••••••••••••"}
-          </code>
-          <ActionGroup variant="entry">
-            <Button
-              onClick={() =>
-                setDetachedPasswordVisible(!detachedPasswordVisible)
-              }
-            >
-              {detachedPasswordVisible ? "隐藏" : "显示"}
-            </Button>
-            <Button onClick={() => void handleCopyDetachedPassword()}>
-              复制
-            </Button>
-            <Button
-              onClick={handleStartDetachedPasswordMigration}
-              variant="primary"
-            >
-              迁移到空间
-            </Button>
-          </ActionGroup>
-          {detachedCopyStatus ? (
-            <p className="login-note">{detachedCopyStatus}</p>
-          ) : null}
-        </div>
+              : "••••••••••••••••••••••••"
+          }
+        />
       ) : null}
     </Card>
   );

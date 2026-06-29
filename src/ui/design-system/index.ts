@@ -3,6 +3,8 @@ export { Button } from "./Button";
 export type { ButtonProps } from "./Button";
 export { Card } from "./Card";
 export type { CardProps } from "./Card";
+export { CopyableSecret } from "./CopyableSecret";
+export type { CopyableSecretProps } from "./CopyableSecret";
 export { DescriptionList } from "./DescriptionList";
 export type { DescriptionListItem } from "./DescriptionList";
 export { EmptyState } from "./EmptyState";

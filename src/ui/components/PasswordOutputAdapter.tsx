@@ -7,7 +7,12 @@ import {
   type PasswordOutputPresetId
 } from "../../crypto-engine/output-policy";
 import type { PasswordGroup } from "../../storage-data";
-import { ActionGroup, Button, SelectField } from "../design-system";
+import {
+  ActionGroup,
+  Button,
+  CopyableSecret,
+  SelectField
+} from "../design-system";
 import { PasswordOutputPolicyFields } from "./PasswordOutputPolicyFields";
 
 type PasswordOutputAdapterProps = {
@@ -92,10 +97,12 @@ export function PasswordOutputAdapter({
           </span>
         </div>
       </div>
-      <div className="adapted-password-box">
-        <span>适配密码</span>
-        <code>{adaptedPassword || "无法生成适配密码"}</code>
-      </div>
+      <CopyableSecret
+        className="adapted-password-box"
+        disabled={!adaptedPassword}
+        label="适配密码"
+        value={adaptedPassword || "无法生成适配密码"}
+      />
       {adapterError ? <p className="field-note">{adapterError}</p> : null}
       <ActionGroup variant="entry">
         <Button onClick={() => setEditingPolicy((value) => !value)}>

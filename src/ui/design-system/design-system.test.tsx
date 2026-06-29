@@ -5,6 +5,7 @@ import {
   Button,
   Card,
   CheckboxField,
+  CopyableSecret,
   EmptyState,
   SectionHeader,
   TextField
@@ -80,5 +81,28 @@ describe("design-system", () => {
     ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "刷新" })).toBeInTheDocument();
     expect(screen.getByText("暂无数据")).toBeInTheDocument();
+  });
+
+  it("copies CopyableSecret values and reports status", async () => {
+    const originalClipboard = navigator.clipboard;
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: { writeText }
+    });
+
+    try {
+      render(<CopyableSecret label="已解密核心密码" value="secret-value" />);
+
+      fireEvent.click(screen.getByRole("button", { name: "复制" }));
+
+      expect(writeText).toHaveBeenCalledWith("secret-value");
+      expect(await screen.findByRole("status")).toHaveTextContent("已复制。");
+    } finally {
+      Object.defineProperty(navigator, "clipboard", {
+        configurable: true,
+        value: originalClipboard
+      });
+    }
   });
 });

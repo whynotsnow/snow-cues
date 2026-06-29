@@ -41,7 +41,6 @@ export function useDetachedPasswordController({
   const [detachedPasswordPreview, setDetachedPasswordPreview] = useState("");
   const [detachedPasswordVisible, setDetachedPasswordVisible] = useState(false);
   const [detachedGenerating, setDetachedGenerating] = useState(false);
-  const [detachedCopyStatus, setDetachedCopyStatus] = useState("");
   const [pendingDetachedEntrySecret, setPendingDetachedEntrySecret] =
     useState("");
   const [detachedMigrationFormVisible, setDetachedMigrationFormVisible] =
@@ -50,7 +49,6 @@ export function useDetachedPasswordController({
   async function handleGenerateDetachedPassword() {
     setError("");
     setStatus("");
-    setDetachedCopyStatus("");
     if (!coreCryptoAvailable) {
       setError(coreCryptoUnavailableMessage);
       return;
@@ -88,23 +86,10 @@ export function useDetachedPasswordController({
     }
   }
 
-  async function handleCopyDetachedPassword() {
-    if (!detachedPasswordPreview) {
-      return;
-    }
-    try {
-      await navigator.clipboard?.writeText(detachedPasswordPreview);
-      setDetachedCopyStatus("已复制。");
-    } catch {
-      setDetachedCopyStatus("当前浏览器不允许自动复制，请手动复制。");
-    }
-  }
-
   function handleClearDetachedPassword() {
     setDetachedDerivationKey("");
     setDetachedPasswordPreview("");
     setDetachedPasswordVisible(false);
-    setDetachedCopyStatus("");
     setPendingDetachedEntrySecret("");
     setDetachedMigrationFormVisible(false);
     setStatus("已清空本次游离密码。");
@@ -132,7 +117,6 @@ export function useDetachedPasswordController({
     setDetachedDerivationKey("");
     setDetachedPasswordPreview("");
     setDetachedPasswordVisible(false);
-    setDetachedCopyStatus("");
     setPendingDetachedEntrySecret("");
     setDetachedMigrationFormVisible(false);
   }
@@ -156,12 +140,10 @@ export function useDetachedPasswordController({
     detachedPasswordVisible,
     setDetachedPasswordVisible,
     detachedGenerating,
-    detachedCopyStatus,
     pendingDetachedEntrySecret,
     detachedMigrationFormVisible,
     setDetachedMigrationFormVisible,
     handleGenerateDetachedPassword,
-    handleCopyDetachedPassword,
     handleClearDetachedPassword,
     handleStartDetachedPasswordMigration,
     handleCancelDetachedPasswordMigration,

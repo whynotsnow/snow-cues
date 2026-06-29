@@ -1021,12 +1021,48 @@ h2 {
 }
 
 .group-summary span,
-.adapted-password-box span,
-.entry-secret span {
+.copyable-secret-label {
   color: var(--muted-fg);
   display: block;
   font-size: 0.85rem;
   margin-bottom: 0.25rem;
+}
+
+.copyable-secret {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.copyable-secret-main {
+  min-width: 0;
+}
+
+.copyable-secret code {
+  display: block;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.copyable-secret-controls {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.copyable-secret-controls .entry-actions {
+  margin: 0;
+}
+
+.copyable-secret-status {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--muted-fg);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  margin: 0;
+  padding: 0.5rem 0.6rem;
 }
 
 .output-adapter-panel {
@@ -1050,14 +1086,7 @@ h2 {
 }
 
 .adapted-password-box {
-  display: grid;
   gap: 0.25rem;
-}
-
-.adapted-password-box code {
-  display: block;
-  overflow-wrap: anywhere;
-  white-space: pre-wrap;
 }
 
 .nav-rail-nav,
@@ -1467,21 +1496,9 @@ h2 {
   background: var(--muted);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  display: grid;
   gap: 0.65rem;
   margin-top: 0.75rem;
   padding: 0.85rem;
-}
-
-.detached-result span {
-  color: var(--muted-fg);
-  font-size: 0.85rem;
-  font-weight: 750;
-}
-
-.detached-result code {
-  overflow-wrap: anywhere;
-  white-space: pre-wrap;
 }
 
 .space-index-section {
@@ -1736,7 +1753,6 @@ h2 {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   min-height: 2.5rem;
-  overflow-wrap: anywhere;
   padding: 0.7rem;
 }
 

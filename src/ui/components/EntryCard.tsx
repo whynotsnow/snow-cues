@@ -3,6 +3,7 @@ import type { PasswordEntry } from "../../storage-data";
 import {
   ActionGroup,
   Button,
+  CopyableSecret,
   DescriptionList,
   SelectField,
   TextareaField,
@@ -286,26 +287,26 @@ export function EntryCard({
           <small>请根据提示重新输入关键密钥后再次解密。</small>
         </div>
       ) : null}
-      <div
+      <CopyableSecret
         className={
           isEditing ? "entry-secret entry-secret-editing" : "entry-secret"
         }
-      >
-        <span>
-          {isEditing
+        disabled={isEditing || visibleEntryId !== entry.id}
+        label={
+          isEditing
             ? "密码内容"
             : visibleEntryId === entry.id
               ? "已解密核心密码"
-              : "密码状态"}
-        </span>
-        <code>
-          {isEditing
+              : "密码状态"
+        }
+        value={
+          isEditing
             ? "当前不支持编辑密码"
             : visibleEntryId === entry.id
               ? visiblePassword
-              : "加密密码"}
-        </code>
-      </div>
+              : "加密密码"
+        }
+      />
       {!isEditing && visibleEntryId === entry.id ? (
         <PasswordOutputAdapter
           corePassword={visiblePassword}
