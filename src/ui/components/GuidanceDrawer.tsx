@@ -154,7 +154,11 @@ export function GuidanceDrawer({ guidance, onAction }: GuidanceDrawerProps) {
           {collapsed ? "操作指引" : "收起指引"}
         </span>
         <span className="guidance-drawer-toggle-icon">
-          {collapsed ? <ChevronLeftIcon size={16} /> : <ChevronRightIcon size={16} />}
+          {collapsed ? (
+            <ChevronLeftIcon size={16} />
+          ) : (
+            <ChevronRightIcon size={16} />
+          )}
         </span>
       </button>
       {!collapsed && (

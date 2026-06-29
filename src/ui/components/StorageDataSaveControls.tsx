@@ -76,7 +76,10 @@ export function StorageDataSaveFeedback({
         </section>
       ) : null}
       {storageDataDownloadPackage ? (
-        <section className="storage-data-feedback-panel" aria-label="下载保存包">
+        <section
+          className="storage-data-feedback-panel"
+          aria-label="下载保存包"
+        >
           <div>
             <h3>保存包已生成</h3>
             <p>
